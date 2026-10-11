@@ -4,3421 +4,521 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>NexaChat</title>
+<style>
+:root{--bg:#081321;--panel:#102238;--card:#17304a;--text:#f3f7ff;--muted:#a8bdd2;--accent:#22c7a9;--border:#29445e;--danger:#ff657a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+header{height:48px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:8px}
+.logo{font-size:19px;font-weight:bold;color:var(--accent)}
+#onlineCount{font-size:12px;color:var(--accent)}
+main{padding:12px;max-width:520px;margin:auto}
+.hidden{display:none!important}
+h2{font-size:20px;margin:6px 0 14px}
+h3{font-size:16px;margin:0 0 10px}
+p{color:var(--muted);line-height:1.4}
+input{width:100%;padding:12px;margin:5px 0 10px;background:#07101d;border:1px solid var(--border);border-radius:6px;color:white;outline:none}
+input:focus,button:focus{border-color:var(--accent);outline:1px solid var(--accent)}
+.btn{width:100%;padding:12px;background:var(--accent);color:#041b19;border:0;border-radius:6px;font-weight:bold;margin:4px 0}
+.btn.secondary{background:var(--card);color:white;border:1px solid var(--border)}
+.btn.danger{background:var(--danger);color:#22040a}
+.card{background:var(--panel);border:1px solid var(--border);padding:12px;border-radius:8px;margin:9px 0}
+.row{display:flex;align-items:center;gap:8px}
+.row>*{min-width:0}
+.userrow{padding:12px;background:var(--panel);border-bottom:1px solid var(--border);cursor:pointer}
+.userrow:focus{background:var(--card)}
+.small{font-size:12px;color:var(--muted)}
+.error{color:#ff8293;font-size:13px;white-space:pre-wrap}
+#messages{height:calc(100dvh - 185px);min-height:180px;overflow-y:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px}
+.msg{padding:8px 9px;margin:7px 0;background:var(--panel);border-radius:7px;overflow-wrap:anywhere}
+.msghead{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px}
+.sender{color:var(--accent);font-weight:bold}
+.time{font-size:10px;color:var(--muted);white-space:nowrap}
+.msgtext{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.4}
+#composer{display:flex;gap:6px;margin-top:8px}
+#composer input{margin:0;flex:1;min-width:0}
+#composer button{width:65px;margin:0}
+#typing{height:18px;color:var(--accent);font-size:12px;padding:3px}
+.softkeys{position:fixed;bottom:0;left:0;right:0;height:29px;background:#020810;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:12px;z-index:5}
+body{padding-bottom:35px}
+#status{font-size:13px;color:var(--muted);margin:8px 0;white-space:pre-wrap}
+#userList{max-height:55dvh;overflow:auto}
+hr{border:0;border-top:1px solid var(--border);margin:14px 0}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">✦ NexaChat</div>
+  <div id="onlineCount">● 0 online</div>
+</header>
+
+<main>
+  <section id="authView">
+    <div class="card">
+      <h2>Welcome to NexaChat</h2>
+      <p>Simple, fast chat for KaiOS.</p>
+      <label for="username">Username</label>
+      <input id="username" maxlength="20" autocomplete="username" placeholder="Letters, numbers, underscore">
+      <label for="password">Password</label>
+      <input id="password" type="password" maxlength="64" autocomplete="current-password" placeholder="At least 6 characters">
+      <button id="loginBtn" class="btn">LOGIN</button>
+      <button id="signupBtn" class="btn secondary">CREATE ACCOUNT</button>
+      <div id="authError" class="error" role="alert"></div>
+    </div>
+  </section>
+
+  <section id="homeView" class="hidden">
+    <h2 id="welcome">Hello!</h2>
+    <button class="btn" id="worldBtn">🌎 World Lounge</button>
+    <button class="btn secondary" id="inboxBtn">💬 Private Chat / Users</button>
+    <button class="btn secondary" id="settingsBtn">⚙ Settings</button>
+    <div id="homeError" class="error"></div>
+  </section>
+
+  <section id="worldView" class="hidden">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h2 style="margin:0">🌎 World Lounge</h2>
+      <button class="btn secondary" style="width:auto;margin:0;padding:8px" id="worldRefresh">Refresh</button>
+    </div>
+    <div id="messages" aria-live="polite"></div>
+    <div id="typing"></div>
+    <div id="composer">
+      <input id="worldInput" maxlength="1000" placeholder="Write a message..." aria-label="Message">
+      <button class="btn" id="sendWorld">SEND</button>
+    </div>
+    <button class="btn secondary" id="worldUsersBtn">ONLINE USERS</button>
+  </section>
+
+  <section id="usersView" class="hidden">
+    <h2>Users</h2>
+    <input id="userSearch" maxlength="30" placeholder="Search username...">
+    <div id="userList"></div>
+    <div id="usersError" class="error"></div>
+  </section>
+
+  <section id="privateView" class="hidden">
+    <div class="row" style="justify-content:space-between">
+      <h2 id="privateTitle">Private Chat</h2>
+      <button class="btn secondary" style="width:auto;padding:8px" id="privateBack">BACK</button>
+    </div>
+    <div class="small">Text messages only</div>
+    <div id="privateMessages" style="height:calc(100dvh - 205px);min-height:160px;overflow:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px;margin-top:8px" aria-live="polite"></div>
+    <div id="privateTyping" class="small" style="height:18px"></div>
+    <div id="privateComposer" class="row">
+      <input id="privateInput" maxlength="1000" placeholder="Write a message..." aria-label="Private message">
+      <button id="sendPrivate" class="btn" style="width:65px">SEND</button>
+    </div>
+    <div id="privateError" class="error"></div>
+  </section>
+
+  <section id="settingsView" class="hidden">
+    <h2>Settings</h2>
+    <div class="card">
+      <p id="accountInfo"></p>
+      <button id="logoutBtn" class="btn danger">LOG OUT</button>
+    </div>
+    <p>Choose a theme</p>
+    <button class="btn secondary themeBtn" data-theme="dark">Midnight Blue</button>
+    <button class="btn secondary themeBtn" data-theme="light">White Theme</button>
+    <button class="btn secondary themeBtn" data-theme="ocean">Ocean Blue</button>
+    <div id="settingsError" class="error"></div>
+  </section>
+
+  <div id="status" role="status"></div>
+</main>
+
+<div class="softkeys">
+  <span id="softLeft">OPTIONS</span>
+  <span id="softCenter">OK</span>
+  <span id="softRight">BACK</span>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<style>
-*{box-sizing:border-box}
-
-html,body{
-margin:0;
-padding:0;
-width:100%;
-height:100%;
-overflow:hidden;
-font-family:Arial,sans-serif;
-background:#071426;
-color:#fff;
-}
-
-button,input{
-font:inherit;
-}
-
-button{
-cursor:pointer;
-outline:none;
-}
-
-.hidden{display:none!important}
-
-#loading{
-position:fixed;
-inset:0;
-background:#071426;
-z-index:99999;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-}
-
-.logo{
-width:72px;
-height:72px;
-border-radius:50%;
-background:#168cff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:36px;
-margin-bottom:14px;
-}
-
-.loadingText{
-font-size:17px;
-letter-spacing:2px;
-}
-
-.screen{
-width:100%;
-height:100vh;
-display:flex;
-flex-direction:column;
-overflow:hidden;
-}
-
-.header{
-height:58px;
-min-height:58px;
-background:#0d213a;
-border-bottom:1px solid #24445f;
-display:flex;
-align-items:center;
-padding:0 8px;
-position:relative;
-z-index:20;
-}
-
-.headerLeft{
-width:48px;
-display:flex;
-align-items:center;
-justify-content:flex-start;
-}
-
-.headerCenter{
-flex:1;
-min-width:0;
-text-align:center;
-overflow:hidden;
-}
-
-.headerRight{
-width:60px;
-display:flex;
-align-items:center;
-justify-content:flex-end;
-}
-
-.backBtn,
-.headerBtn{
-border:0;
-background:transparent;
-color:#fff;
-font-size:25px;
-padding:5px 8px;
-}
-
-.title{
-font-size:18px;
-font-weight:bold;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-}
-
-.subTitle{
-font-size:11px;
-margin-top:2px;
-}
-
-.onlineText{color:#35e879}
-.offlineText{color:#9ba9b7}
-
-.content{
-flex:1;
-min-height:0;
-overflow-y:auto;
-overflow-x:hidden;
-}
-
-.authWrap{
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:15px;
-}
-
-.card{
-width:100%;
-max-width:390px;
-background:#0d213a;
-border:1px solid #234765;
-border-radius:14px;
-padding:20px;
-}
-
-.card h1{
-text-align:center;
-margin:0 0 18px;
-}
-
-.card .logo{
-margin:0 auto 14px;
-}
-
-input{
-width:100%;
-padding:13px;
-margin:6px 0;
-background:#08192b;
-color:#fff;
-border:1px solid #315472;
-border-radius:9px;
-outline:none;
-}
-
-input:focus{
-border-color:#168cff;
-outline:2px solid #168cff;
-}
-
-.primaryBtn,
-.secondaryBtn{
-width:100%;
-padding:13px;
-margin-top:8px;
-border-radius:9px;
-font-weight:bold;
-}
-
-.primaryBtn{
-border:0;
-background:#168cff;
-color:#fff;
-}
-
-.secondaryBtn{
-border:1px solid #315472;
-background:#102943;
-color:#fff;
-}
-
-.homeMenu{
-padding:15px;
-}
-
-.menuBtn{
-width:100%;
-padding:17px 14px;
-margin:6px 0;
-border:1px solid #284b68;
-border-radius:11px;
-background:#0d213a;
-color:#fff;
-text-align:left;
-font-size:16px;
-}
-
-.menuBtn:focus,
-.optionBtn:focus,
-.userItem:focus,
-.bottomBtn:focus,
-.message:focus,
-.actionBtn:focus{
-border-color:#168cff;
-outline:2px solid #168cff;
-}
-
-.searchBox{
-padding:9px;
-background:#091a2d;
-border-bottom:1px solid #1c3a55;
-}
-
-.searchBox input{
-margin:0;
-}
-
-.userList{
-padding:9px;
-}
-
-.userItem{
-width:100%;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:13px;
-margin-bottom:7px;
-background:#0d213a;
-border:1px solid #234763;
-border-radius:10px;
-color:#fff;
-text-align:left;
-}
-
-.userInfo{
-min-width:0;
-}
-
-.userName{
-font-weight:bold;
-overflow:hidden;
-text-overflow:ellipsis;
-white-space:nowrap;
-}
-
-.userStatus{
-font-size:11px;
-margin-top:3px;
-}
-
-.online{
-color:#35e879;
-}
-
-.offline{
-color:#98a7b5;
-}
-
-.empty{
-text-align:center;
-color:#8fa1b2;
-padding:30px 12px;
-}
-
-.globalTopInfo{
-height:34px;
-min-height:34px;
-padding:8px 12px;
-background:#091a2d;
-border-bottom:1px solid #193b56;
-font-size:12px;
-}
-
-.chatMessages{
-flex:1;
-min-height:0;
-overflow-y:auto;
-padding:9px;
-}
-
-.message{
-position:relative;
-max-width:88%;
-margin:7px 0;
-padding:9px 10px;
-background:#102943;
-border:1px solid transparent;
-border-radius:10px;
-word-break:break-word;
-}
-
-.message.mine{
-margin-left:auto;
-background:#126bc1;
-}
-
-.messageName{
-color:#68baff;
-font-size:11px;
-font-weight:bold;
-margin-bottom:3px;
-}
-
-.message.mine .messageName{
-color:#fff;
-}
-
-.messageText{
-font-size:14px;
-line-height:1.3;
-}
-
-.messageTime{
-color:#b1c0cd;
-font-size:9px;
-margin-top:4px;
-text-align:right;
-}
-
-.mention{
-background:#ffd43b;
-color:#111;
-border-radius:4px;
-padding:1px 3px;
-font-weight:bold;
-}
-
-.chatInputArea{
-min-height:57px;
-background:#0d213a;
-border-top:1px solid #24445f;
-display:flex;
-align-items:center;
-padding:7px;
-}
-
-.chatInputArea input{
-flex:1;
-margin:0 6px 0 0;
-}
-
-.sendBtn{
-width:62px;
-min-width:62px;
-height:44px;
-border:0;
-border-radius:8px;
-background:#168cff;
-color:#fff;
-font-weight:bold;
-}
-
-.bottomBar{
-min-height:51px;
-height:51px;
-background:#0d213a;
-border-top:1px solid #24445f;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:5px 7px;
-}
-
-.bottomBtn{
-min-width:85px;
-border:1px solid #315472;
-background:#102943;
-color:#fff;
-border-radius:8px;
-padding:9px 10px;
-}
-
-.bottomBtn:focus{
-background:#168cff;
-}
-
-.popup{
-position:absolute;
-left:7px;
-bottom:58px;
-width:230px;
-max-height:280px;
-overflow-y:auto;
-background:#0d213a;
-border:1px solid #315472;
-border-radius:10px;
-z-index:100;
-}
-
-.popupBtn{
-width:100%;
-padding:12px;
-border:0;
-border-bottom:1px solid #24445f;
-background:#0d213a;
-color:#fff;
-text-align:left;
-}
-
-.privateHeader{
-height:58px;
-min-height:58px;
-background:#0d213a;
-border-bottom:1px solid #24445f;
-display:flex;
-align-items:center;
-position:relative;
-z-index:30;
-}
-
-.privateMessages{
-flex:1;
-min-height:0;
-overflow-y:auto;
-padding:9px;
-}
-
-.privateMessage{
-position:relative;
-width:100%;
-display:flex;
-margin:7px 0;
-}
-
-.privateMessage.mine{
-justify-content:flex-end;
-}
-
-.privateBubble{
-max-width:83%;
-padding:9px 32px 9px 10px;
-background:#102943;
-border-radius:10px;
-border:1px solid transparent;
-position:relative;
-word-break:break-word;
-}
-
-.privateMessage.mine .privateBubble{
-background:#126bc1;
-}
-
-.msgMenuBtn{
-position:absolute;
-right:3px;
-top:4px;
-width:24px;
-height:25px;
-border:0;
-background:transparent;
-color:#fff;
-font-size:17px;
-padding:0;
-}
-
-.replyQuote{
-background:#071a2c;
-border-left:3px solid #67b9ff;
-padding:5px 7px;
-margin-bottom:5px;
-border-radius:4px;
-font-size:11px;
-color:#c9d7e2;
-}
-
-.edited{
-font-size:9px;
-color:#c7d5df;
-margin-left:4px;
-}
-
-.selectedMessage{
-outline:2px solid #ffd43b;
-}
-
-.messageActions{
-position:fixed;
-left:8px;
-right:8px;
-bottom:58px;
-background:#0d213a;
-border:1px solid #315472;
-border-radius:10px;
-z-index:200;
-}
-
-.actionBtn{
-width:100%;
-padding:13px;
-border:0;
-border-bottom:1px solid #24445f;
-background:#0d213a;
-color:#fff;
-text-align:left;
-}
-
-.actionBtn:last-child{
-border-bottom:0;
-}
-
-.replyBar{
-background:#091a2d;
-border-top:1px solid #24445f;
-padding:6px 9px;
-display:flex;
-align-items:center;
-}
-
-.replyText{
-flex:1;
-font-size:11px;
-color:#b9c8d4;
-overflow:hidden;
-white-space:nowrap;
-text-overflow:ellipsis;
-}
-
-.cancelReply{
-border:0;
-background:transparent;
-color:#ff7777;
-font-size:20px;
-}
-
-.optionArea{
-padding:12px;
-}
-
-.optionBtn{
-width:100%;
-padding:14px;
-margin:5px 0;
-border-radius:9px;
-border:1px solid #315472;
-background:#0d213a;
-color:#fff;
-text-align:left;
-}
-
-.danger{
-color:#ff7070;
-}
-
-.info{
-padding:12px;
-color:#9fb0bf;
-font-size:12px;
-line-height:1.5;
-}
-
-#toast{
-position:fixed;
-left:10px;
-right:10px;
-bottom:65px;
-background:#0d213a;
-border:1px solid #315472;
-border-radius:9px;
-padding:12px;
-text-align:center;
-z-index:9999;
-display:none;
-}
-
-.editArea{
-display:flex;
-gap:5px;
-width:100%;
-}
-
-.editArea input{
-flex:1;
-margin:0;
-}
-
-.smallBtn{
-border:0;
-border-radius:7px;
-background:#168cff;
-color:#fff;
-padding:8px 10px;
-}
-
-.confirmBox{
-padding:20px;
-text-align:center;
-}
-
-.confirmBox h2{
-margin-top:0;
-}
-
-.statusDot{
-font-size:11px;
-}
-
-.blockedBox{
-margin:10px;
-padding:14px;
-background:#351d25;
-border:1px solid #71333f;
-border-radius:10px;
-color:#ffb4b4;
-text-align:center;
-}
-
-.replyBtn{
-border:0;
-background:transparent;
-color:#fff;
-}
-
-@media(max-width:280px){
-.title{font-size:15px}
-.menuBtn{font-size:14px}
-.bottomBtn{min-width:70px;padding:8px 5px}
-}
-</style>
-</head>
-
-<body>
-
-<div id="loading">
-  <div class="logo">💬</div>
-  <div class="loadingText">LOADING NEXACHAT...</div>
-</div>
-
-<div id="app"></div>
-<div id="toast"></div>
-
 <script>
+(function(){
+"use strict";
 
-/* =====================================================
-   FIREBASE
-===================================================== */
-
-const firebaseConfig={
-apiKey:"AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",
-authDomain:"nexachat-28ecc.firebaseapp.com",
-projectId:"nexachat-28ecc",
-storageBucket:"nexachat-28ecc.firebasestorage.app",
-messagingSenderId:"367209102337",
-appId:"1:367209102337:web:6f3a0e63b554f6dd145400",
-measurementId:"G-JLQW9XPDL6"
+/* NexaChat Firebase configuration */
+var firebaseConfig = {
+  apiKey: "AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",
+  authDomain: "nexachat-28ecc.firebaseapp.com",
+  projectId: "nexachat-28ecc",
+  storageBucket: "nexachat-28ecc.firebasestorage.app",
+  messagingSenderId: "367209102337",
+  appId: "1:367209102337:web:6f3a0e63b554f6dd145400",
+  measurementId: "G-JLQW9XPDL6"
 };
 
-firebase.initializeApp(firebaseConfig);
+var auth, db, me = null, myName = "", currentChat = null;
+var unsub = [], presenceTimer = null, typingTimer = null;
+var sendingWorld = false, sendingPrivate = false;
+var lastWorldTyping = 0, lastPrivateTyping = 0;
+var $ = function(id){return document.getElementById(id);};
 
-const auth=firebase.auth();
-const db=firebase.firestore();
-
-/* =====================================================
-   VARIABLES
-===================================================== */
-
-let currentUser=null;
-let currentProfile=null;
-
-let listeners=[];
-
-let selectedPrivateUser=null;
-let selectedMessage=null;
-let replyMessage=null;
-let editingMessageId=null;
-
-let globalUsersCache=[];
-
-let globalSearchOpen=false;
-
-/* =====================================================
-   HELPERS
-===================================================== */
-
-const $=id=>document.getElementById(id);
-
-function esc(value){
-return String(value||"")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-}
-
-function toast(message){
-
-const box=$("toast");
-
-if(!box)return;
-
-box.textContent=message;
-box.style.display="block";
-
-clearTimeout(window.toastTimer);
-
-window.toastTimer=setTimeout(()=>{
-box.style.display="none";
-},2500);
-}
-
+function setStatus(text){$("status").textContent = text || "";}
+function error(id,text){$(id).textContent = text || "";}
 function clearListeners(){
-
-listeners.forEach(fn=>{
-try{fn();}catch(e){}
+  unsub.forEach(function(fn){try{fn();}catch(e){}});
+  unsub = [];
+}
+function listen(fn){
+  if(typeof fn === "function") unsub.push(fn);
+}
+function show(view){
+  ["authView","homeView","worldView","usersView","privateView","settingsView"].forEach(function(id){
+    $(id).classList.toggle("hidden",id!==view);
+  });
+  setStatus("");
+  $("softLeft").textContent = view==="worldView" ? "USERS" : "OPTIONS";
+  $("softRight").textContent = view==="authView" ? "" : "BACK";
+  if(view==="worldView") setTimeout(function(){$("worldInput").focus();},50);
+  if(view==="privateView") setTimeout(function(){$("privateInput").focus();},50);
+}
+function cleanName(s){return String(s||"").trim();}
+function validName(s){return /^[A-Za-z0-9_]{3,20}$/.test(s);}
+function emailFor(name){return name.toLowerCase()+"@nexachat.local";}
+function safeTime(ts){
+  try{
+    if(!ts) return "";
+    var d=ts.toDate ? ts.toDate() : new Date(ts);
+    if(isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  }catch(e){return "";}
+}
+function addMessage(container, data){
+  var box=document.createElement("div"); box.className="msg";
+  var head=document.createElement("div"); head.className="msghead";
+  var sender=document.createElement("span"); sender.className="sender";
+  sender.textContent=String(data.username||data.senderName||"User");
+  var time=document.createElement("span"); time.className="time";
+  time.textContent=safeTime(data.createdAt);
+  head.appendChild(sender);head.appendChild(time);
+  var text=document.createElement("div");text.className="msgtext";
+  text.textContent=String(data.text||"");
+  box.appendChild(head);box.appendChild(text);
+  container.appendChild(box);
+}
+function scrollBottom(el){el.scrollTop=el.scrollHeight;}
+function getChatId(a,b){return [a,b].sort().join("_");}
+function myUserRef(){return db.collection("users").doc(me.uid);}
+function updateLastSeen(){
+  if(!me) return;
+  myUserRef().set({username:myName,usernameLower:myName.toLowerCase(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
+  .catch(function(e){console.warn("Presence update:",e.code);});
+}
+function startPresence(){
+  stopPresence();
+  updateLastSeen();
+  presenceTimer=setInterval(updateLastSeen,25000);
+}
+function stopPresence(){
+  if(presenceTimer) clearInterval(presenceTimer);
+  presenceTimer=null;
+}
+function isOnline(data){
+  if(!data.lastSeen) return false;
+  var d=data.lastSeen.toDate ? data.lastSeen.toDate().getTime() : new Date(data.lastSeen).getTime();
+  return !isNaN(d) && Date.now()-d<70000;
+}
+function startOnlineCount(){
+  listen(db.collection("users").onSnapshot(function(snap){
+    var count=0;
+    snap.forEach(function(doc){if(doc.id!==me.uid && isOnline(doc.data())) count++;});
+    $("onlineCount").textContent="● "+count+" online";
+  },function(e){console.warn(e);}));
+}
+function startWorld(){
+  clearListeners();show("worldView");
+  $("messages").textContent="";
+  listen(db.collection("worldMessages").orderBy("createdAt","desc").limit(15).onSnapshot(function(snap){
+    var el=$("messages");el.textContent="";
+    var docs=[];snap.forEach(function(d){docs.push(d.data());});
+    docs.reverse().forEach(function(d){addMessage(el,d);});
+    scrollBottom(el);
+  },function(e){
+    setStatus("World Lounge error: "+e.message);
+  }));
+  listen(db.collection("worldTyping").onSnapshot(function(snap){
+    var names=[];
+    snap.forEach(function(d){
+      var x=d.data();
+      if(d.id!==me.uid && x.typing && x.updatedAt){
+        var t=x.updatedAt.toDate ? x.updatedAt.toDate().getTime() : 0;
+        if(Date.now()-t<7000) names.push(x.username||"Someone");
+      }
+    });
+    $("typing").textContent=names.length ? names.slice(0,2).join(", ")+" typing..." : "";
+  },function(e){console.warn(e);}));
+}
+function setWorldTyping(typing){
+  if(!me)return;
+  var now=Date.now();
+  if(typing && now-lastWorldTyping<1500)return;
+  lastWorldTyping=now;
+  db.collection("worldTyping").doc(me.uid).set({
+    username:myName,typing:!!typing,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true}).catch(function(e){console.warn(e);});
+}
+function sendWorld(){
+  var text=$("worldInput").value.trim();
+  if(!text||!me||sendingWorld)return;
+  if(text.length>1000)return;
+  sendingWorld=true;
+  $("sendWorld").disabled=true;
+  db.collection("worldMessages").add({
+    senderUid:me.uid,username:myName,text:text,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    $("worldInput").value="";
+    setWorldTyping(false);
+  }).catch(function(e){setStatus("Message send nahi hua: "+e.message);})
+  .finally(function(){sendingWorld=false;$("sendWorld").disabled=false;});
+}
+function loadUsers(){
+  clearListeners();show("usersView");
+  $("userList").textContent="";
+  listen(db.collection("users").limit(100).onSnapshot(function(snap){
+    var query=$("userSearch").value.trim().toLowerCase();
+    var el=$("userList");el.textContent="";
+    var list=[];
+    snap.forEach(function(d){
+      var x=d.data();
+      if(d.id!==me.uid && x.username && x.username.toLowerCase().indexOf(query)!==-1){
+        list.push({id:d.id,data:x});
+      }
+    });
+    list.sort(function(a,b){return a.data.username.localeCompare(b.data.username);});
+    if(!list.length){
+      var p=document.createElement("p");p.textContent="No users found.";el.appendChild(p);
+    }
+    list.forEach(function(item){
+      var row=document.createElement("div");row.className="userrow";row.tabIndex=0;
+      var name=document.createElement("strong");name.textContent=item.data.username;
+      var sub=document.createElement("div");sub.className="small";
+      sub.textContent=isOnline(item.data)?"● Online":"○ Offline";
+      row.appendChild(name);row.appendChild(sub);
+      row.addEventListener("click",function(){openPrivate(item.id,item.data.username);});
+      row.addEventListener("keydown",function(e){if(e.key==="Enter")openPrivate(item.id,item.data.username);});
+      el.appendChild(row);
+    });
+  },function(e){error("usersError",e.message);}));
+}
+function openPrivate(uid,name){
+  if(uid===me.uid)return;
+  currentChat={uid:uid,name:name};
+  clearListeners();show("privateView");
+  $("privateTitle").textContent=name;
+  $("privateMessages").textContent="";
+  error("privateError","");
+  var chatId=getChatId(me.uid,uid);
+  listen(db.collection("privateMessages").where("chatId","==",chatId).orderBy("createdAt","desc").limit(10).onSnapshot(function(snap){
+    var el=$("privateMessages");el.textContent="";
+    var docs=[];snap.forEach(function(d){docs.push(d.data());});
+    docs.reverse().forEach(function(d){addMessage(el,d);});
+    scrollBottom(el);
+  },function(e){error("privateError","Private chat error: "+e.message);}));
+  listen(db.collection("privateTyping").doc(chatId).onSnapshot(function(doc){
+    var d=doc.exists?doc.data():{};
+    $("privateTyping").textContent=(d.uid!==me.uid && d.typing && d.updatedAt &&
+      Date.now()-(d.updatedAt.toDate?d.updatedAt.toDate().getTime():0)<7000)
+      ? name+" typing..." : "";
+  },function(e){console.warn(e);}));
+}
+function setPrivateTyping(typing){
+  if(!me||!currentChat)return;
+  var now=Date.now();
+  if(typing && now-lastPrivateTyping<1500)return;
+  lastPrivateTyping=now;
+  db.collection("privateTyping").doc(getChatId(me.uid,currentChat.uid)).set({
+    uid:me.uid,username:myName,typing:!!typing,
+    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+  },{merge:true}).catch(function(e){console.warn(e);});
+}
+function sendPrivate(){
+  var text=$("privateInput").value.trim();
+  if(!text||!me||!currentChat||sendingPrivate)return;
+  sendingPrivate=true;$("sendPrivate").disabled=true;
+  var chatId=getChatId(me.uid,currentChat.uid);
+  db.collection("privateMessages").add({
+    chatId:chatId,senderUid:me.uid,receiverUid:currentChat.uid,
+    senderName:myName,username:myName,text:text,
+    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    $("privateInput").value="";
+    setPrivateTyping(false);
+  }).catch(function(e){error("privateError","Send nahi hua: "+e.message);})
+  .finally(function(){sendingPrivate=false;$("sendPrivate").disabled=false;});
+}
+function goHome(){
+  clearListeners();currentChat=null;show("homeView");
+}
+function friendlyError(e){
+  var code=e && e.code || "";
+  if(code==="auth/user-not-found"||code==="auth/wrong-password"||code==="auth/invalid-credential")return "Username ya password ghalat hai.";
+  if(code==="auth/email-already-in-use")return "Is username ka account pehle se hai.";
+  if(code==="auth/weak-password")return "Password kam az kam 6 characters ka rakho.";
+  if(code==="auth/network-request-failed")return "Internet connection check karo.";
+  if(code==="permission-denied"||code==="firestore/permission-denied")return "Firestore Rules ne access rok diya. Rules check karo.";
+  return e && e.message ? e.message : "Kuch ghalat hua. Dobara koshish karo.";
+}
+function signup(){
+  var name=cleanName($("username").value),pass=$("password").value;
+  error("authError","");
+  if(!validName(name)){error("authError","Username 3-20 characters ka ho. Sirf English letters, numbers aur _ use karo.");return;}
+  if(pass.length<6){error("authError","Password kam az kam 6 characters ka ho.");return;}
+  $("signupBtn").disabled=true;
+  auth.createUserWithEmailAndPassword(emailFor(name),pass).then(function(cred){
+    me=cred.user;myName=name;
+    return db.collection("usernames").doc(name.toLowerCase()).get().then(function(doc){
+      if(doc.exists && doc.data().uid!==me.uid){
+        throw new Error("USERNAME_TAKEN");
+      }
+      return db.collection("usernames").doc(name.toLowerCase()).set({
+        uid:me.uid,username:name
+      }).then(function(){
+        return myUserRef().set({
+          username:name,usernameLower:name.toLowerCase(),
+          createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+          lastSeen:firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    });
+  }).then(function(){
+    startPresence();goHome();$("welcome").textContent="Hello, "+myName+"!";
+    startOnlineCount();
+  }).catch(function(e){
+    var message=e.message==="USERNAME_TAKEN"?"Yeh username pehle se use ho raha hai.":friendlyError(e);
+    error("authError",message);
+    if(me && me.uid){
+      // Do not delete an account automatically after an uncertain network error.
+      me=null;myName="";
+    }
+  }).finally(function(){$("signupBtn").disabled=false;});
+}
+function login(){
+  var name=cleanName($("username").value),pass=$("password").value;
+  error("authError","");
+  if(!validName(name)){error("authError","Apna valid username likho.");return;}
+  if(!pass){error("authError","Password likho.");return;}
+  $("loginBtn").disabled=true;
+  auth.signInWithEmailAndPassword(emailFor(name),pass).then(function(cred){
+    me=cred.user;
+    return myUserRef().get();
+  }).then(function(doc){
+    if(!doc.exists || !doc.data().username)throw new Error("User profile nahi mila. Account setup check karo.");
+    myName=doc.data().username;
+    startPresence();goHome();
+    $("welcome").textContent="Hello, "+myName+"!";
+    startOnlineCount();
+  }).catch(function(e){
+    error("authError",friendlyError(e));
+  }).finally(function(){$("loginBtn").disabled=false;});
+}
+function logout(){
+  clearListeners();stopPresence();
+  if(me){
+    db.collection("worldTyping").doc(me.uid).set({
+      username:myName,typing:false,
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    },{merge:true}).catch(function(){});
+  }
+  auth.signOut().catch(function(e){setStatus(friendlyError(e));});
+}
+function setTheme(t){
+  var r=document.documentElement;
+  if(t==="light"){
+    r.style.setProperty("--bg","#edf2f7");r.style.setProperty("--panel","#fff");
+    r.style.setProperty("--card","#e2eaf2");r.style.setProperty("--text","#172538");
+    r.style.setProperty("--muted","#516579");r.style.setProperty("--border","#c3d0df");
+  }else if(t==="ocean"){
+    r.style.setProperty("--bg","#05283b");r.style.setProperty("--panel","#06405a");
+    r.style.setProperty("--card","#0a5870");r.style.setProperty("--text","#f2fbff");
+    r.style.setProperty("--muted","#b9dbe7");r.style.setProperty("--border","#20728b");
+  }else{
+    r.style.setProperty("--bg","#081321");r.style.setProperty("--panel","#102238");
+    r.style.setProperty("--card","#17304a");r.style.setProperty("--text","#f3f7ff");
+    r.style.setProperty("--muted","#a8bdd2");r.style.setProperty("--border","#29445e");
+  }
+  try{localStorage.setItem("nexachat-theme",t);}catch(e){}
+}
+$("loginBtn").addEventListener("click",login);
+$("signupBtn").addEventListener("click",signup);
+$("worldBtn").addEventListener("click",startWorld);
+$("worldRefresh").addEventListener("click",startWorld);
+$("sendWorld").addEventListener("click",sendWorld);
+$("worldInput").addEventListener("input",function(){setWorldTyping(!!this.value.trim());});
+$("worldInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendWorld();}});
+$("worldUsersBtn").addEventListener("click",loadUsers);
+$("inboxBtn").addEventListener("click",loadUsers);
+$("userSearch").addEventListener("input",loadUsers);
+$("sendPrivate").addEventListener("click",sendPrivate);
+$("privateInput").addEventListener("input",function(){setPrivateTyping(!!this.value.trim());});
+$("privateInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendPrivate();}});
+$("privateBack").addEventListener("click",loadUsers);
+$("settingsBtn").addEventListener("click",function(){
+  show("settingsView");$("accountInfo").textContent="Logged in as: "+myName;
 });
-
-listeners=[];
-}
-
-function addListener(fn){
-
-if(typeof fn==="function"){
-listeners.push(fn);
-}
-}
-
-function show(html){
-
-$("app").innerHTML=html;
-}
-
-function focusFirst(){
-
-setTimeout(()=>{
-
-const first=$(
-"#app button:not(.hidden),#app input"
-);
-
-if(first){
-
-try{
-first.focus();
-}catch(e){}
-
-}
-
-},120);
-}
-
-function timeText(timestamp){
-
-if(!timestamp)return "";
-
-let date;
-
-try{
-
-date=timestamp.toDate
-?timestamp.toDate()
-:new Date(timestamp);
-
-}catch(e){
-
-return "";
-
-}
-
-return date.toLocaleTimeString([],{
-hour:"2-digit",
-minute:"2-digit"
+$("logoutBtn").addEventListener("click",logout);
+document.querySelectorAll(".themeBtn").forEach(function(b){
+  b.addEventListener("click",function(){setTheme(b.dataset.theme);});
 });
-}
-
-function emailFromUsername(username){
-
-return username
-.trim()
-.toLowerCase()
-.replace(/[^a-z0-9]/g,"")
-+"@nexachat.local";
-}
-
-function escapeAttribute(value){
-
-return String(value||"")
-.replace(/\\/g,"\\\\")
-.replace(/'/g,"\\'");
-}
-
-function userStatusText(user){
-
-return user.online
-?"● Online"
-:"● Offline";
-}
-
-/* =====================================================
-   KAIOS KEY SUPPORT
-===================================================== */
-
+$("softLeft").addEventListener("click",function(){
+  if(!$("worldView").classList.contains("hidden"))loadUsers();
+  else if(!$("authView").classList.contains("hidden"))login();
+  else loadUsers();
+});
+$("softRight").addEventListener("click",function(){
+  if(!$("privateView").classList.contains("hidden"))loadUsers();
+  else if(!$("worldView").classList.contains("hidden"))goHome();
+  else if(!$("usersView").classList.contains("hidden")||!$("settingsView").classList.contains("hidden"))goHome();
+  else if(!$("homeView").classList.contains("hidden"))logout();
+});
 document.addEventListener("keydown",function(e){
-
-const active=document.activeElement;
-const tag=active?active.tagName:"";
-
-if(
-tag==="INPUT" ||
-tag==="TEXTAREA"
-){
-
-if(e.key==="Enter" &&
-active.id==="globalInput"){
-
-e.preventDefault();
-sendGlobal();
-}
-
-if(e.key==="Enter" &&
-active.id==="privateInput"){
-
-e.preventDefault();
-sendPrivate();
-}
-
-return;
-}
-
-if(e.key==="Backspace"){
-
-e.preventDefault();
-
-const back=document.querySelector(
-"[data-back='true']"
-);
-
-if(back){
-
-back.click();
-return;
-
-}
-
-}
-
-if(
-e.key==="SoftLeft" ||
-e.key==="F1"
-){
-
-const btn=document.querySelector(
-"[data-soft-left='true']"
-);
-
-if(btn){
-btn.click();
-}
-
-}
-
-if(
-e.key==="SoftRight" ||
-e.key==="F2"
-){
-
-const btn=document.querySelector(
-"[data-soft-right='true']"
-);
-
-if(btn){
-btn.click();
-}
-
-}
-
+  if(e.key==="Escape"||e.key==="Backspace" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){
+    e.preventDefault();
+    if(!$("privateView").classList.contains("hidden"))loadUsers();
+    else if(!$("worldView").classList.contains("hidden")||!$("usersView").classList.contains("hidden")||!$("settingsView").classList.contains("hidden"))goHome();
+  }
+});
+document.addEventListener("visibilitychange",function(){
+  if(!document.hidden && me)updateLastSeen();
+});
+window.addEventListener("beforeunload",function(){
+  stopPresence();clearListeners();
 });
 
-/* =====================================================
-   AUTH
-===================================================== */
-
-function loginScreen(){
-
-clearListeners();
-
-show(`
-<div class="authWrap">
-
-<div class="card">
-
-<div class="logo">💬</div>
-
-<h1>NexaChat</h1>
-
-<input
-id="loginUser"
-placeholder="Username"
-autocomplete="username">
-
-<input
-id="loginPass"
-type="password"
-placeholder="Password"
-autocomplete="current-password">
-
-<button
-class="primaryBtn"
-onclick="login()">
-LOGIN
-</button>
-
-<button
-class="secondaryBtn"
-onclick="signupScreen()">
-CREATE ACCOUNT
-</button>
-
-</div>
-
-</div>
-`);
-
-focusFirst();
-}
-
-function signupScreen(){
-
-clearListeners();
-
-show(`
-<div class="authWrap">
-
-<div class="card">
-
-<div class="logo">💬</div>
-
-<h1>Create Account</h1>
-
-<input
-id="signupUser"
-placeholder="Username"
-autocomplete="username">
-
-<input
-id="signupPass"
-type="password"
-placeholder="Password"
-autocomplete="new-password">
-
-<button
-class="primaryBtn"
-onclick="signup()">
-SIGN UP
-</button>
-
-<button
-class="secondaryBtn"
-onclick="loginScreen()">
-BACK TO LOGIN
-</button>
-
-</div>
-
-</div>
-`);
-
-focusFirst();
-}
-
-async function signup(){
-
-const username=$("signupUser").value.trim();
-const password=$("signupPass").value;
-
-if(username.length<3){
-
-toast("Username kam az kam 3 characters ka ho.");
-return;
-
-}
-
-if(!/^[A-Za-z0-9_]+$/.test(username)){
-
-toast("Username mein sirf letters, numbers aur _ use karo.");
-return;
-
-}
-
-if(password.length<6){
-
-toast("Password kam az kam 6 characters ka ho.");
-return;
-
-}
-
+/* Initialize Firebase once */
 try{
-
-const usernameLower=username.toLowerCase();
-
-const check=await db
-.collection("users")
-.where("usernameLower","==",usernameLower)
-.limit(1)
-.get();
-
-if(!check.empty){
-
-toast("Ye username already use ho raha hai.");
-return;
-
-}
-
-const email=emailFromUsername(username);
-
-const cred=
-await auth.createUserWithEmailAndPassword(
-email,
-password
-);
-
-await db
-.collection("users")
-.doc(cred.user.uid)
-.set({
-
-uid:cred.user.uid,
-
-username:username,
-
-usernameLower:usernameLower,
-
-online:true,
-
-lastSeen:
-firebase.firestore.FieldValue.serverTimestamp(),
-
-createdAt:
-firebase.firestore.FieldValue.serverTimestamp()
-
-});
-
-toast("Account create ho gaya ❤️");
-
-}catch(error){
-
-toast(error.message);
-
-}
-}
-
-async function login(){
-
-const username=$("loginUser").value.trim();
-const password=$("loginPass").value;
-
-if(!username||!password){
-
-toast("Username aur password dono likho.");
-return;
-
-}
-
-try{
-
-await auth.signInWithEmailAndPassword(
-emailFromUsername(username),
-password
-);
-
-}catch(error){
-
-toast("Login failed: "+error.message);
-
-}
-}
-
-/* =====================================================
-   PROFILE / PRESENCE
-===================================================== */
-
-async function loadProfile(){
-
-const ref=db
-.collection("users")
-.doc(currentUser.uid);
-
-const snap=await ref.get();
-
-if(!snap.exists){
-
-await ref.set({
-
-uid:currentUser.uid,
-
-username:"User",
-
-usernameLower:"user",
-
-online:true,
-
-lastSeen:
-firebase.firestore.FieldValue.serverTimestamp(),
-
-createdAt:
-firebase.firestore.FieldValue.serverTimestamp()
-
-});
-
-currentProfile={
-uid:currentUser.uid,
-username:"User",
-usernameLower:"user"
-};
-
-}else{
-
-currentProfile=snap.data();
-
-}
-
-await setOnline(true);
-}
-
-async function setOnline(value){
-
-if(!currentUser)return;
-
-try{
-
-await db
-.collection("users")
-.doc(currentUser.uid)
-.update({
-
-online:value,
-
-lastSeen:
-firebase.firestore.FieldValue.serverTimestamp()
-
-});
-
-}catch(e){}
-
-}
-
-async function logout(){
-
-try{
-
-await setOnline(false);
-
-}catch(e){}
-
-clearListeners();
-
-await auth.signOut();
-}
-
-window.addEventListener(
-"beforeunload",
-function(){
-
-if(currentUser){
-setOnline(false);
-}
-
-});
-
-setInterval(function(){
-
-if(currentUser){
-setOnline(true);
-}
-
-},60000);
-
-/* =====================================================
-   HOME
-===================================================== */
-
-function home(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerCenter">
-<div class="title">NexaChat</div>
-</div>
-
-<div class="headerRight">
-
-<button
-class="headerBtn"
-onclick="settings()">
-⚙
-</button>
-
-</div>
-
-</div>
-
-<div class="content">
-
-<div class="homeMenu">
-
-<button
-class="menuBtn"
-onclick="onlineUsers()">
-🟢 Online Users
-</button>
-
-<button
-class="menuBtn"
-onclick="globalLounge()">
-🌍 Global Lounge
-</button>
-
-<button
-class="menuBtn"
-onclick="nexaInbox()">
-📥 Nexa Inbox
-</button>
-
-</div>
-
-</div>
-
-</div>
-`);
-
-focusFirst();
-}
-
-/* =====================================================
-   ONLINE USERS
-===================================================== */
-
-function onlineUsers(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="home()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-<div class="title">Online Users</div>
-</div>
-
-<div class="headerRight"></div>
-
-</div>
-
-<div
-id="onlineList"
-class="content userList">
-
-<div class="empty">
-Loading...
-</div>
-
-</div>
-
-</div>
-`);
-
-const unsub=db
-.collection("users")
-.where("online","==",true)
-.onSnapshot(
-snap=>{
-
-let html="";
-
-snap.forEach(doc=>{
-
-if(doc.id===currentUser.uid)return;
-
-const u=doc.data();
-
-html+=`
-<button
-class="userItem"
-onclick="openPrivate('${escapeAttribute(u.uid)}','${escapeAttribute(u.username)}')">
-
-<div class="userInfo">
-
-<div class="userName">
-${esc(u.username)}
-</div>
-
-<div class="userStatus online">
-● Online
-</div>
-
-</div>
-
-<div>💬</div>
-
-</button>
-`;
-
-});
-
-$("onlineList").innerHTML=
-html||
-`<div class="empty">
-Koi user online nahi hai.
-</div>`;
-
-},
-error=>{
-
-$("onlineList").innerHTML=
-`<div class="empty">
-${esc(error.message)}
-</div>`;
-
-}
-);
-
-addListener(unsub);
-
-focusFirst();
-}
-
-/* =====================================================
-   GLOBAL LOUNGE
-===================================================== */
-
-function globalLounge(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="home()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-🌍 Global Lounge
-</div>
-
-</div>
-
-<div class="headerRight">
-
-<div id="globalCount"
-style="font-size:12px">
-👥 0
-</div>
-
-</div>
-
-</div>
-
-<div class="globalTopInfo">
-👥 Online now:
-<span id="globalCountText">0</span>
-</div>
-
-<div
-id="globalMessages"
-class="chatMessages">
-
-<div class="empty">
-Loading messages...
-</div>
-
-</div>
-
-<div id="mentionPopup"
-class="popup hidden"></div>
-
-<div class="chatInputArea">
-
-<input
-id="globalInput"
-placeholder="Write message..."
-autocomplete="off">
-
-<button
-class="sendBtn"
-onclick="sendGlobal()">
-SEND
-</button>
-
-</div>
-
-<div class="bottomBar">
-
-<button
-class="bottomBtn"
-data-soft-left="true"
-onclick="onlineUsers()">
-👥 Users
-</button>
-
-<button
-class="bottomBtn"
-data-soft-right="true"
-onclick="home()">
-EXIT
-</button>
-
-</div>
-
-</div>
-`);
-
-const msgUnsub=db
-.collection("worldMessages")
-.orderBy("timestamp","desc")
-.limit(10)
-.onSnapshot(
-snap=>{
-
-const list=[];
-
-snap.forEach(doc=>{
-
-list.push({
-id:doc.id,
-...doc.data()
-});
-
-});
-
-list.reverse();
-
-renderGlobalMessages(list);
-
-},
-error=>{
-
-const box=$("globalMessages");
-
-if(box){
-
-box.innerHTML=
-`<div class="empty">
-${esc(error.message)}
-</div>`;
-
-}
-
-}
-);
-
-addListener(msgUnsub);
-
-const onlineUnsub=db
-.collection("users")
-.where("online","==",true)
-.onSnapshot(
-snap=>{
-
-globalUsersCache=[];
-
-snap.forEach(doc=>{
-
-if(doc.id!==currentUser.uid){
-
-globalUsersCache.push({
-uid:doc.id,
-...doc.data()
-});
-
-}
-
-});
-
-const count=snap.size;
-
-if($("globalCount")){
-$("globalCount").textContent="👥 "+count;
-}
-
-if($("globalCountText")){
-$("globalCountText").textContent=count;
-}
-
-},
-error=>{}
-);
-
-addListener(onlineUnsub);
-
-$("globalInput").addEventListener(
-"input",
-showMentionPopup
-);
-
-$("globalInput").addEventListener(
-"keydown",
-function(e){
-
-if(e.key==="@"){
-
-setTimeout(
-showMentionPopup,
-30
-);
-
-}
-
-if(e.key==="Escape"){
-
-hideMentionPopup();
-
-}
-
-}
-);
-
-cleanGlobalMessages();
-
-focusFirst();
-}
-
-function renderGlobalMessages(list){
-
-const box=$("globalMessages");
-
-if(!box)return;
-
-if(!list.length){
-
-box.innerHTML=
-`<div class="empty">
-Global Lounge mein abhi koi message nahi.
-</div>`;
-
-return;
-}
-
-let html="";
-
-list.forEach(m=>{
-
-const mine=
-m.senderUid===currentUser.uid;
-
-let text=esc(m.text||"");
-
-text=text.replace(
-/@([A-Za-z0-9_]+)/g,
-'<span class="mention">@$1</span>'
-);
-
-html+=`
-<div class="message ${mine?"mine":""}">
-
-<div class="messageName">
-${esc(m.senderName||"User")}
-</div>
-
-<div class="messageText">
-${text}
-</div>
-
-<div class="messageTime">
-${timeText(m.timestamp)}
-</div>
-
-</div>
-`;
-
-});
-
-box.innerHTML=html;
-
-setTimeout(()=>{
-
-box.scrollTop=box.scrollHeight;
-
-},20);
-}
-
-async function sendGlobal(){
-
-const input=$("globalInput");
-
-if(!input)return;
-
-const text=input.value.trim();
-
-if(!text)return;
-
-try{
-
-await db.collection("worldMessages")
-.add({
-
-senderUid:currentUser.uid,
-
-senderName:currentProfile.username,
-
-text:text,
-
-timestamp:
-firebase.firestore.FieldValue.serverTimestamp()
-
-});
-
-input.value="";
-
-hideMentionPopup();
-
-await cleanGlobalMessages();
-
-}catch(error){
-
-toast("Message send nahi hua: "+error.message);
-
-}
-}
-
-function showMentionPopup(){
-
-const input=$("globalInput");
-
-if(!input)return;
-
-const value=input.value;
-
-const at=value.lastIndexOf("@");
-
-if(at<0){
-
-hideMentionPopup();
-return;
-
-}
-
-const part=value
-.substring(at+1)
-.split(/\s/)[0]
-.toLowerCase();
-
-if(!part){
-
-hideMentionPopup();
-return;
-
-}
-
-const matches=globalUsersCache
-.filter(u=>
-u.username &&
-u.username.toLowerCase().startsWith(part)
-)
-.slice(0,8);
-
-const popup=$("mentionPopup");
-
-if(!popup)return;
-
-if(!matches.length){
-
-hideMentionPopup();
-return;
-
-}
-
-popup.innerHTML=matches
-.map(u=>`
-<button
-class="popupBtn"
-onclick="insertMention('${escapeAttribute(u.username)}')">
-@${esc(u.username)}
-</button>
-`)
-.join("");
-
-popup.classList.remove("hidden");
-}
-
-function hideMentionPopup(){
-
-const p=$("mentionPopup");
-
-if(p){
-p.classList.add("hidden");
-}
-
-}
-
-function insertMention(username){
-
-const input=$("globalInput");
-
-if(!input)return;
-
-const value=input.value;
-
-const at=value.lastIndexOf("@");
-
-input.value=
-value.substring(0,at)
-+"@"+username+" ";
-
-input.focus();
-
-hideMentionPopup();
-}
-
-async function cleanGlobalMessages(){
-
-try{
-
-const snap=await db
-.collection("worldMessages")
-.orderBy("timestamp","desc")
-.limit(30)
-.get();
-
-if(snap.size<=10)return;
-
-const docs=snap.docs.slice(10);
-
-const batch=db.batch();
-
-docs.forEach(doc=>{
-
-/*
-Only delete messages owned by the
-current user because Firestore rules
-protect other users' messages.
-*/
-
-if(doc.data().senderUid===currentUser.uid){
-
-batch.delete(doc.ref);
-
-}
-
-});
-
-await batch.commit();
-
-}catch(e){}
-
-}
-
-/* =====================================================
-   NEXA INBOX
-===================================================== */
-
-function nexaInbox(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="home()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-📥 Nexa Inbox
-</div>
-
-</div>
-
-<div class="headerRight">
-
-<button
-class="headerBtn"
-onclick="inboxOptions()">
-⋮
-</button>
-
-</div>
-
-</div>
-
-<div class="searchBox">
-
-<input
-id="userSearch"
-placeholder="Search username..."
-autocomplete="off">
-
-</div>
-
-<div
-id="inboxList"
-class="content userList">
-
-<div class="empty">
-Loading users...
-</div>
-
-</div>
-
-</div>
-`);
-
-const unsub=db
-.collection("users")
-.limit(100)
-.onSnapshot(
-snap=>{
-
-globalUsersCache=[];
-
-snap.forEach(doc=>{
-
-if(doc.id===currentUser.uid)return;
-
-globalUsersCache.push({
-uid:doc.id,
-...doc.data()
-});
-
-});
-
-renderInboxUsers();
-
-},
-error=>{
-
-$("inboxList").innerHTML=
-`<div class="empty">
-${esc(error.message)}
-</div>`;
-
-}
-);
-
-addListener(unsub);
-
-$("userSearch").addEventListener(
-"input",
-renderInboxUsers
-);
-
-focusFirst();
-}
-
-function renderInboxUsers(){
-
-const box=$("inboxList");
-
-if(!box)return;
-
-const input=$("userSearch");
-
-const query=
-input
-?input.value.trim().toLowerCase()
-:"";
-
-const users=globalUsersCache.filter(u=>
-!query ||
-String(u.username||"")
-.toLowerCase()
-.includes(query)
-);
-
-if(!users.length){
-
-box.innerHTML=
-`<div class="empty">
-User nahi mila.
-</div>`;
-
-return;
-}
-
-box.innerHTML=users
-.map(u=>`
-
-<button
-class="userItem"
-onclick="openPrivate('${escapeAttribute(u.uid)}','${escapeAttribute(u.username)}')">
-
-<div class="userInfo">
-
-<div class="userName">
-${esc(u.username)}
-</div>
-
-<div class="userStatus ${u.online?"online":"offline"}">
-${u.online?"● Online":"● Offline"}
-</div>
-
-</div>
-
-<div>💬</div>
-
-</button>
-
-`)
-.join("");
-}
-
-/* =====================================================
-   PRIVATE CHAT
-===================================================== */
-
-async function openPrivate(uid,username){
-
-selectedPrivateUser={
-uid:uid,
-username:username
-};
-
-clearListeners();
-
-replyMessage=null;
-selectedMessage=null;
-editingMessageId=null;
-
-const blocked=await checkEitherBlocked(
-currentUser.uid,
-uid
-);
-
-showPrivateScreen(blocked);
-}
-
-async function showPrivateScreen(blocked){
-
-show(`
-<div class="screen">
-
-<div class="privateHeader">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="privateBack()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-${esc(selectedPrivateUser.username)}
-</div>
-
-<div
-id="privateStatus"
-class="subTitle offlineText">
-Checking...
-</div>
-
-</div>
-
-<div class="headerRight">
-
-<button
-class="headerBtn"
-onclick="privateOptions()">
-⋮
-</button>
-
-</div>
-
-</div>
-
-<div
-id="privateMessages"
-class="privateMessages">
-
-<div class="empty">
-Loading messages...
-</div>
-
-</div>
-
-<div id="blockedState"></div>
-
-<div id="replyBarHolder"></div>
-
-<div id="privateInputArea"
-class="chatInputArea">
-
-<input
-id="privateInput"
-placeholder="Write message..."
-autocomplete="off">
-
-<button
-class="sendBtn"
-onclick="sendPrivate()">
-SEND
-</button>
-
-</div>
-
-<div class="bottomBar">
-
-<button
-class="bottomBtn"
-data-soft-left="true"
-onclick="privateOptions()">
-OPTIONS
-</button>
-
-<button
-class="bottomBtn"
-data-soft-right="true"
-onclick="privateBack()">
-BACK
-</button>
-
-</div>
-
-</div>
-`);
-
-renderBlockedState(blocked);
-
-const statusUnsub=db
-.collection("users")
-.doc(selectedPrivateUser.uid)
-.onSnapshot(
-snap=>{
-
-if(!snap.exists)return;
-
-const u=snap.data();
-
-const status=$("privateStatus");
-
-if(status){
-
-status.textContent=
-u.online?"● Online":"● Offline";
-
-status.className=
-"subTitle "+
-(u.online
-?"onlineText"
-:"offlineText");
-
-}
-
-}
-);
-
-addListener(statusUnsub);
-
-await listenPrivateMessages();
-
-focusFirst();
-}
-
-async function listenPrivateMessages(){
-
-const other=selectedPrivateUser.uid;
-
-let sent=[];
-let received=[];
-
-const render=()=>{
-
-const map={};
-
-sent.forEach(m=>map[m.id]=m);
-received.forEach(m=>map[m.id]=m);
-
-const list=Object.values(map)
-.sort((a,b)=>{
-
-const ta=a.timestamp &&
-a.timestamp.toMillis
-?a.timestamp.toMillis()
-:0;
-
-const tb=b.timestamp &&
-b.timestamp.toMillis
-?b.timestamp.toMillis()
-:0;
-
-return ta-tb;
-
-})
-.slice(-10);
-
-renderPrivateMessages(list);
-
-};
-
-const unsub1=db
-.collection("privateMessages")
-.where("senderUid","==",currentUser.uid)
-.where("receiverUid","==",other)
-.orderBy("timestamp","desc")
-.limit(10)
-.onSnapshot(
-snap=>{
-
-sent=[];
-
-snap.forEach(doc=>{
-
-sent.push({
-id:doc.id,
-...doc.data()
-});
-
-});
-
-render();
-
-},
-error=>{
-
-if($("privateMessages")){
-
-$("privateMessages").innerHTML=
-`<div class="empty">
-Index required. Firebase error:<br>
-${esc(error.message)}
-</div>`;
-
-}
-
-}
-);
-
-const unsub2=db
-.collection("privateMessages")
-.where("senderUid","==",other)
-.where("receiverUid","==",currentUser.uid)
-.orderBy("timestamp","desc")
-.limit(10)
-.onSnapshot(
-snap=>{
-
-received=[];
-
-snap.forEach(doc=>{
-
-received.push({
-id:doc.id,
-...doc.data()
-});
-
-});
-
-render();
-
-},
-error=>{
-
-if($("privateMessages")){
-
-$("privateMessages").innerHTML=
-`<div class="empty">
-${esc(error.message)}
-</div>`;
-
-}
-
-}
-);
-
-addListener(unsub1);
-addListener(unsub2);
-
-await cleanPrivateMessages();
-}
-
-function renderPrivateMessages(list){
-
-const box=$("privateMessages");
-
-if(!box)return;
-
-if(!list.length){
-
-box.innerHTML=
-`<div class="empty">
-Abhi koi private message nahi.
-</div>`;
-
-return;
-}
-
-let html="";
-
-list.forEach(m=>{
-
-const mine=
-m.senderUid===currentUser.uid;
-
-let text=esc(m.text||"");
-
-let replyHtml="";
-
-if(m.replyToText){
-
-replyHtml=`
-<div class="replyQuote">
-<b>${esc(m.replyToSenderName||"User")}</b><br>
-${esc(m.replyToText)}
-</div>
-`;
-
-}
-
-html+=`
-
-<div
-class="privateMessage ${mine?"mine":""}"
-id="msg-${esc(m.id)}">
-
-<div class="privateBubble">
-
-${replyHtml}
-
-<div class="messageText">
-${text}
-${m.edited
-?'<span class="edited">(edited)</span>'
-:""}
-</div>
-
-<div class="messageTime">
-${timeText(m.timestamp)}
-</div>
-
-<button
-class="msgMenuBtn"
-onclick="openMessageActions('${escapeAttribute(m.id)}')">
-⋮
-</button>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-box.innerHTML=html;
-
-setTimeout(()=>{
-
-box.scrollTop=box.scrollHeight;
-
-},20);
-}
-
-async function sendPrivate(){
-
-const input=$("privateInput");
-
-if(!input)return;
-
-const text=input.value.trim();
-
-if(!text)return;
-
-const blocked=await checkEitherBlocked(
-currentUser.uid,
-selectedPrivateUser.uid
-);
-
-if(blocked){
-
-renderBlockedState(true);
-toast("Is user ke saath chat blocked hai.");
-return;
-}
-
-try{
-
-const data={
-
-senderUid:currentUser.uid,
-
-receiverUid:selectedPrivateUser.uid,
-
-senderName:currentProfile.username,
-
-text:text,
-
-timestamp:
-firebase.firestore.FieldValue.serverTimestamp()
-
-};
-
-if(replyMessage){
-
-data.replyToId=replyMessage.id;
-data.replyToText=replyMessage.text||"";
-data.replyToSenderName=
-replyMessage.senderName||"User";
-
-}
-
-await db
-.collection("privateMessages")
-.add(data);
-
-input.value="";
-
-replyMessage=null;
-
-renderReplyBar();
-
-await cleanPrivateMessages();
-
-}catch(error){
-
-toast("Message send nahi hua: "+error.message);
-
-}
-}
-
-function privateBack(){
-
-clearListeners();
-
-selectedPrivateUser=null;
-
-nexaInbox();
-}
-
-/* =====================================================
-   MESSAGE ACTIONS
-===================================================== */
-
-async function openMessageActions(id){
-
-const snap=await db
-.collection("privateMessages")
-.doc(id)
-.get();
-
-if(!snap.exists){
-
-toast("Message nahi mila.");
-return;
-}
-
-selectedMessage={
-id:snap.id,
-...snap.data()
-};
-
-const old=document.querySelector(
-".messageActions"
-);
-
-if(old)old.remove();
-
-const mine=
-selectedMessage.senderUid===currentUser.uid;
-
-const box=document.createElement("div");
-
-box.className="messageActions";
-
-box.innerHTML=`
-
-<button
-class="actionBtn"
-onclick="startReply()">
-↩ Reply
-</button>
-
-${
-mine
-?`
-<button
-class="actionBtn"
-onclick="startEdit()">
-✏ Edit
-</button>
-
-<button
-class="actionBtn"
-onclick="deleteSelectedMessage()">
-🗑 Delete
-</button>
-`
-:""
-}
-
-<button
-class="actionBtn"
-onclick="closeMessageActions()">
-✕ Cancel
-</button>
-`;
-
-document.body.appendChild(box);
-
-}
-
-function closeMessageActions(){
-
-const box=document.querySelector(
-".messageActions"
-);
-
-if(box)box.remove();
-
-selectedMessage=null;
-}
-
-function startReply(){
-
-if(!selectedMessage)return;
-
-replyMessage=selectedMessage;
-
-closeMessageActions();
-
-renderReplyBar();
-
-const input=$("privateInput");
-
-if(input)input.focus();
-}
-
-function renderReplyBar(){
-
-const holder=$("replyBarHolder");
-
-if(!holder)return;
-
-if(!replyMessage){
-
-holder.innerHTML="";
-return;
-}
-
-holder.innerHTML=`
-
-<div class="replyBar">
-
-<div class="replyText">
-
-Replying to
-<b>${esc(replyMessage.senderName||"User")}</b>:
-${esc(replyMessage.text||"")}
-
-</div>
-
-<button
-class="cancelReply"
-onclick="cancelReply()">
-×
-</button>
-
-</div>
-`;
-}
-
-function cancelReply(){
-
-replyMessage=null;
-
-renderReplyBar();
-}
-
-function startEdit(){
-
-if(!selectedMessage)return;
-
-if(
-selectedMessage.senderUid!==currentUser.uid
-){
-
-toast("Sirf apna message edit kar sakte ho.");
-return;
-}
-
-editingMessageId=selectedMessage.id;
-
-closeMessageActions();
-
-const input=$("privateInput");
-
-const area=$("privateInputArea");
-
-if(!input||!area)return;
-
-area.innerHTML=`
-
-<div class="editArea">
-
-<input
-id="editInput"
-value="${esc(selectedMessage.text||"")}"
-autocomplete="off">
-
-<button
-class="smallBtn"
-onclick="saveEdit()">
-SAVE
-</button>
-
-<button
-class="smallBtn"
-onclick="cancelEdit()">
-X
-</button>
-
-</div>
-`;
-
-$("editInput").focus();
-}
-
-async function saveEdit(){
-
-const input=$("editInput");
-
-if(!input)return;
-
-const text=input.value.trim();
-
-if(!text){
-
-toast("Message empty nahi ho sakta.");
-return;
-}
-
-try{
-
-await db
-.collection("privateMessages")
-.doc(editingMessageId)
-.update({
-
-text:text,
-
-edited:true,
-
-editedAt:
-firebase.firestore.FieldValue.serverTimestamp()
-
-});
-
-editingMessageId=null;
-
-restorePrivateInput();
-
-toast("Message edit ho gaya.");
-
-}catch(error){
-
-toast(error.message);
-
-}
-}
-
-function cancelEdit(){
-
-editingMessageId=null;
-
-restorePrivateInput();
-}
-
-function restorePrivateInput(){
-
-const area=$("privateInputArea");
-
-if(!area)return;
-
-area.innerHTML=`
-
-<input
-id="privateInput"
-placeholder="Write message..."
-autocomplete="off">
-
-<button
-class="sendBtn"
-onclick="sendPrivate()">
-SEND
-</button>
-`;
-}
-
-async function deleteSelectedMessage(){
-
-if(!selectedMessage)return;
-
-if(
-selectedMessage.senderUid!==currentUser.uid
-){
-
-toast("Sirf apna message delete kar sakte ho.");
-return;
-}
-
-const yes=confirm(
-"Kya ye message delete karna hai?"
-);
-
-if(!yes){
-
-closeMessageActions();
-return;
-}
-
-try{
-
-await db
-.collection("privateMessages")
-.doc(selectedMessage.id)
-.delete();
-
-toast("Message delete ho gaya.");
-
-}catch(error){
-
-toast(error.message);
-
-}
-
-closeMessageActions();
-}
-
-/* =====================================================
-   PRIVATE CLEANUP
-===================================================== */
-
-async function cleanPrivateMessages(){
-
-if(!currentUser||!selectedPrivateUser)return;
-
-try{
-
-const other=selectedPrivateUser.uid;
-
-const a=await db
-.collection("privateMessages")
-.where("senderUid","==",currentUser.uid)
-.where("receiverUid","==",other)
-.orderBy("timestamp","desc")
-.limit(30)
-.get();
-
-const b=await db
-.collection("privateMessages")
-.where("senderUid","==",other)
-.where("receiverUid","==",currentUser.uid)
-.orderBy("timestamp","desc")
-.limit(30)
-.get();
-
-const map={};
-
-a.forEach(d=>{
-map[d.id]={ref:d.ref,...d.data()};
-});
-
-b.forEach(d=>{
-map[d.id]={ref:d.ref,...d.data()};
-});
-
-const all=Object.entries(map)
-.sort((x,y)=>{
-
-const aTime=x[1].timestamp &&
-x[1].timestamp.toMillis
-?x[1].timestamp.toMillis()
-:0;
-
-const bTime=y[1].timestamp &&
-y[1].timestamp.toMillis
-?y[1].timestamp.toMillis()
-:0;
-
-return bTime-aTime;
-
-});
-
-const old=all.slice(10);
-
-const batch=db.batch();
-
-old.forEach(item=>{
-
-/*
-Firestore rules allow each user
-to delete only their own messages.
-*/
-
-if(item[1].senderUid===currentUser.uid){
-
-batch.delete(item[1].ref);
-
-}
-
-});
-
-if(old.some(item=>
-item[1].senderUid===currentUser.uid
-)){
-
-await batch.commit();
-
-}
-
-}catch(e){}
-}
-
-/* =====================================================
-   BLOCK SYSTEM
-===================================================== */
-
-async function isBlocked(ownerUid,targetUid){
-
-const id=ownerUid+"_"+targetUid;
-
-const snap=await db
-.collection("blocks")
-.doc(id)
-.get();
-
-return snap.exists;
-}
-
-async function checkEitherBlocked(a,b){
-
-try{
-
-const first=await isBlocked(a,b);
-
-if(first)return true;
-
-const second=await isBlocked(b,a);
-
-return second;
-
+  if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+  auth=firebase.auth();
+  db=firebase.firestore();
+  try{
+    var theme=localStorage.getItem("nexachat-theme");
+    if(theme)setTheme(theme);
+  }catch(e){}
+  auth.onAuthStateChanged(function(user){
+    if(!user){
+      me=null;myName="";stopPresence();clearListeners();
+      show("authView");
+      return;
+    }
+    me=user;
+    myUserRef().get().then(function(doc){
+      if(!doc.exists || !doc.data().username)return;
+      myName=doc.data().username;
+      startPresence();goHome();
+      $("welcome").textContent="Hello, "+myName+"!";
+      startOnlineCount();
+    }).catch(function(e){setStatus(friendlyError(e));});
+  });
 }catch(e){
-
-return false;
-
+  error("authError","Firebase initialize nahi hua: "+e.message);
 }
-}
-
-async function blockUser(){
-
-if(!selectedPrivateUser)return;
-
-const yes=confirm(
-"Is user ko block karna hai?"
-);
-
-if(!yes)return;
-
-try{
-
-const id=
-currentUser.uid+
-"_"+selectedPrivateUser.uid;
-
-await db
-.collection("blocks")
-.doc(id)
-.set({
-
-ownerUid:currentUser.uid,
-
-blockedUid:selectedPrivateUser.uid,
-
-blockedUsername:selectedPrivateUser.username,
-
-createdAt:
-firebase.firestore.FieldValue.serverTimestamp()
-
-});
-
-toast("User block ho gaya.");
-
-privateBack();
-
-}catch(error){
-
-toast(error.message);
-
-}
-}
-
-async function unblockUser(uid){
-
-try{
-
-await db
-.collection("blocks")
-.doc(
-currentUser.uid+"_"+uid
-)
-.delete();
-
-toast("User unblock ho gaya.");
-
-blockedUsers();
-
-}catch(error){
-
-toast(error.message);
-
-}
-}
-
-function renderBlockedState(blocked){
-
-const box=$("blockedState");
-
-const input=$("privateInputArea");
-
-if(!box)return;
-
-if(blocked){
-
-box.innerHTML=`
-
-<div class="blockedBox">
-
-🚫 Chat blocked
-
-<br><br>
-
-Is conversation mein normal
-message send nahi ho sakta.
-
-</div>
-`;
-
-if(input){
-
-input.style.display="none";
-
-}
-
-}else{
-
-box.innerHTML="";
-
-if(input){
-
-input.style.display="flex";
-
-}
-
-}
-}
-
-/* =====================================================
-   PRIVATE OPTIONS
-===================================================== */
-
-function privateOptions(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="openPrivate('${escapeAttribute(selectedPrivateUser.uid)}','${escapeAttribute(selectedPrivateUser.username)}')">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-Options
-</div>
-
-</div>
-
-</div>
-
-<div class="content optionArea">
-
-<button
-class="optionBtn"
-onclick="blockUser()">
-🚫 Block ${esc(selectedPrivateUser.username)}
-</button>
-
-<button
-class="optionBtn"
-onclick="blockedUsers()">
-🔓 Blocked Users
-</button>
-
-<button
-class="optionBtn"
-onclick="openPrivate('${escapeAttribute(selectedPrivateUser.uid)}','${escapeAttribute(selectedPrivateUser.username)}')">
-← Back to Chat
-</button>
-
-</div>
-
-</div>
-`);
-
-focusFirst();
-}
-
-/* =====================================================
-   INBOX OPTIONS
-===================================================== */
-
-function inboxOptions(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="nexaInbox()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-Nexa Inbox Options
-</div>
-
-</div>
-
-</div>
-
-<div class="content optionArea">
-
-<button
-class="optionBtn"
-onclick="settings()">
-⚙ Settings
-</button>
-
-<button
-class="optionBtn"
-onclick="blockedUsers()">
-🔓 Blocked Users
-</button>
-
-<button
-class="optionBtn danger"
-onclick="removeAccountScreen()">
-🗑 Remove ID
-</button>
-
-<button
-class="optionBtn"
-onclick="logout()">
-🚪 Logout
-</button>
-
-</div>
-
-</div>
-`);
-
-focusFirst();
-}
-
-/* =====================================================
-   BLOCKED USERS
-===================================================== */
-
-function blockedUsers(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="nexaInbox()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-Blocked Users
-</div>
-
-</div>
-
-</div>
-
-<div
-id="blockedList"
-class="content userList">
-
-<div class="empty">
-Loading...
-</div>
-
-</div>
-
-</div>
-`);
-
-const unsub=db
-.collection("blocks")
-.where("ownerUid","==",currentUser.uid)
-.onSnapshot(
-snap=>{
-
-const box=$("blockedList");
-
-if(!box)return;
-
-if(snap.empty){
-
-box.innerHTML=
-`<div class="empty">
-Koi blocked user nahi hai.
-</div>`;
-
-return;
-}
-
-let html="";
-
-snap.forEach(doc=>{
-
-const d=doc.data();
-
-html+=`
-
-<div
-class="userItem">
-
-<div class="userInfo">
-
-<div class="userName">
-${esc(d.blockedUsername||"User")}
-</div>
-
-<div class="userStatus offline">
-🚫 Blocked
-</div>
-
-</div>
-
-<button
-class="smallBtn"
-onclick="unblockUser('${escapeAttribute(d.blockedUid)}')">
-UNBLOCK
-</button>
-
-</div>
-`;
-
-});
-
-box.innerHTML=html;
-
-},
-error=>{
-
-$("blockedList").innerHTML=
-`<div class="empty">
-${esc(error.message)}
-</div>`;
-
-}
-);
-
-addListener(unsub);
-
-focusFirst();
-}
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-function settings(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="home()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-⚙ Settings
-</div>
-
-</div>
-
-</div>
-
-<div class="content optionArea">
-
-<div class="info">
-
-<b>Username</b><br>
-${esc(currentProfile.username)}
-
-<br><br>
-
-<b>NexaChat ID</b><br>
-${esc(currentUser.uid)}
-
-<br><br>
-
-Lightweight KaiOS-friendly NexaChat.
-
-</div>
-
-<button
-class="optionBtn"
-onclick="blockedUsers()">
-🔓 Blocked Users
-</button>
-
-<button
-class="optionBtn"
-onclick="logout()">
-🚪 Logout
-</button>
-
-<button
-class="optionBtn danger"
-onclick="removeAccountScreen()">
-🗑 Remove ID
-</button>
-
-</div>
-
-</div>
-`);
-
-focusFirst();
-}
-
-/* =====================================================
-   REMOVE ACCOUNT
-===================================================== */
-
-function removeAccountScreen(){
-
-clearListeners();
-
-show(`
-<div class="screen">
-
-<div class="header">
-
-<div class="headerLeft">
-
-<button
-class="backBtn"
-data-back="true"
-onclick="settings()">
-‹
-</button>
-
-</div>
-
-<div class="headerCenter">
-
-<div class="title">
-Remove ID
-</div>
-
-</div>
-
-</div>
-
-<div class="content">
-
-<div class="confirmBox">
-
-<h2>⚠ Remove ID?</h2>
-
-<p>
-Tumhara NexaChat account permanently
-remove ho jayega.
-</p>
-
-<p>
-Ye action undo nahi hoga.
-</p>
-
-<input
-id="deletePassword"
-type="password"
-placeholder="Enter password">
-
-<button
-class="primaryBtn"
-onclick="removeAccount()">
-YES, REMOVE ID
-</button>
-
-<button
-class="secondaryBtn"
-onclick="settings()">
-CANCEL
-</button>
-
-</div>
-
-</div>
-
-</div>
-`);
-
-focusFirst();
-}
-
-async function removeAccount(){
-
-const password=$("deletePassword").value;
-
-if(!password){
-
-toast("Password enter karo.");
-return;
-}
-
-const yes=confirm(
-"Final confirmation: ID permanently remove karni hai?"
-);
-
-if(!yes)return;
-
-try{
-
-const credential=
-firebase.auth.EmailAuthProvider.credential(
-emailFromUsername(currentProfile.username),
-password
-);
-
-await currentUser.reauthenticateWithCredential(
-credential
-);
-
-const uid=currentUser.uid;
-
-await db
-.collection("users")
-.doc(uid)
-.delete();
-
-await currentUser.delete();
-
-toast("ID remove ho gayi.");
-
-}catch(error){
-
-toast(
-"Remove failed: "+
-(error.message||"Unknown error")
-);
-
-}
-}
-
-/* =====================================================
-   AUTH STATE
-===================================================== */
-
-auth.onAuthStateChanged(
-async user=>{
-
-if(user){
-
-currentUser=user;
-
-try{
-
-await loadProfile();
-
-$("loading").style.display="none";
-
-home();
-
-}catch(error){
-
-$("loading").style.display="none";
-
-toast(error.message);
-
-loginScreen();
-
-}
-
-}else{
-
-currentUser=null;
-currentProfile=null;
-
-clearListeners();
-
-$("loading").style.display="none";
-
-loginScreen();
-
-}
-
-}
-);
-
-/* =====================================================
-   LOADING SAFETY
-===================================================== */
-
-setTimeout(()=>{
-
-if($("loading")){
-
-$("loading").style.display="none";
-
-}
-
-},3500);
-
+})();
 </script>
-
 </body>
 </html>
