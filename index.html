@@ -11,7 +11,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
 button,input{font:inherit}
 button{cursor:pointer}
 header{height:48px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:8px}
-.logo{font-size:19px;font-weight:bold;color:var(--accent)}
+.logo{font-size:16px;font-weight:bold;color:var(--accent)}
+.logo span{font-size:11px;color:var(--muted);margin-left:6px}
 #onlineCount{font-size:12px;color:var(--accent)}
 main{padding:12px;max-width:520px;margin:auto}
 .hidden{display:none!important}
@@ -30,7 +31,7 @@ input:focus,button:focus{border-color:var(--accent);outline:1px solid var(--acce
 .userrow:focus{background:var(--card)}
 .small{font-size:12px;color:var(--muted)}
 .error{color:#ff8293;font-size:13px;white-space:pre-wrap}
-#messages{height:calc(100dvh - 185px);min-height:180px;overflow-y:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px}
+#messages{height:calc(100vh - 185px);height:calc(100dvh - 185px);min-height:180px;overflow-y:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px}
 .msg{padding:8px 9px;margin:7px 0;background:var(--panel);border-radius:7px;overflow-wrap:anywhere}
 .msghead{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px}
 .sender{color:var(--accent);font-weight:bold}
@@ -43,13 +44,13 @@ input:focus,button:focus{border-color:var(--accent);outline:1px solid var(--acce
 .softkeys{position:fixed;bottom:0;left:0;right:0;height:29px;background:#020810;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:12px;z-index:5}
 body{padding-bottom:35px}
 #status{font-size:13px;color:var(--muted);margin:8px 0;white-space:pre-wrap}
-#userList{max-height:55dvh;overflow:auto}
+#userList{max-height:55vh;max-height:55dvh;overflow:auto}
 hr{border:0;border-top:1px solid var(--border);margin:14px 0}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">✦ NexaChat</div>
+  <div class="logo">✦ NexaChat <span>Owner: Ziddi Malik</span></div>
   <div id="onlineCount">● 0 online</div>
 </header>
 
@@ -57,6 +58,7 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
   <section id="authView">
     <div class="card">
       <h2>Welcome to NexaChat</h2>
+      <p style="color:var(--accent);font-weight:bold;margin-top:-10px">Owner: Ziddi Malik</p>
       <p>Simple, fast chat for KaiOS.</p>
       <label for="username">Username</label>
       <input id="username" maxlength="20" autocomplete="username" placeholder="Letters, numbers, underscore">
@@ -87,12 +89,11 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
       <input id="worldInput" maxlength="1000" placeholder="Write a message..." aria-label="Message">
       <button class="btn" id="sendWorld">SEND</button>
     </div>
-    <button class="btn secondary" id="worldUsersBtn">ONLINE USERS</button>
   </section>
 
   <section id="usersView" class="hidden">
-    <h2>Users</h2>
-    <input id="userSearch" maxlength="30" placeholder="Search username...">
+    <h2>Online Users</h2>
+    <input id="userSearch" maxlength="30" placeholder="Search online users...">
     <div id="userList"></div>
     <div id="usersError" class="error"></div>
   </section>
@@ -103,8 +104,8 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
       <button class="btn secondary" style="width:auto;padding:8px" id="privateBack">BACK</button>
     </div>
     <div class="small">Text messages only</div>
-    <div id="privateMessages" style="height:calc(100dvh - 205px);min-height:160px;overflow:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px;margin-top:8px" aria-live="polite"></div>
-    <div id="privateTyping" class="small" style="height:18px"></div>
+    <div id="privateMessages" style="height:calc(100vh - 205px);height:calc(100dvh - 205px);min-height:160px;overflow:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px;margin-top:8px" aria-live="polite"></div>
+    <div id="privateTyping" class="small" style="height:18px;color:var(--accent)"></div>
     <div id="privateComposer" class="row">
       <input id="privateInput" maxlength="1000" placeholder="Write a message..." aria-label="Private message">
       <button id="sendPrivate" class="btn" style="width:65px">SEND</button>
@@ -140,8 +141,8 @@ hr{border:0;border-top:1px solid var(--border);margin:14px 0}
 <script>
 (function(){
 "use strict";
-
-/* NexaChat Firebase configuration */
+if(!Promise.prototype.finally){Promise.prototype.finally=function(f){var P=this.constructor;return this.then(function(v){return P.resolve(f()).then(function(){return v;});},function(e){return P.resolve(f()).then(function(){throw e;});});};}
+if(window.NodeList&&!NodeList.prototype.forEach){NodeList.prototype.forEach=Array.prototype.forEach;}
 var firebaseConfig = {
   apiKey: "AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",
   authDomain: "nexachat-28ecc.firebaseapp.com",
@@ -151,22 +152,17 @@ var firebaseConfig = {
   appId: "1:367209102337:web:6f3a0e63b554f6dd145400",
   measurementId: "G-JLQW9XPDL6"
 };
-
 var auth, db, me = null, myName = "", currentChat = null;
-var unsub = [], presenceTimer = null, typingTimer = null;
+var unsub = [], presenceTimer = null;
 var sendingWorld = false, sendingPrivate = false;
 var lastWorldTyping = 0, lastPrivateTyping = 0;
+var cachedUsers = [];
+var onlineUnsub = null;
 var $ = function(id){return document.getElementById(id);};
-
 function setStatus(text){$("status").textContent = text || "";}
 function error(id,text){$(id).textContent = text || "";}
-function clearListeners(){
-  unsub.forEach(function(fn){try{fn();}catch(e){}});
-  unsub = [];
-}
-function listen(fn){
-  if(typeof fn === "function") unsub.push(fn);
-}
+function clearListeners(){ unsub.forEach(function(fn){try{fn();}catch(e){}}); unsub = []; }
+function listen(fn){ if(typeof fn === "function") unsub.push(fn); }
 function show(view){
   ["authView","homeView","worldView","usersView","privateView","settingsView"].forEach(function(id){
     $(id).classList.toggle("hidden",id!==view);
@@ -206,41 +202,32 @@ function getChatId(a,b){return [a,b].sort().join("_");}
 function myUserRef(){return db.collection("users").doc(me.uid);}
 function updateLastSeen(){
   if(!me) return;
-  myUserRef().set({username:myName,usernameLower:myName.toLowerCase(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})
-  .catch(function(e){console.warn("Presence update:",e.code);});
+  myUserRef().set({username:myName,usernameLower:myName.toLowerCase(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(function(e){});
 }
-function startPresence(){
-  stopPresence();
-  updateLastSeen();
-  presenceTimer=setInterval(updateLastSeen,25000);
-}
-function stopPresence(){
-  if(presenceTimer) clearInterval(presenceTimer);
-  presenceTimer=null;
-}
+function startPresence(){ stopPresence(); updateLastSeen(); presenceTimer=setInterval(updateLastSeen,25000); }
+function stopPresence(){ if(presenceTimer) clearInterval(presenceTimer); presenceTimer=null; }
 function isOnline(data){
   if(!data.lastSeen) return false;
   var d=data.lastSeen.toDate ? data.lastSeen.toDate().getTime() : new Date(data.lastSeen).getTime();
   return !isNaN(d) && Date.now()-d<70000;
 }
 function startOnlineCount(){
-  listen(db.collection("users").onSnapshot(function(snap){
+  if(onlineUnsub){try{onlineUnsub();}catch(e){}}
+  onlineUnsub=db.collection("users").onSnapshot(function(snap){
     var count=0;
     snap.forEach(function(doc){if(doc.id!==me.uid && isOnline(doc.data())) count++;});
     $("onlineCount").textContent="● "+count+" online";
-  },function(e){console.warn(e);}));
+  });
 }
 function startWorld(){
   clearListeners();show("worldView");
   $("messages").textContent="";
-  listen(db.collection("worldMessages").orderBy("createdAt","desc").limit(15).onSnapshot(function(snap){
+  listen(db.collection("worldMessages").orderBy("createdAt","desc").limit(20).onSnapshot(function(snap){
     var el=$("messages");el.textContent="";
     var docs=[];snap.forEach(function(d){docs.push(d.data());});
     docs.reverse().forEach(function(d){addMessage(el,d);});
     scrollBottom(el);
-  },function(e){
-    setStatus("World Lounge error: "+e.message);
-  }));
+  },function(e){ setStatus("World error: "+e.message); }));
   listen(db.collection("worldTyping").onSnapshot(function(snap){
     var names=[];
     snap.forEach(function(d){
@@ -251,60 +238,52 @@ function startWorld(){
       }
     });
     $("typing").textContent=names.length ? names.slice(0,2).join(", ")+" typing..." : "";
-  },function(e){console.warn(e);}));
+  }));
 }
 function setWorldTyping(typing){
   if(!me)return;
   var now=Date.now();
-  if(typing && now-lastWorldTyping<1500)return;
+  if(typing && now-lastWorldTyping<1000)return;
   lastWorldTyping=now;
-  db.collection("worldTyping").doc(me.uid).set({
-    username:myName,typing:!!typing,
-    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-  },{merge:true}).catch(function(e){console.warn(e);});
+  db.collection("worldTyping").doc(me.uid).set({ username:myName,typing:!!typing, updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
 }
 function sendWorld(){
   var text=$("worldInput").value.trim();
   if(!text||!me||sendingWorld)return;
-  if(text.length>1000)return;
-  sendingWorld=true;
-  $("sendWorld").disabled=true;
-  db.collection("worldMessages").add({
-    senderUid:me.uid,username:myName,text:text,
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(){
-    $("worldInput").value="";
-    setWorldTyping(false);
-  }).catch(function(e){setStatus("Message send nahi hua: "+e.message);})
+  sendingWorld=true; $("sendWorld").disabled=true;
+  db.collection("worldMessages").add({ senderUid:me.uid,username:myName,text:text, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){ $("worldInput").value=""; setWorldTyping(false);
+  }).catch(function(e){setStatus("Failed to send: "+e.message);})
   .finally(function(){sendingWorld=false;$("sendWorld").disabled=false;});
+}
+function renderUsers(){
+  var query=$("userSearch").value.trim().toLowerCase();
+  var el=$("userList"); el.textContent="";
+  var list = cachedUsers.filter(function(item){
+    if(!isOnline(item.data)) return false;
+    if(query && item.data.usernameLower.indexOf(query)===-1 && item.data.username.toLowerCase().indexOf(query)===-1) return false;
+    return true;
+  });
+  list.sort(function(a,b){return a.data.username.localeCompare(b.data.username);});
+  if(!list.length){ var p=document.createElement("p"); p.textContent="No online users found."; el.appendChild(p); return; }
+  list.forEach(function(item){
+    var row=document.createElement("div");row.className="userrow";row.tabIndex=0;
+    var name=document.createElement("strong");name.textContent=item.data.username;
+    var sub=document.createElement("div");sub.className="small"; sub.textContent="● Online";
+    row.appendChild(name);row.appendChild(sub);
+    row.addEventListener("click",function(){openPrivate(item.id,item.data.username);});
+    row.addEventListener("keydown",function(e){if(e.key==="Enter")openPrivate(item.id,item.data.username);});
+    el.appendChild(row);
+  });
 }
 function loadUsers(){
   clearListeners();show("usersView");
-  $("userList").textContent="";
-  listen(db.collection("users").limit(100).onSnapshot(function(snap){
-    var query=$("userSearch").value.trim().toLowerCase();
-    var el=$("userList");el.textContent="";
-    var list=[];
-    snap.forEach(function(d){
-      var x=d.data();
-      if(d.id!==me.uid && x.username && x.username.toLowerCase().indexOf(query)!==-1){
-        list.push({id:d.id,data:x});
-      }
+  $("userList").textContent=""; cachedUsers=[];
+  listen(db.collection("users").limit(200).onSnapshot(function(snap){
+    cachedUsers=[]; snap.forEach(function(d){
+      var x=d.data(); if(d.id!==me.uid && x.username){ cachedUsers.push({id:d.id,data:x}); }
     });
-    list.sort(function(a,b){return a.data.username.localeCompare(b.data.username);});
-    if(!list.length){
-      var p=document.createElement("p");p.textContent="No users found.";el.appendChild(p);
-    }
-    list.forEach(function(item){
-      var row=document.createElement("div");row.className="userrow";row.tabIndex=0;
-      var name=document.createElement("strong");name.textContent=item.data.username;
-      var sub=document.createElement("div");sub.className="small";
-      sub.textContent=isOnline(item.data)?"● Online":"○ Offline";
-      row.appendChild(name);row.appendChild(sub);
-      row.addEventListener("click",function(){openPrivate(item.id,item.data.username);});
-      row.addEventListener("keydown",function(e){if(e.key==="Enter")openPrivate(item.id,item.data.username);});
-      el.appendChild(row);
-    });
+    renderUsers();
   },function(e){error("usersError",e.message);}));
 }
 function openPrivate(uid,name){
@@ -315,209 +294,127 @@ function openPrivate(uid,name){
   $("privateMessages").textContent="";
   error("privateError","");
   var chatId=getChatId(me.uid,uid);
-  listen(db.collection("privateMessages").where("chatId","==",chatId).orderBy("createdAt","desc").limit(10).onSnapshot(function(snap){
+  listen(db.collection("privateMessages").where("chatId","==",chatId).onSnapshot(function(snap){
     var el=$("privateMessages");el.textContent="";
     var docs=[];snap.forEach(function(d){docs.push(d.data());});
-    docs.reverse().forEach(function(d){addMessage(el,d);});
+    function ms(x){return x.createdAt&&x.createdAt.toMillis?x.createdAt.toMillis():Date.now();}
+    docs.sort(function(a,b){return ms(a)-ms(b);});
+    docs.slice(-20).forEach(function(d){addMessage(el,d);});
     scrollBottom(el);
-  },function(e){error("privateError","Private chat error: "+e.message);}));
+  },function(e){error("privateError","Chat error: "+e.message);}));
   listen(db.collection("privateTyping").doc(chatId).onSnapshot(function(doc){
     var d=doc.exists?doc.data():{};
-    $("privateTyping").textContent=(d.uid!==me.uid && d.typing && d.updatedAt &&
-      Date.now()-(d.updatedAt.toDate?d.updatedAt.toDate().getTime():0)<7000)
-      ? name+" typing..." : "";
-  },function(e){console.warn(e);}));
+    var isTyping = d.uid!==me.uid && d.typing && d.updatedAt && Date.now()-(d.updatedAt.toDate?d.updatedAt.toDate().getTime():0)<7000;
+    $("privateTyping").textContent = isTyping ? name+" typing..." : "";
+  }));
 }
 function setPrivateTyping(typing){
   if(!me||!currentChat)return;
   var now=Date.now();
-  if(typing && now-lastPrivateTyping<1500)return;
+  if(typing && now-lastPrivateTyping<1000)return;
   lastPrivateTyping=now;
-  db.collection("privateTyping").doc(getChatId(me.uid,currentChat.uid)).set({
-    uid:me.uid,username:myName,typing:!!typing,
-    updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-  },{merge:true}).catch(function(e){console.warn(e);});
+  db.collection("privateTyping").doc(getChatId(me.uid,currentChat.uid)).set({ uid:me.uid,username:myName,typing:!!typing, updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
 }
 function sendPrivate(){
   var text=$("privateInput").value.trim();
   if(!text||!me||!currentChat||sendingPrivate)return;
   sendingPrivate=true;$("sendPrivate").disabled=true;
   var chatId=getChatId(me.uid,currentChat.uid);
-  db.collection("privateMessages").add({
-    chatId:chatId,senderUid:me.uid,receiverUid:currentChat.uid,
-    senderName:myName,username:myName,text:text,
-    createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(){
-    $("privateInput").value="";
-    setPrivateTyping(false);
-  }).catch(function(e){error("privateError","Send nahi hua: "+e.message);})
+  db.collection("privateMessages").add({ chatId:chatId,senderUid:me.uid,receiverUid:currentChat.uid, senderName:myName,username:myName,text:text, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){ $("privateInput").value=""; setPrivateTyping(false);
+  }).catch(function(e){error("privateError","Failed to send: "+e.message);})
   .finally(function(){sendingPrivate=false;$("sendPrivate").disabled=false;});
 }
-function goHome(){
-  clearListeners();currentChat=null;show("homeView");
-}
+function goHome(){ clearListeners();currentChat=null;show("homeView"); }
 function friendlyError(e){
   var code=e && e.code || "";
-  if(code==="auth/user-not-found"||code==="auth/wrong-password"||code==="auth/invalid-credential")return "Username ya password ghalat hai.";
-  if(code==="auth/email-already-in-use")return "Is username ka account pehle se hai.";
-  if(code==="auth/weak-password")return "Password kam az kam 6 characters ka rakho.";
-  if(code==="auth/network-request-failed")return "Internet connection check karo.";
-  if(code==="permission-denied"||code==="firestore/permission-denied")return "Firestore Rules ne access rok diya. Rules check karo.";
-  return e && e.message ? e.message : "Kuch ghalat hua. Dobara koshish karo.";
+  if(code==="auth/user-not-found"||code==="auth/wrong-password"||code==="auth/invalid-credential")return "Incorrect username or password.";
+  if(code==="auth/email-already-in-use")return "This username already exists.";
+  if(code==="auth/weak-password")return "Password must be at least 6 characters.";
+  if(code==="auth/network-request-failed")return "Check your internet connection.";
+  if(code==="permission-denied"||code==="firestore/permission-denied")return "Permission denied. Check Firestore Rules.";
+  return e && e.message ? e.message : "Something went wrong. Try again.";
 }
 function signup(){
   var name=cleanName($("username").value),pass=$("password").value;
   error("authError","");
-  if(!validName(name)){error("authError","Username 3-20 characters ka ho. Sirf English letters, numbers aur _ use karo.");return;}
-  if(pass.length<6){error("authError","Password kam az kam 6 characters ka ho.");return;}
-  $("signupBtn").disabled=true;
+  if(!validName(name)){error("authError","Username 3-20 chars, letters, numbers, underscore only.");return;}
+  if(pass.length<6){error("authError","Password must be at least 6 characters.");return;}
+  $("signupBtn").disabled=true; $("loginBtn").disabled=true;
   auth.createUserWithEmailAndPassword(emailFor(name),pass).then(function(cred){
     me=cred.user;myName=name;
-    return db.collection("usernames").doc(name.toLowerCase()).get().then(function(doc){
-      if(doc.exists && doc.data().uid!==me.uid){
-        throw new Error("USERNAME_TAKEN");
-      }
-      return db.collection("usernames").doc(name.toLowerCase()).set({
-        uid:me.uid,username:name
-      }).then(function(){
-        return myUserRef().set({
-          username:name,usernameLower:name.toLowerCase(),
-          createdAt:firebase.firestore.FieldValue.serverTimestamp(),
-          lastSeen:firebase.firestore.FieldValue.serverTimestamp()
-        });
-      });
+    return db.collection("usernames").doc(name.toLowerCase()).set({uid:me.uid,username:name}).then(function(){
+      return myUserRef().set({ username:name,usernameLower:name.toLowerCase(), createdAt:firebase.firestore.FieldValue.serverTimestamp(), lastSeen:firebase.firestore.FieldValue.serverTimestamp() });
     });
-  }).then(function(){
-    startPresence();goHome();$("welcome").textContent="Hello, "+myName+"!";
-    startOnlineCount();
-  }).catch(function(e){
-    var message=e.message==="USERNAME_TAKEN"?"Yeh username pehle se use ho raha hai.":friendlyError(e);
-    error("authError",message);
-    if(me && me.uid){
-      // Do not delete an account automatically after an uncertain network error.
-      me=null;myName="";
-    }
-  }).finally(function(){$("signupBtn").disabled=false;});
+  }).then(function(){ startPresence();goHome();$("welcome").textContent="Hello, "+myName+"!"; startOnlineCount();
+  }).catch(function(e){ error("authError",e.message==="USERNAME_TAKEN"?"Username already taken.":friendlyError(e)); me=null;myName="";
+  }).finally(function(){$("signupBtn").disabled=false;$("loginBtn").disabled=false;});
 }
 function login(){
   var name=cleanName($("username").value),pass=$("password").value;
   error("authError","");
-  if(!validName(name)){error("authError","Apna valid username likho.");return;}
-  if(!pass){error("authError","Password likho.");return;}
-  $("loginBtn").disabled=true;
+  if(!validName(name)){error("authError","Enter valid username.");return;}
+  if(!pass){error("authError","Enter password.");return;}
+  $("loginBtn").disabled=true; $("signupBtn").disabled=true;
   auth.signInWithEmailAndPassword(emailFor(name),pass).then(function(cred){
-    me=cred.user;
-    return myUserRef().get();
+    me=cred.user; return myUserRef().get();
   }).then(function(doc){
-    if(!doc.exists || !doc.data().username)throw new Error("User profile nahi mila. Account setup check karo.");
-    myName=doc.data().username;
-    startPresence();goHome();
-    $("welcome").textContent="Hello, "+myName+"!";
-    startOnlineCount();
-  }).catch(function(e){
-    error("authError",friendlyError(e));
-  }).finally(function(){$("loginBtn").disabled=false;});
+    if(!doc.exists || !doc.data().username) throw new Error("Profile not found.");
+    myName=doc.data().username; startPresence();goHome(); $("welcome").textContent="Hello, "+myName+"!"; startOnlineCount();
+  }).catch(function(e){ error("authError",friendlyError(e));
+  }).finally(function(){$("loginBtn").disabled=false;$("signupBtn").disabled=false;});
 }
 function logout(){
   clearListeners();stopPresence();
-  if(me){
-    db.collection("worldTyping").doc(me.uid).set({
-      username:myName,typing:false,
-      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-    },{merge:true}).catch(function(){});
-  }
-  auth.signOut().catch(function(e){setStatus(friendlyError(e));});
+  if(me){ db.collection("worldTyping").doc(me.uid).set({username:myName,typing:false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(function(){}); }
+  auth.signOut();
 }
 function setTheme(t){
   var r=document.documentElement;
-  if(t==="light"){
-    r.style.setProperty("--bg","#edf2f7");r.style.setProperty("--panel","#fff");
-    r.style.setProperty("--card","#e2eaf2");r.style.setProperty("--text","#172538");
-    r.style.setProperty("--muted","#516579");r.style.setProperty("--border","#c3d0df");
-  }else if(t==="ocean"){
-    r.style.setProperty("--bg","#05283b");r.style.setProperty("--panel","#06405a");
-    r.style.setProperty("--card","#0a5870");r.style.setProperty("--text","#f2fbff");
-    r.style.setProperty("--muted","#b9dbe7");r.style.setProperty("--border","#20728b");
-  }else{
-    r.style.setProperty("--bg","#081321");r.style.setProperty("--panel","#102238");
-    r.style.setProperty("--card","#17304a");r.style.setProperty("--text","#f3f7ff");
-    r.style.setProperty("--muted","#a8bdd2");r.style.setProperty("--border","#29445e");
-  }
-  try{localStorage.setItem("nexachat-theme",t);}catch(e){}
+  if(t==="light"){ r.style.setProperty("--bg","#edf2f7");r.style.setProperty("--panel","#fff"); r.style.setProperty("--card","#e2eaf2");r.style.setProperty("--text","#172538"); r.style.setProperty("--muted","#516579");r.style.setProperty("--border","#c3d0df"); }
+  else if(t==="ocean"){ r.style.setProperty("--bg","#05283b");r.style.setProperty("--panel","#06405a"); r.style.setProperty("--card","#0a5870");r.style.setProperty("--text","#f2fbff"); r.style.setProperty("--muted","#b9dbe7");r.style.setProperty("--border","#20728b"); }
+  else{ r.style.setProperty("--bg","#081321");r.style.setProperty("--panel","#102238"); r.style.setProperty("--card","#17304a");r.style.setProperty("--text","#f3f7ff"); r.style.setProperty("--muted","#a8bdd2");r.style.setProperty("--border","#29445e"); }
+  try{localStorage.setItem("theme",t);}catch(e){}
 }
-$("loginBtn").addEventListener("click",login);
-$("signupBtn").addEventListener("click",signup);
-$("worldBtn").addEventListener("click",startWorld);
-$("worldRefresh").addEventListener("click",startWorld);
-$("sendWorld").addEventListener("click",sendWorld);
-$("worldInput").addEventListener("input",function(){setWorldTyping(!!this.value.trim());});
-$("worldInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendWorld();}});
-$("worldUsersBtn").addEventListener("click",loadUsers);
-$("inboxBtn").addEventListener("click",loadUsers);
-$("userSearch").addEventListener("input",loadUsers);
-$("sendPrivate").addEventListener("click",sendPrivate);
-$("privateInput").addEventListener("input",function(){setPrivateTyping(!!this.value.trim());});
-$("privateInput").addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendPrivate();}});
-$("privateBack").addEventListener("click",loadUsers);
-$("settingsBtn").addEventListener("click",function(){
-  show("settingsView");$("accountInfo").textContent="Logged in as: "+myName;
-});
-$("logoutBtn").addEventListener("click",logout);
-document.querySelectorAll(".themeBtn").forEach(function(b){
-  b.addEventListener("click",function(){setTheme(b.dataset.theme);});
-});
-$("softLeft").addEventListener("click",function(){
-  if(!$("worldView").classList.contains("hidden"))loadUsers();
-  else if(!$("authView").classList.contains("hidden"))login();
-  else loadUsers();
-});
-$("softRight").addEventListener("click",function(){
-  if(!$("privateView").classList.contains("hidden"))loadUsers();
-  else if(!$("worldView").classList.contains("hidden"))goHome();
-  else if(!$("usersView").classList.contains("hidden")||!$("settingsView").classList.contains("hidden"))goHome();
-  else if(!$("homeView").classList.contains("hidden"))logout();
-});
-document.addEventListener("keydown",function(e){
-  if(e.key==="Escape"||e.key==="Backspace" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){
-    e.preventDefault();
-    if(!$("privateView").classList.contains("hidden"))loadUsers();
-    else if(!$("worldView").classList.contains("hidden")||!$("usersView").classList.contains("hidden")||!$("settingsView").classList.contains("hidden"))goHome();
-  }
-});
-document.addEventListener("visibilitychange",function(){
-  if(!document.hidden && me)updateLastSeen();
-});
-window.addEventListener("beforeunload",function(){
-  stopPresence();clearListeners();
-});
-
-/* Initialize Firebase once */
-try{
-  if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-  auth=firebase.auth();
-  db=firebase.firestore();
-  try{
-    var theme=localStorage.getItem("nexachat-theme");
-    if(theme)setTheme(theme);
-  }catch(e){}
-  auth.onAuthStateChanged(function(user){
-    if(!user){
-      me=null;myName="";stopPresence();clearListeners();
-      show("authView");
-      return;
-    }
-    me=user;
-    myUserRef().get().then(function(doc){
-      if(!doc.exists || !doc.data().username)return;
-      myName=doc.data().username;
-      startPresence();goHome();
-      $("welcome").textContent="Hello, "+myName+"!";
-      startOnlineCount();
-    }).catch(function(e){setStatus(friendlyError(e));});
+function goBack(){
+  if(!$("privateView").classList.contains("hidden")) loadUsers();
+  else if(!$("usersView").classList.contains("hidden")||!$("worldView").classList.contains("hidden")||!$("settingsView").classList.contains("hidden")) goHome();
+}
+function init(){
+  try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }catch(e){ error("authError","Firebase init failed: "+e.message); return; }
+  var th=null; try{th=localStorage.getItem("theme");}catch(e){} if(th) setTheme(th);
+  $("loginBtn").addEventListener("click",login);
+  $("signupBtn").addEventListener("click",signup);
+  $("worldBtn").addEventListener("click",startWorld);
+  $("inboxBtn").addEventListener("click",loadUsers);
+  $("settingsBtn").addEventListener("click",function(){clearListeners();show("settingsView");$("accountInfo").textContent=myName?"Logged in as: "+myName:"Not logged in";});
+  $("worldRefresh").addEventListener("click",startWorld);
+  $("sendWorld").addEventListener("click",sendWorld);
+  $("worldInput").addEventListener("input",function(){ setWorldTyping(this.value.length>0); });
+  $("worldInput").addEventListener("keydown",function(e){ if(e.key==="Enter") sendWorld(); });
+  $("worldInput").addEventListener("blur",function(){ setWorldTyping(false); });
+  $("userSearch").addEventListener("input",renderUsers);
+  $("privateBack").addEventListener("click",loadUsers);
+  $("sendPrivate").addEventListener("click",sendPrivate);
+  $("privateInput").addEventListener("input",function(){ setPrivateTyping(this.value.length>0); });
+  $("privateInput").addEventListener("keydown",function(e){ if(e.key==="Enter") sendPrivate(); });
+  $("privateInput").addEventListener("blur",function(){ setPrivateTyping(false); });
+  $("logoutBtn").addEventListener("click",logout);
+  document.querySelectorAll(".themeBtn").forEach(function(b){ b.addEventListener("click",function(){setTheme(this.dataset.theme);}); });
+  auth.onAuthStateChanged(function(u){
+    if(u){ me=u; myUserRef().get().then(function(doc){ if(doc.exists){ myName=doc.data().username||""; $("welcome").textContent="Hello, "+myName+"!"; startPresence(); startOnlineCount(); show("homeView"); } else { show("authView"); } }).catch(function(){ show("authView"); }); }
+    else { me=null; myName=""; stopPresence(); if(onlineUnsub){try{onlineUnsub();}catch(e){} onlineUnsub=null;} clearListeners(); show("authView"); $("onlineCount").textContent="● 0 online"; }
   });
-}catch(e){
-  error("authError","Firebase initialize nahi hua: "+e.message);
+  $("softRight").addEventListener("click",goBack);
+  $("softLeft").addEventListener("click",function(){ if(!$("worldView").classList.contains("hidden")) loadUsers(); });
+  window.addEventListener("keydown",function(e){
+    var k=e.key, t=e.target||{};
+    var typing=(t.tagName==="INPUT" && t.value!=="");
+    if(k==="SoftRight"||k==="Escape"||(k==="Backspace"&&!typing)){ e.preventDefault(); goBack(); }
+    else if(k==="SoftLeft" && !$("worldView").classList.contains("hidden")){ e.preventDefault(); loadUsers(); }
+  });
 }
+document.addEventListener("DOMContentLoaded",init);
 })();
 </script>
 </body>
