@@ -1,149 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NexaChat</title>
 <style>
-:root{--bg:#081321;--panel:#102238;--card:#17304a;--text:#f3f7ff;--muted:#a8bdd2;--accent:#22c7a9;--border:#29445e;--danger:#ff657a}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
-button,input{font:inherit}
-button{cursor:pointer}
-header{height:48px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:8px}
-.logo{font-size:16px;font-weight:bold;color:var(--accent)}
-.logo span{font-size:11px;color:var(--muted);margin-left:6px}
-#onlineCount{font-size:12px;color:var(--accent)}
-main{padding:12px;max-width:520px;margin:auto}
-.hidden{display:none!important}
-h2{font-size:20px;margin:6px 0 14px}
-h3{font-size:16px;margin:0 0 10px}
-p{color:var(--muted);line-height:1.4}
-input{width:100%;padding:12px;margin:5px 0 10px;background:#07101d;border:1px solid var(--border);border-radius:6px;color:white;outline:none}
-input:focus,button:focus{border-color:var(--accent);outline:1px solid var(--accent)}
-.btn{width:100%;padding:12px;background:var(--accent);color:#041b19;border:0;border-radius:6px;font-weight:bold;margin:4px 0}
-.btn.secondary{background:var(--card);color:white;border:1px solid var(--border)}
-.btn.danger{background:var(--danger);color:#22040a}
-.card{background:var(--panel);border:1px solid var(--border);padding:12px;border-radius:8px;margin:9px 0}
-.row{display:flex;align-items:center;gap:8px}
-.row>*{min-width:0}
-.userrow{padding:12px;background:var(--panel);border-bottom:1px solid var(--border);cursor:pointer}
-.userrow:focus{background:var(--card)}
-.small{font-size:12px;color:var(--muted)}
-.error{color:#ff8293;font-size:13px;white-space:pre-wrap}
-#messages{height:calc(100vh - 185px);height:calc(100dvh - 185px);min-height:180px;overflow-y:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px}
-.msg{padding:8px 9px;margin:7px 0;background:var(--panel);border-radius:7px;overflow-wrap:anywhere}
-.msghead{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px}
-.sender{color:var(--accent);font-weight:bold}
-.time{font-size:10px;color:var(--muted);white-space:nowrap}
-.msgtext{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.4}
-#composer{display:flex;gap:6px;margin-top:8px}
-#composer input{margin:0;flex:1;min-width:0}
-#composer button{width:65px;margin:0}
-#typing{height:18px;color:var(--accent);font-size:12px;padding:3px}
-.softkeys{position:fixed;bottom:0;left:0;right:0;height:29px;background:#020810;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:12px;z-index:5}
-body{padding-bottom:35px}
-#status{font-size:13px;color:var(--muted);margin:8px 0;white-space:pre-wrap}
-#userList{max-height:55vh;max-height:55dvh;overflow:auto}
-hr{border:0;border-top:1px solid var(--border);margin:14px 0}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
+#auth-screen{position:fixed;inset:0;background:#020a02;display:flex;align-items:center;justify-content:center;z-index:9999}
+#auth-screen::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,255,70,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,70,0.07) 1px, transparent 1px);background-size:30px 30px}
+.hacker-card{position:relative;z-index:2;width:92%;max-width:360px;background:rgba(0,20,0,0.92);border:1px solid #00ff46;box-shadow:0 0 25px rgba(0,255,70,0.35);border-radius:16px;padding:28px 22px;font-family:monospace}
+.hacker-logo{font-size:30px;font-weight:900;color:#00ff46;text-align:center;text-shadow:0 0 12px #00ff46}
+.hacker-sub{text-align:center;color:#7aff9a;font-size:11px;margin:6px 0 22px}
+.hacker-input{width:100%;background:#000e00;border:1px solid #00ff46;color:#00ff46;border-radius:10px;padding:13px 14px;margin-bottom:14px;outline:none;font-size:15px;font-family:monospace}
+.hacker-btn{width:100%;background:#00ff46;color:#000;font-weight:900;border:none;border-radius:10px;padding:12px;margin-top:8px;cursor:pointer;font-size:15px;font-family:monospace}
+.hacker-btn2{width:100%;background:transparent;color:#00ff46;font-weight:900;border:1px solid #00ff46;border-radius:10px;padding:12px;margin-top:10px;cursor:pointer;font-family:monospace}
+.hacker-link{color:#7aff9a;font-size:12px;text-align:center;margin-top:16px;font-family:monospace}
+.app{display:none;height:100vh;flex-direction:column}
+.app.show{display:flex}
+#homeApp{background:#020611;padding:14px 12px}
+.neon-top{background:#101a3a;border:1.5px solid #22d3ee;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.neon-welcome{margin-top:18px;background:#0f1733;border:2px solid #c084fc;border-radius:16px;padding:18px 16px;display:flex;justify-content:space-between;align-items:center}
+.neon-welcome small{color:#7dd3fc;font-size:13px}
+.neon-welcome h2{color:#fff;font-size:32px;font-weight:900}
+.neon-explore{border:2px solid #ff6ad5;color:#ffb4e6;padding:8px 16px;border-radius:10px;font-weight:900;cursor:pointer}
+.neon-card{margin-top:18px;background:#0f1733;border:1.5px solid #22d3ee;border-radius:16px;padding:16px 14px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.15s}
+.neon-card:focus{outline:2px solid #c084fc;transform:scale(1.02)}
+.neon-icon{width:52px;height:52px;border-radius:50%;border:2px solid #e879f9;display:flex;align-items:center;justify-content:center;font-size:24px}
+.neon-card h3{color:#fff;font-size:15px;font-weight:800}
+.neon-card p{color:#a5b4d4;font-size:12px}
+#globalApp{background:#070e28;color:#fff;position:relative}
+.top-g{height:48px;background:#101a3a;border-bottom:2px solid #22d3ee;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
+.online-badge{background:#0a2e1f;border:1px solid #22c55e;color:#4ade80;font-size:10px;padding:3px 7px;border-radius:12px}
+.chat-area{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.msg{max-width:85%;border-radius:12px;padding:8px 10px;border:1.2px solid}
+.msg.other{align-self:flex-start;background:#1a2040;border-color:#a78bfa}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,#0e7490,#a21caf);border-color:#22d3ee}
+.msg.highlight{border-color:#fde047!important;box-shadow:0 0 14px rgba(253,224,71,0.7)!important}
+.msg.mention{color:#fde047;font-weight:900;background:rgba(253,224,71,0.18);padding:0 4px;border-radius:4px}
+#mentionPopup{position:absolute;bottom:84px;left:8px;width:180px;background:#0f1a33;border:2px solid #fde047;border-radius:10px;padding:6px;display:none;z-index:50;max-height:140px;overflow-y:auto}
+.mention-item{padding:7px 8px;border-radius:6px;font-size:12px;color:#fff;cursor:pointer}
+.mention-item.active{background:#fde047;color:#000;font-weight:900}
+#globalTyping{display:none;padding:6px 12px;color:#fde047;font-size:11px;font-style:italic;background:#0f1a33;border-top:1px solid #1e2a50}
+#onlineApp{background:#070e28;color:#fff}
+#inboxApp{background:#070e28;color:#fff;position:relative}
+.top-i{height:52px;background:#0a1030;border-bottom:2px solid #22d3ee;display:flex;align-items:center;justify-content:center}
+.top-i h1{font-size:22px;color:#22d3ee;text-shadow:0 0 8px #22d3ee}
+.search-box{height:48px;background:#0a1030;padding:6px 10px;border-bottom:1px solid #1e2a50}
+.search-box input{width:100%;height:100%;background:#070e28;border:1.2px solid #22d3ee;border-radius:10px;color:#fff;padding:0 10px 0 36px;font-size:13px;outline:none}
+.list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.row{height:60px;background:#0f1733;border:1px solid #1e2a50;border-radius:12px;display:flex;align-items:center;padding:0 10px;gap:8px;cursor:pointer;transition:0.15s}
+.row:hover,.row.active,.row:focus{border-color:#22d3ee!important;background:#152047!important;box-shadow:0 0 12px rgba(34,211,238,0.35);transform:scale(1.01);outline:none}
+.avatar{width:42px;height:42px;border-radius:50%;background:#1e293b;border:1.5px solid #334155;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+.status.online{background:#0a2e1f;color:#4ade80;border:1px solid #22c55e;padding:2px 6px;border-radius:10px;font-size:9px}
+.status.offline{background:#1a1a1a;color:#94a3b8;border:1px solid #333;padding:2px 6px;border-radius:10px;font-size:9px}
+#inboxOptions{position:absolute;bottom:38px;left:6px;width:210px;background:#0f1733;border:2px solid #22d3ee;border-radius:12px;padding:6px;display:none;z-index:99;box-shadow:0 0 18px rgba(34,211,238,0.5)}
+.opt-btn{width:100%;padding:10px;background:#101a3a;border:1px solid #1e2a50;border-radius:8px;color:#fff;margin-bottom:6px;cursor:pointer;text-align:left;font-size:12px}
+.opt-btn:hover,.opt-btn:focus{background:#152047;border-color:#22d3ee;outline:none}
+#blockedView{position:absolute;inset:0;background:#070e28;z-index:100;display:none;flex-direction:column}
+#chatApp{background:#0b141a;color:#fff;position:relative}
+.chat-top{height:56px;background:#202c33;display:flex;align-items:center;padding:0 10px;gap:10px;border-bottom:1px solid #2a3942}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px 8px;display:flex;flex-direction:column;gap:8px;background:#0b141a;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.c-msg{max-width:75%;padding:7px 10px;border-radius:10px;font-size:13px;position:relative;cursor:pointer;transition:0.15s;border:1px solid transparent}
+.c-msg.me{align-self:flex-end;background:#005c4b;color:#e9edef;border-bottom-right-radius:2px}
+.c-msg.other{align-self:flex-start;background:#202c33;color:#e9edef;border-bottom-left-radius:2px}
+.c-msg:hover,.c-msg.active,.c-msg:focus{background:#1e3a5f!important;border-color:#22d3ee!important;box-shadow:0 0 10px rgba(34,211,238,0.4);transform:scale(1.02);outline:none}
+.c-meta{font-size:9px;color:#94a3b8;margin-top:4px;display:flex;justify-content:flex-end;gap:4px;align-items:center}
+.tick{font-size:11px}.tick.seen{color:#53bdeb}.tick.delivered{color:#fff}
+.reply-preview{font-size:10px;background:rgba(0,0,0,0.25);border-left:2px solid #22d3ee;padding:3px 6px;border-radius:4px;margin-bottom:4px;color:#7dd3fc}
+#typingInd{display:none;padding:6px 12px;color:#00ff46;font-size:11px;font-style:italic}
+.inputbar{height:50px;background:#202c33;display:flex;align-items:center;padding:0 8px;gap:8px}
+.inputbar input{flex:1;height:34px;background:#2a3942;border:none;border-radius:18px;color:#fff;padding:0 14px;outline:none}
+.send{width:34px;height:34px;background:#00a884;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:800;cursor:pointer}
+.soft{height:32px;background:#000;display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:11px;color:#7aff9a;border-top:1px solid #222}
+#chatOptions{position:absolute;bottom:38px;left:6px;width:200px;background:#0f1733;border:2px solid #22d3ee;border-radius:12px;padding:6px;display:none;z-index:99;box-shadow:0 0 18px rgba(34,211,238,0.5)}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">✦ NexaChat <span>Owner: Ziddi Malik</span></div>
-  <div id="onlineCount">● 0 online</div>
-</header>
 
-<main>
-  <section id="authView">
-    <div class="card">
-      <h2>Welcome to NexaChat</h2>
-      <p style="color:var(--accent);font-weight:bold;margin-top:-10px">Owner: Ziddi Malik</p>
-      <p>Simple, fast chat for KaiOS.</p>
-      <label for="username">Username</label>
-      <input id="username" maxlength="20" autocomplete="username" placeholder="Letters, numbers, underscore">
-      <label for="password">Password</label>
-      <input id="password" type="password" maxlength="64" autocomplete="current-password" placeholder="At least 6 characters">
-      <button id="loginBtn" class="btn">LOGIN</button>
-      <button id="signupBtn" class="btn secondary">CREATE ACCOUNT</button>
-      <div id="authError" class="error" role="alert"></div>
-    </div>
-  </section>
-
-  <section id="homeView" class="hidden">
-    <h2 id="welcome">Hello!</h2>
-    <button class="btn" id="worldBtn">🌎 World Lounge</button>
-    <button class="btn secondary" id="inboxBtn">💬 Private Chat / Users</button>
-    <button class="btn secondary" id="settingsBtn">⚙ Settings</button>
-    <div id="homeError" class="error"></div>
-  </section>
-
-  <section id="worldView" class="hidden">
-    <div class="row" style="justify-content:space-between;margin-bottom:8px">
-      <h2 style="margin:0">🌎 World Lounge</h2>
-      <button class="btn secondary" style="width:auto;margin:0;padding:8px" id="worldRefresh">Refresh</button>
-    </div>
-    <div id="messages" aria-live="polite"></div>
-    <div id="typing"></div>
-    <div id="composer">
-      <input id="worldInput" maxlength="1000" placeholder="Write a message..." aria-label="Message">
-      <button class="btn" id="sendWorld">SEND</button>
-    </div>
-  </section>
-
-  <section id="usersView" class="hidden">
-    <h2>Online Users</h2>
-    <input id="userSearch" maxlength="30" placeholder="Search online users...">
-    <div id="userList"></div>
-    <div id="usersError" class="error"></div>
-  </section>
-
-  <section id="privateView" class="hidden">
-    <div class="row" style="justify-content:space-between">
-      <h2 id="privateTitle">Private Chat</h2>
-      <button class="btn secondary" style="width:auto;padding:8px" id="privateBack">BACK</button>
-    </div>
-    <div class="small">Text messages only</div>
-    <div id="privateMessages" style="height:calc(100vh - 205px);height:calc(100dvh - 205px);min-height:160px;overflow:auto;padding:8px;background:#07101d;border:1px solid var(--border);border-radius:8px;margin-top:8px" aria-live="polite"></div>
-    <div id="privateTyping" class="small" style="height:18px;color:var(--accent)"></div>
-    <div id="privateComposer" class="row">
-      <input id="privateInput" maxlength="1000" placeholder="Write a message..." aria-label="Private message">
-      <button id="sendPrivate" class="btn" style="width:65px">SEND</button>
-    </div>
-    <div id="privateError" class="error"></div>
-  </section>
-
-  <section id="settingsView" class="hidden">
-    <h2>Settings</h2>
-    <div class="card">
-      <p id="accountInfo"></p>
-      <button id="logoutBtn" class="btn danger">LOG OUT</button>
-    </div>
-    <p>Choose a theme</p>
-    <button class="btn secondary themeBtn" data-theme="dark">Midnight Blue</button>
-    <button class="btn secondary themeBtn" data-theme="light">White Theme</button>
-    <button class="btn secondary themeBtn" data-theme="ocean">Ocean Blue</button>
-    <div id="settingsError" class="error"></div>
-  </section>
-
-  <div id="status" role="status"></div>
-</main>
-
-<div class="softkeys">
-  <span id="softLeft">OPTIONS</span>
-  <span id="softCenter">OK</span>
-  <span id="softRight">BACK</span>
+<div id="auth-screen">
+  <div class="hacker-card">
+    <div class="hacker-logo">> NEXACHAT_</div>
+    <div class="hacker-sub">OWNER: ZIDDI MALIK // SECURE LOGIN</div>
+    <input id="username" class="hacker-input" placeholder="> username">
+    <input id="password" type="password" class="hacker-input" placeholder="> password">
+    <button id="loginBtn" class="hacker-btn">[ LOGIN ]</button>
+    <button id="signupBtn" class="hacker-btn2">[ SIGN UP ]</button>
+    <div class="hacker-link">System v2.1 • Encrypted • Secure Node • Firebase Live</div>
+  </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script>
-(function(){
-"use strict";
-if(!Promise.prototype.finally){Promise.prototype.finally=function(f){var P=this.constructor;return this.then(function(v){return P.resolve(f()).then(function(){return v;});},function(e){return P.resolve(f()).then(function(){throw e;});});};}
-if(window.NodeList&&!NodeList.prototype.forEach){NodeList.prototype.forEach=Array.prototype.forEach;}
-var firebaseConfig = {
+<div id="homeApp" class="app">
+  <div class="neon-top"><div>⬡</div><div><h1 style="color:#fff;font-size:22px">NexaChat</h1><p id="ownerP" style="color:#c4b5fd;font-size:12px">Ziddi Malik</p></div><div style="margin-left:auto;color:#fff;font-size:11px" id="meHome"></div></div>
+  <div class="neon-welcome"><div><small>Welcome back</small><h2 id="welcomeH2">Legend</h2></div><div class="neon-explore" onclick="localStorage.clear();location.reload()">LOGOUT</div></div>
+  <div class="neon-card" tabindex="0" onclick="showApp('online')"><div class="neon-icon">👥</div><div><h3>ONLINE USERS</h3><p>See who's online</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
+  <div class="neon-card" tabindex="0" onclick="showApp('global')"><div class="neon-icon">🌐</div><div><h3>GLOBE LOUNGE</h3><p>Join public chat</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
+  <div class="neon-card" tabindex="0" onclick="showApp('inbox')"><div class="neon-icon">✉️</div><div><h3>NEXA INBOX</h3><p>Secure & private chats</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
+  <div style="flex:1"></div><div class="soft"><span>Options</span><span>Back</span></div>
+</div>
+
+<div id="onlineApp" class="app">
+  <div class="top-g"><h2>Online Users</h2><div class="online-badge" id="onlineCount">● Online</div></div>
+  <div class="search-box"><input id="searchOnline" placeholder="Search ID or name"></div>
+  <div class="list" id="onlineList"></div>
+  <div class="soft"><span style="color:#00ff46">Open Chat</span><span onclick="showApp('home')">Back</span></div>
+</div>
+
+<div id="globalApp" class="app">
+  <div class="top-g"><h2>Global Lounge</h2><div class="online-badge" id="globalOnlineCount">● Online</div></div>
+  <div class="chat-area" id="globalArea"></div>
+  <div id="mentionPopup"></div>
+  <div id="globalTyping">Someone is typing...</div>
+  <div style="height:42px;background:#101a3a;border-top:2px solid #22d3ee;display:flex;padding:0 8px;align-items:center"><input id="globalInput" placeholder="Type @ to mention..." style="flex:1;background:#070e28;border:1px solid #475569;border-radius:8px;color:#fff;padding:8px"><button onclick="sendGlobal()" style="margin-left:6px;background:#22d3ee;border:none;border-radius:8px;padding:8px 12px;font-weight:800">SEND</button></div>
+  <div class="soft"><span onclick="openMention()">Tag @</span><span onclick="showApp('home')">Back</span></div>
+</div>
+
+<div id="inboxApp" class="app">
+  <div class="top-i"><h1>💬 Nexa Inbox</h1></div>
+  <div class="search-box"><input id="searchInbox" placeholder="🔍 Search ID or name"></div>
+  <div class="list" id="inboxList"></div>
+  <div id="inboxOptions">
+    <button class="opt-btn" tabindex="0" onclick="blockUser()">🚫 Block User</button>
+    <button class="opt-btn" tabindex="0" onclick="unblockUser()">✅ Unblock User</button>
+    <button class="opt-btn" tabindex="0" onclick="showBlocked()">👥 Blocked Users</button>
+    <button class="opt-btn" tabindex="0" style="color:#ff6b6b" onclick="removeFromInbox()">🗑️ Remove from Inbox</button>
+  </div>
+  <div id="blockedView">
+    <div class="top-g"><h2>Blocked Users</h2><div style="color:#22d3ee;cursor:pointer" onclick="document.getElementById('blockedView').style.display='none'">✕ Close</div></div>
+    <div class="list" id="blockedList"></div>
+  </div>
+  <div class="soft"><span onclick="toggleInboxOptions()" style="color:#00ff46;font-weight:900;cursor:pointer">Options</span><span onclick="showApp('home')" style="cursor:pointer">Back</span></div>
+</div>
+
+<div id="chatApp" class="app">
+  <div class="chat-top"><div onclick="showApp('inbox')" style="font-size:24px;font-weight:800;cursor:pointer">‹</div><div><div style="font-weight:700"><span id="chatName">User</span> ●</div><div style="font-size:11px;color:#8696a0" id="chatStatus">Online</div></div></div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div id="typingInd">●●● typing...</div>
+  <div class="inputbar"><input id="chatInput" placeholder="Type a message"><div class="send" id="chatSend">➤</div></div>
+  <div id="chatOptions">
+    <button class="opt-btn" tabindex="0" onclick="replyMsg()">↩️ Reply</button>
+    <button class="opt-btn" tabindex="0" onclick="editMsg()">✏️ Edit</button>
+    <button class="opt-btn" tabindex="0" style="color:#ff6b6b" onclick="deleteMsg()">🗑️ Delete</button>
+  </div>
+  <div class="soft"><span onclick="toggleChatOptions()" style="color:#00ff46;font-weight:900;cursor:pointer">Options</span><span onclick="showApp('inbox')" style="cursor:pointer">Back</span></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, setDoc, deleteDoc, updateDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
   apiKey: "AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",
   authDomain: "nexachat-28ecc.firebaseapp.com",
   projectId: "nexachat-28ecc",
@@ -152,270 +158,306 @@ var firebaseConfig = {
   appId: "1:367209102337:web:6f3a0e63b554f6dd145400",
   measurementId: "G-JLQW9XPDL6"
 };
-var auth, db, me = null, myName = "", currentChat = null;
-var unsub = [], presenceTimer = null;
-var sendingWorld = false, sendingPrivate = false;
-var lastWorldTyping = 0, lastPrivateTyping = 0;
-var cachedUsers = [];
-var onlineUnsub = null;
-var $ = function(id){return document.getElementById(id);};
-function setStatus(text){$("status").textContent = text || "";}
-function error(id,text){$(id).textContent = text || "";}
-function clearListeners(){ unsub.forEach(function(fn){try{fn();}catch(e){}}); unsub = []; }
-function listen(fn){ if(typeof fn === "function") unsub.push(fn); }
-function show(view){
-  ["authView","homeView","worldView","usersView","privateView","settingsView"].forEach(function(id){
-    $(id).classList.toggle("hidden",id!==view);
-  });
-  setStatus("");
-  $("softLeft").textContent = view==="worldView" ? "USERS" : "OPTIONS";
-  $("softRight").textContent = view==="authView" ? "" : "BACK";
-  if(view==="worldView") setTimeout(function(){$("worldInput").focus();},50);
-  if(view==="privateView") setTimeout(function(){$("privateInput").focus();},50);
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.sendGlobal = sendGlobal;
+window.openMention = openMention;
+window.toggleInboxOptions = toggleInboxOptions;
+window.blockUser = blockUser;
+window.unblockUser = unblockUser;
+window.showBlocked = showBlocked;
+window.removeFromInbox = removeFromInbox;
+window.toggleChatOptions = toggleChatOptions;
+window.replyMsg = replyMsg;
+window.editMsg = editMsg;
+window.deleteMsg = deleteMsg;
+
+let currentUser=localStorage.getItem('nexa_current')||null;
+let demoUsers=[];
+let allUsers=[]; // all users including offline for search
+let blockMap=JSON.parse(localStorage.getItem('nexa_blockMap')||'{}');
+let selected=null, selectedInbox=null, selectedMsgIndex=null, mentionIndex=0, replyTo=null, focusIndex=0;
+let globalUnsub=null, privateUnsub=null, typingTimeout=null, usersUnsub=null, globalTypingUnsub=null, privateTypingUnsub=null;
+
+function isValidUsername(id){
+  if(!id) return false;
+  if(id==='undefined') return false;
+  if(id.length>25) return false; // REMOVE RANDOM LONG IDs LIKE 49cvHKI...
+  if(id.length<2) return false;
+  return true;
 }
-function cleanName(s){return String(s||"").trim();}
-function validName(s){return /^[A-Za-z0-9_]{3,20}$/.test(s);}
-function emailFor(name){return name.toLowerCase()+"@nexachat.local";}
-function safeTime(ts){
-  try{
-    if(!ts) return "";
-    var d=ts.toDate ? ts.toDate() : new Date(ts);
-    if(isNaN(d.getTime())) return "";
-    return d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-  }catch(e){return "";}
-}
-function addMessage(container, data){
-  var box=document.createElement("div"); box.className="msg";
-  var head=document.createElement("div"); head.className="msghead";
-  var sender=document.createElement("span"); sender.className="sender";
-  sender.textContent=String(data.username||data.senderName||"User");
-  var time=document.createElement("span"); time.className="time";
-  time.textContent=safeTime(data.createdAt);
-  head.appendChild(sender);head.appendChild(time);
-  var text=document.createElement("div");text.className="msgtext";
-  text.textContent=String(data.text||"");
-  box.appendChild(head);box.appendChild(text);
-  container.appendChild(box);
-}
-function scrollBottom(el){el.scrollTop=el.scrollHeight;}
-function getChatId(a,b){return [a,b].sort().join("_");}
-function myUserRef(){return db.collection("users").doc(me.uid);}
-function updateLastSeen(){
-  if(!me) return;
-  myUserRef().set({username:myName,usernameLower:myName.toLowerCase(),lastSeen:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(function(e){});
-}
-function startPresence(){ stopPresence(); updateLastSeen(); presenceTimer=setInterval(updateLastSeen,25000); }
-function stopPresence(){ if(presenceTimer) clearInterval(presenceTimer); presenceTimer=null; }
-function isOnline(data){
-  if(!data.lastSeen) return false;
-  var d=data.lastSeen.toDate ? data.lastSeen.toDate().getTime() : new Date(data.lastSeen).getTime();
-  return !isNaN(d) && Date.now()-d<70000;
-}
-function startOnlineCount(){
-  if(onlineUnsub){try{onlineUnsub();}catch(e){}}
-  onlineUnsub=db.collection("users").onSnapshot(function(snap){
-    var count=0;
-    snap.forEach(function(doc){if(doc.id!==me.uid && isOnline(doc.data())) count++;});
-    $("onlineCount").textContent="● "+count+" online";
+
+function initUsersListener(){
+  if(usersUnsub) usersUnsub();
+  usersUnsub = onSnapshot(collection(db,"users"),(snap)=>{
+    demoUsers=[];
+    allUsers=[];
+    snap.forEach(d=>{
+      let u=d.data();
+      let realId = u.id || d.id;
+      if(!isValidUsername(realId)) return; // REMOVE FAKE RANDOM IDS
+      if(realId===currentUser) return;
+      let realName = u.name || realId;
+      let userObj={id:realId,name:realName,online:u.online||false};
+      allUsers.push(userObj);
+      if(userObj.online){ demoUsers.push(userObj); }
+    });
+    renderLists();
+    let onlineCount = demoUsers.length;
+    let el1=document.getElementById('globalOnlineCount');
+    let el2=document.getElementById('onlineCount');
+    if(el1) el1.innerText = '● Online: ' + (onlineCount+1);
+    if(el2) el2.innerText = '● Online: ' + (onlineCount+1);
   });
 }
-function startWorld(){
-  clearListeners();show("worldView");
-  $("messages").textContent="";
-  listen(db.collection("worldMessages").orderBy("createdAt","desc").limit(20).onSnapshot(function(snap){
-    var el=$("messages");el.textContent="";
-    var docs=[];snap.forEach(function(d){docs.push(d.data());});
-    docs.reverse().forEach(function(d){addMessage(el,d);});
-    scrollBottom(el);
-  },function(e){ setStatus("World error: "+e.message); }));
-  listen(db.collection("worldTyping").onSnapshot(function(snap){
-    var names=[];
-    snap.forEach(function(d){
-      var x=d.data();
-      if(d.id!==me.uid && x.typing && x.updatedAt){
-        var t=x.updatedAt.toDate ? x.updatedAt.toDate().getTime() : 0;
-        if(Date.now()-t<7000) names.push(x.username||"Someone");
+
+window.showApp = function(id){
+  document.querySelectorAll('.app').forEach(a=>a.classList.remove('show'));
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById(id+'App').classList.add('show');
+  if(id==='inbox'||id==='online')renderLists();
+  if(id==='global'){initGlobalListener(); initGlobalTyping();}
+  focusIndex=0; setTimeout(()=>{updateFocus();},120);
+}
+document.getElementById('signupBtn').onclick=()=>{let u=document.getElementById('username').value.trim();if(!u)return alert('Please enter username');currentUser=u;localStorage.setItem('nexa_current',currentUser);document.getElementById('welcomeH2').innerText=currentUser;document.getElementById('meHome').innerText=currentUser;registerUser();initUsersListener();showApp('home');};
+document.getElementById('loginBtn').onclick=()=>{let u=document.getElementById('username').value.trim();if(!u)return alert('Please enter username');currentUser=u;localStorage.setItem('nexa_current',currentUser);document.getElementById('welcomeH2').innerText=currentUser;document.getElementById('meHome').innerText=currentUser;registerUser();initUsersListener();showApp('home');};
+if(currentUser){document.getElementById('welcomeH2').innerText=currentUser;document.getElementById('meHome').innerText=currentUser;document.getElementById('auth-screen').style.display='none';showApp('home');registerUser();initUsersListener();}
+
+async function registerUser(){
+  if(!currentUser) return;
+  await setDoc(doc(db,"users",currentUser),{id:currentUser,name:currentUser,online:true,lastSeen:serverTimestamp()},{merge:true});
+}
+
+function initGlobalListener(){
+  if(globalUnsub) globalUnsub();
+  const q = query(collection(db,"globalChat"),orderBy("createdAt","asc"));
+  globalUnsub = onSnapshot(q, async (snap)=>{
+    let docs = [];
+    snap.forEach(d=>docs.push({id:d.id, data:d.data()}));
+    if(docs.length > 20){
+      let toDelete = docs.slice(0, docs.length - 20);
+      for(let old of toDelete){ await deleteDoc(doc(db,"globalChat",old.id)); }
+      docs = docs.slice(docs.length - 20);
+    }
+    let area=document.getElementById('globalArea'); area.innerHTML='';
+    docs.forEach(item=>{
+      let m=item.data;
+      let isMe=m.name===currentUser;
+      let isMentioned=m.mention && currentUser && m.mention.toLowerCase()===currentUser.toLowerCase();
+      let d=document.createElement('div');
+      d.className='msg '+(isMe?'me':'other')+(isMentioned?' highlight':'');
+      let txt=m.text||'';
+      if(m.mention && m.mention!=='undefined'){txt=txt.replace(new RegExp('@'+m.mention,'ig'),'<span class="mention">@'+m.mention+'</span>');}
+      d.innerHTML='<div style="font-size:10px;font-weight:800;margin-bottom:2px;color:'+(isMe?'#a5f3fc':'#f0abfc')+'">'+(m.name||'User')+'</div>'+txt+'<div style="font-size:9px;color:#94a3b8;text-align:right;margin-top:3px">'+(m.time||'')+'</div>';
+      area.appendChild(d);
+    });
+    area.scrollTop=area.scrollHeight;
+  });
+}
+
+async function sendGlobal(){
+  let i=document.getElementById('globalInput'); if(!i.value.trim())return;
+  let mm=i.value.match(/@([a-z0-9_]+)/i);
+  let mentionVal = (mm && mm[1]!=='undefined')? mm[1] : null;
+  await addDoc(collection(db,"globalChat"),{
+    name:currentUser,
+    text:i.value,
+    time:new Date().toLocaleTimeString().slice(0,5),
+    mention:mentionVal,
+    createdAt:serverTimestamp()
+  });
+  i.value=''; document.getElementById('mentionPopup').style.display='none';
+  await setDoc(doc(db,"typing","global"),{[currentUser]:false},{merge:true});
+}
+
+function openMention(){
+  let pop=document.getElementById('mentionPopup');
+  if(pop.style.display==='block'){pop.style.display='none';return;}
+  let validUsers = demoUsers.filter(u=>isValidUsername(u.id));
+  if(validUsers.length===0){pop.innerHTML='<div style="color:#777;padding:8px;font-size:11px">No users online</div>';}
+  else{
+    pop.innerHTML=validUsers.map((u,j)=>`<div class="mention-item ${j===mentionIndex?'active':''}" onclick="insertMention('${u.id}')">@${u.id}</div>`).join('');
+  }
+  pop.style.display='block';
+}
+window.insertMention = function(id){if(!isValidUsername(id)) return; let inp=document.getElementById('globalInput');inp.value+=' @'+id+' ';document.getElementById('mentionPopup').style.display='none';inp.focus();}
+
+function initGlobalTyping(){
+  if(globalTypingUnsub) globalTypingUnsub();
+  globalTypingUnsub = onSnapshot(doc(db,"typing","global"),(snap)=>{
+    let el=document.getElementById('globalTyping');
+    if(!snap.exists()){el.style.display='none';return;}
+    let data=snap.data();
+    let typers=Object.keys(data).filter(k=>k!==currentUser && isValidUsername(k) && data[k]===true);
+    if(typers.length>0){el.innerText=typers.join(', ')+' is typing...';el.style.display='block';}
+    else{el.style.display='none';}
+  });
+}
+document.getElementById('globalInput').addEventListener('input',()=>{
+  let v=document.getElementById('globalInput').value;
+  if(v.includes('@')){openMention();}
+  setDoc(doc(db,"typing","global"),{[currentUser]:true},{merge:true});
+  clearTimeout(typingTimeout);
+  typingTimeout=setTimeout(async()=>{ await setDoc(doc(db,"typing","global"),{[currentUser]:false},{merge:true}); },1200);
+});
+document.getElementById('globalInput').onkeydown=e=>{if(e.key==='Enter')sendGlobal();};
+
+function isBlockedByMe(t){return (blockMap[currentUser]||[]).includes(t);}
+function isBlockedByOther(t){return (blockMap[t]||[]).includes(currentUser);}
+
+window.renderLists = function(){
+  let qOnline=document.getElementById('searchOnline')?.value.toLowerCase()||'';
+  let qInbox=document.getElementById('searchInbox')?.value.toLowerCase()||'';
+
+  // ONLINE PAGE: Only online when no search, if search then include offline too
+  let onlineListEl=document.getElementById('onlineList');
+  if(onlineListEl){
+    let source = qOnline? allUsers : demoUsers;
+    let filtered = source.filter(u=>{
+      if(!isValidUsername(u.id)) return false;
+      if(!qOnline) return true;
+      return u.id.toLowerCase().includes(qOnline)||u.name.toLowerCase().includes(qOnline);
+    });
+    onlineListEl.innerHTML=filtered.length?filtered.map(u=>`<div class="row" tabindex="0" onclick="selectOnlineUser('${u.id}')"><div class="avatar">${(u.name||u.id)[0]}</div><div style="flex:1"><div style="color:#fff;font-weight:800;font-size:14px">${u.name}</div><div style="color:${u.online?'#4ade80':'#94a3b8'};font-size:11px">${u.online?'● Online':'○ Offline'}</div></div><div style="color:#22d3ee">❯</div></div>`).join(''):'<div style="color:#777;text-align:center;padding:20px">No users found</div>';
+  }
+
+  // INBOX: Same logic - only online when empty, search offline too, and remove random long IDs
+  let inboxEl=document.getElementById('inboxList');
+  if(inboxEl){
+    let source = qInbox? allUsers : demoUsers;
+    let filtered = source.filter(u=>{
+      if(!isValidUsername(u.id)) return false;
+      if(!qInbox) return true;
+      return u.id.toLowerCase().includes(qInbox)||u.name.toLowerCase().includes(qInbox);
+    });
+    inboxEl.innerHTML=filtered.length?filtered.map(u=>{let byMe=isBlockedByMe(u.id);let byOther=isBlockedByOther(u.id);return `<div class="row" tabindex="0" onclick="selectedInbox='${u.id}';openChat('${u.id}')"><div class="avatar">${(u.name||u.id)[0]}</div><div style="flex:1"><div style="color:#fff;font-weight:700">${u.name} ${byMe?'(You Blocked)':''} ${byOther?'(Blocked You)':''}</div><div style="color:#94a3b8;font-size:10px">${byMe?'🚫 You Blocked': byOther?'🚫 Blocked You' : u.online?'● Online':'○ Offline - Tap to chat'}</div></div><div class="status ${u.online?'online':'offline'}">${u.online?'● Online':'○ Offline'}</div></div>`;}).join(''):'<div style="color:#777;text-align:center;padding:20px">No users - Search offline ID</div>';
+  }
+  renderBlocked();setTimeout(updateFocus,80);
+}
+window.selectOnlineUser = function(id){selectedInbox=id;openChat(id);}
+document.getElementById('searchOnline').oninput=renderLists;document.getElementById('searchInbox').oninput=renderLists;
+function toggleInboxOptions(){let el=document.getElementById('inboxOptions');el.style.display=el.style.display==='block'?'none':'block';setTimeout(updateFocus,50);}
+function blockUser(){if(!selectedInbox) return alert('Please select a user first');if(!blockMap[currentUser]) blockMap[currentUser]=[];if(!blockMap[currentUser].includes(selectedInbox)){blockMap[currentUser].push(selectedInbox);localStorage.setItem('nexa_blockMap',JSON.stringify(blockMap));}document.getElementById('inboxOptions').style.display='none';renderLists();}
+function unblockUser(){if(!selectedInbox) return alert('Please select a user first');blockMap[currentUser]=(blockMap[currentUser]||[]).filter(x=>x!==selectedInbox);localStorage.setItem('nexa_blockMap',JSON.stringify(blockMap));document.getElementById('inboxOptions').style.display='none';renderLists();}
+function showBlocked(){document.getElementById('blockedView').style.display='flex';document.getElementById('inboxOptions').style.display='none';renderBlocked();}
+function renderBlocked(){let el=document.getElementById('blockedList');if(!el) return;let list=blockMap[currentUser]||[];if(list.length===0){el.innerHTML='<div style="color:#777;text-align:center;padding:20px">No blocked users</div>';return;}el.innerHTML=list.map(id=>`<div class="row" tabindex="0"><div class="avatar">${id[0]}</div><div style="flex:1;color:#fff">${id}</div><button onclick="unblockSpecific('${id}')" style="background:#00ff46;border:none;border-radius:6px;padding:5px 10px;font-weight:800;cursor:pointer">Unblock</button></div>`).join('');}
+window.unblockSpecific = function(id){blockMap[currentUser]=blockMap[currentUser].filter(x=>x!==id);localStorage.setItem('nexa_blockMap',JSON.stringify(blockMap));renderLists();}
+function removeFromInbox(){if(!selectedInbox) return alert('Please select a user first');document.getElementById('inboxOptions').style.display='none';}
+
+window.openChat = function(id){
+  selected=id;
+  let byMe=isBlockedByMe(id); let byOther=isBlockedByOther(id);
+  document.getElementById('chatName').innerText=id;
+  document.getElementById('chatStatus').innerText=byMe?'Blocked':byOther?'Blocked You':'Online';
+  showApp('chat');
+  if(byMe||byOther){document.getElementById('chatMsgs').innerHTML=`<div style="background:#3f1a1a;border:1px solid #ff4444;color:#ffaaaa;padding:14px;border-radius:10px;text-align:center;margin:30px 10px">${byMe?'🚫 You blocked this user':'🚫 Blocked You'}<br><small>Message will not be delivered</small></div>`;return;}
+  initPrivateListener();
+  initPrivateTyping();
+}
+function getChatId(a,b){return [a,b].sort().join('_');}
+function initPrivateListener(){
+  if(privateUnsub) privateUnsub();
+  let chatId=getChatId(currentUser,selected);
+  const q = query(collection(db,"privateChats",chatId,"messages"),orderBy("createdAt","asc"));
+  privateUnsub = onSnapshot(q, async (snap)=>{
+    let docs=[];
+    snap.forEach(d=>docs.push({id:d.id, data:d.data()}));
+    if(docs.length > 20){
+      let toDelete = docs.slice(0, docs.length - 20);
+      for(let old of toDelete){ await deleteDoc(doc(db,"privateChats",chatId,"messages",old.id)); }
+      docs = docs.slice(docs.length - 20);
+    }
+    let area=document.getElementById('chatMsgs'); area.innerHTML='';
+    docs.forEach(item=>{
+      let m=item.data;
+      let isMe=m.from===currentUser;
+      let tick=''; if(isMe){ if(m.status==='seen') tick='<span class="tick seen">✓✓</span>'; else if(m.status==='delivered') tick='<span class="tick delivered">✓✓</span>'; else tick='<span class="tick">✓</span>';}
+      let replyHtml=m.replyTo?`<div class="reply-preview">↩ ${m.replyTo}</div>`:'';
+      let editTag=m.edited?' <small style="color:#888">(edited)</small>':'';
+      let d=document.createElement('div');
+      d.className='c-msg '+(isMe?'me':'other');
+      d.setAttribute('tabindex','0');
+      d.innerHTML=`${replyHtml}${m.text}${editTag}<div class="c-meta"><span>${m.time||''}</span>${tick}</div>`;
+      d.onclick=()=>{ selectedMsgIndex=item.id; window._selectedDoc=m; };
+      area.appendChild(d);
+      if(!isMe && m.status!=='seen'){
+        updateDoc(doc(db,"privateChats",chatId,"messages",item.id),{status:'seen'});
       }
     });
-    $("typing").textContent=names.length ? names.slice(0,2).join(", ")+" typing..." : "";
-  }));
-}
-function setWorldTyping(typing){
-  if(!me)return;
-  var now=Date.now();
-  if(typing && now-lastWorldTyping<1000)return;
-  lastWorldTyping=now;
-  db.collection("worldTyping").doc(me.uid).set({ username:myName,typing:!!typing, updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-}
-function sendWorld(){
-  var text=$("worldInput").value.trim();
-  if(!text||!me||sendingWorld)return;
-  sendingWorld=true; $("sendWorld").disabled=true;
-  db.collection("worldMessages").add({ senderUid:me.uid,username:myName,text:text, createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(){ $("worldInput").value=""; setWorldTyping(false);
-  }).catch(function(e){setStatus("Failed to send: "+e.message);})
-  .finally(function(){sendingWorld=false;$("sendWorld").disabled=false;});
-}
-function renderUsers(){
-  var query=$("userSearch").value.trim().toLowerCase();
-  var el=$("userList"); el.textContent="";
-  var list = cachedUsers.filter(function(item){
-    if(!isOnline(item.data)) return false;
-    if(query && item.data.usernameLower.indexOf(query)===-1 && item.data.username.toLowerCase().indexOf(query)===-1) return false;
-    return true;
-  });
-  list.sort(function(a,b){return a.data.username.localeCompare(b.data.username);});
-  if(!list.length){ var p=document.createElement("p"); p.textContent="No online users found."; el.appendChild(p); return; }
-  list.forEach(function(item){
-    var row=document.createElement("div");row.className="userrow";row.tabIndex=0;
-    var name=document.createElement("strong");name.textContent=item.data.username;
-    var sub=document.createElement("div");sub.className="small"; sub.textContent="● Online";
-    row.appendChild(name);row.appendChild(sub);
-    row.addEventListener("click",function(){openPrivate(item.id,item.data.username);});
-    row.addEventListener("keydown",function(e){if(e.key==="Enter")openPrivate(item.id,item.data.username);});
-    el.appendChild(row);
+    area.scrollTop=area.scrollHeight;
   });
 }
-function loadUsers(){
-  clearListeners();show("usersView");
-  $("userList").textContent=""; cachedUsers=[];
-  listen(db.collection("users").limit(200).onSnapshot(function(snap){
-    cachedUsers=[]; snap.forEach(function(d){
-      var x=d.data(); if(d.id!==me.uid && x.username){ cachedUsers.push({id:d.id,data:x}); }
-    });
-    renderUsers();
-  },function(e){error("usersError",e.message);}));
-}
-function openPrivate(uid,name){
-  if(uid===me.uid)return;
-  currentChat={uid:uid,name:name};
-  clearListeners();show("privateView");
-  $("privateTitle").textContent=name;
-  $("privateMessages").textContent="";
-  error("privateError","");
-  var chatId=getChatId(me.uid,uid);
-  listen(db.collection("privateMessages").where("chatId","==",chatId).onSnapshot(function(snap){
-    var el=$("privateMessages");el.textContent="";
-    var docs=[];snap.forEach(function(d){docs.push(d.data());});
-    function ms(x){return x.createdAt&&x.createdAt.toMillis?x.createdAt.toMillis():Date.now();}
-    docs.sort(function(a,b){return ms(a)-ms(b);});
-    docs.slice(-20).forEach(function(d){addMessage(el,d);});
-    scrollBottom(el);
-  },function(e){error("privateError","Chat error: "+e.message);}));
-  listen(db.collection("privateTyping").doc(chatId).onSnapshot(function(doc){
-    var d=doc.exists?doc.data():{};
-    var isTyping = d.uid!==me.uid && d.typing && d.updatedAt && Date.now()-(d.updatedAt.toDate?d.updatedAt.toDate().getTime():0)<7000;
-    $("privateTyping").textContent = isTyping ? name+" typing..." : "";
-  }));
-}
-function setPrivateTyping(typing){
-  if(!me||!currentChat)return;
-  var now=Date.now();
-  if(typing && now-lastPrivateTyping<1000)return;
-  lastPrivateTyping=now;
-  db.collection("privateTyping").doc(getChatId(me.uid,currentChat.uid)).set({ uid:me.uid,username:myName,typing:!!typing, updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-}
-function sendPrivate(){
-  var text=$("privateInput").value.trim();
-  if(!text||!me||!currentChat||sendingPrivate)return;
-  sendingPrivate=true;$("sendPrivate").disabled=true;
-  var chatId=getChatId(me.uid,currentChat.uid);
-  db.collection("privateMessages").add({ chatId:chatId,senderUid:me.uid,receiverUid:currentChat.uid, senderName:myName,username:myName,text:text, createdAt:firebase.firestore.FieldValue.serverTimestamp()
-  }).then(function(){ $("privateInput").value=""; setPrivateTyping(false);
-  }).catch(function(e){error("privateError","Failed to send: "+e.message);})
-  .finally(function(){sendingPrivate=false;$("sendPrivate").disabled=false;});
-}
-function goHome(){ clearListeners();currentChat=null;show("homeView"); }
-function friendlyError(e){
-  var code=e && e.code || "";
-  if(code==="auth/user-not-found"||code==="auth/wrong-password"||code==="auth/invalid-credential")return "Incorrect username or password.";
-  if(code==="auth/email-already-in-use")return "This username already exists.";
-  if(code==="auth/weak-password")return "Password must be at least 6 characters.";
-  if(code==="auth/network-request-failed")return "Check your internet connection.";
-  if(code==="permission-denied"||code==="firestore/permission-denied")return "Permission denied. Check Firestore Rules.";
-  return e && e.message ? e.message : "Something went wrong. Try again.";
-}
-function signup(){
-  var name=cleanName($("username").value),pass=$("password").value;
-  error("authError","");
-  if(!validName(name)){error("authError","Username 3-20 chars, letters, numbers, underscore only.");return;}
-  if(pass.length<6){error("authError","Password must be at least 6 characters.");return;}
-  $("signupBtn").disabled=true; $("loginBtn").disabled=true;
-  auth.createUserWithEmailAndPassword(emailFor(name),pass).then(function(cred){
-    me=cred.user;myName=name;
-    return db.collection("usernames").doc(name.toLowerCase()).set({uid:me.uid,username:name}).then(function(){
-      return myUserRef().set({ username:name,usernameLower:name.toLowerCase(), createdAt:firebase.firestore.FieldValue.serverTimestamp(), lastSeen:firebase.firestore.FieldValue.serverTimestamp() });
-    });
-  }).then(function(){ startPresence();goHome();$("welcome").textContent="Hello, "+myName+"!"; startOnlineCount();
-  }).catch(function(e){ error("authError",e.message==="USERNAME_TAKEN"?"Username already taken.":friendlyError(e)); me=null;myName="";
-  }).finally(function(){$("signupBtn").disabled=false;$("loginBtn").disabled=false;});
-}
-function login(){
-  var name=cleanName($("username").value),pass=$("password").value;
-  error("authError","");
-  if(!validName(name)){error("authError","Enter valid username.");return;}
-  if(!pass){error("authError","Enter password.");return;}
-  $("loginBtn").disabled=true; $("signupBtn").disabled=true;
-  auth.signInWithEmailAndPassword(emailFor(name),pass).then(function(cred){
-    me=cred.user; return myUserRef().get();
-  }).then(function(doc){
-    if(!doc.exists || !doc.data().username) throw new Error("Profile not found.");
-    myName=doc.data().username; startPresence();goHome(); $("welcome").textContent="Hello, "+myName+"!"; startOnlineCount();
-  }).catch(function(e){ error("authError",friendlyError(e));
-  }).finally(function(){$("loginBtn").disabled=false;$("signupBtn").disabled=false;});
-}
-function logout(){
-  clearListeners();stopPresence();
-  if(me){ db.collection("worldTyping").doc(me.uid).set({username:myName,typing:false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(function(){}); }
-  auth.signOut();
-}
-function setTheme(t){
-  var r=document.documentElement;
-  if(t==="light"){ r.style.setProperty("--bg","#edf2f7");r.style.setProperty("--panel","#fff"); r.style.setProperty("--card","#e2eaf2");r.style.setProperty("--text","#172538"); r.style.setProperty("--muted","#516579");r.style.setProperty("--border","#c3d0df"); }
-  else if(t==="ocean"){ r.style.setProperty("--bg","#05283b");r.style.setProperty("--panel","#06405a"); r.style.setProperty("--card","#0a5870");r.style.setProperty("--text","#f2fbff"); r.style.setProperty("--muted","#b9dbe7");r.style.setProperty("--border","#20728b"); }
-  else{ r.style.setProperty("--bg","#081321");r.style.setProperty("--panel","#102238"); r.style.setProperty("--card","#17304a");r.style.setProperty("--text","#f3f7ff"); r.style.setProperty("--muted","#a8bdd2");r.style.setProperty("--border","#29445e"); }
-  try{localStorage.setItem("theme",t);}catch(e){}
-}
-function goBack(){
-  if(!$("privateView").classList.contains("hidden")) loadUsers();
-  else if(!$("usersView").classList.contains("hidden")||!$("worldView").classList.contains("hidden")||!$("settingsView").classList.contains("hidden")) goHome();
-}
-function init(){
-  try{ firebase.initializeApp(firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }catch(e){ error("authError","Firebase init failed: "+e.message); return; }
-  var th=null; try{th=localStorage.getItem("theme");}catch(e){} if(th) setTheme(th);
-  $("loginBtn").addEventListener("click",login);
-  $("signupBtn").addEventListener("click",signup);
-  $("worldBtn").addEventListener("click",startWorld);
-  $("inboxBtn").addEventListener("click",loadUsers);
-  $("settingsBtn").addEventListener("click",function(){clearListeners();show("settingsView");$("accountInfo").textContent=myName?"Logged in as: "+myName:"Not logged in";});
-  $("worldRefresh").addEventListener("click",startWorld);
-  $("sendWorld").addEventListener("click",sendWorld);
-  $("worldInput").addEventListener("input",function(){ setWorldTyping(this.value.length>0); });
-  $("worldInput").addEventListener("keydown",function(e){ if(e.key==="Enter") sendWorld(); });
-  $("worldInput").addEventListener("blur",function(){ setWorldTyping(false); });
-  $("userSearch").addEventListener("input",renderUsers);
-  $("privateBack").addEventListener("click",loadUsers);
-  $("sendPrivate").addEventListener("click",sendPrivate);
-  $("privateInput").addEventListener("input",function(){ setPrivateTyping(this.value.length>0); });
-  $("privateInput").addEventListener("keydown",function(e){ if(e.key==="Enter") sendPrivate(); });
-  $("privateInput").addEventListener("blur",function(){ setPrivateTyping(false); });
-  $("logoutBtn").addEventListener("click",logout);
-  document.querySelectorAll(".themeBtn").forEach(function(b){ b.addEventListener("click",function(){setTheme(this.dataset.theme);}); });
-  auth.onAuthStateChanged(function(u){
-    if(u){ me=u; myUserRef().get().then(function(doc){ if(doc.exists){ myName=doc.data().username||""; $("welcome").textContent="Hello, "+myName+"!"; startPresence(); startOnlineCount(); show("homeView"); } else { show("authView"); } }).catch(function(){ show("authView"); }); }
-    else { me=null; myName=""; stopPresence(); if(onlineUnsub){try{onlineUnsub();}catch(e){} onlineUnsub=null;} clearListeners(); show("authView"); $("onlineCount").textContent="● 0 online"; }
-  });
-  $("softRight").addEventListener("click",goBack);
-  $("softLeft").addEventListener("click",function(){ if(!$("worldView").classList.contains("hidden")) loadUsers(); });
-  window.addEventListener("keydown",function(e){
-    var k=e.key, t=e.target||{};
-    var typing=(t.tagName==="INPUT" && t.value!=="");
-    if(k==="SoftRight"||k==="Escape"||(k==="Backspace"&&!typing)){ e.preventDefault(); goBack(); }
-    else if(k==="SoftLeft" && !$("worldView").classList.contains("hidden")){ e.preventDefault(); loadUsers(); }
+function initPrivateTyping(){
+  if(privateTypingUnsub) privateTypingUnsub();
+  if(!selected) return;
+  let chatId=getChatId(currentUser,selected);
+  privateTypingUnsub = onSnapshot(doc(db,"typing",chatId),(snap)=>{
+    let el=document.getElementById('typingInd');
+    if(!snap.exists()){el.style.display='none';return;}
+    let data=snap.data();
+    let other=selected;
+    if(data[other]===true){el.style.display='block'; el.innerText=other+' is typing...';}
+    else{el.style.display='none';}
   });
 }
-document.addEventListener("DOMContentLoaded",init);
-})();
+function toggleChatOptions(){let el=document.getElementById('chatOptions');el.style.display=el.style.display==='block'?'none':'block';if(!window._selectedDoc) alert('Please select a message first');else setTimeout(updateFocus,30);}
+function replyMsg(){if(!window._selectedDoc) return; replyTo=window._selectedDoc.text; document.getElementById('chatInput').placeholder='Reply to: '+replyTo.slice(0,20); document.getElementById('chatInput').focus(); document.getElementById('chatOptions').style.display='none';}
+async function deleteMsg(){if(!selectedMsgIndex) return; let chatId=getChatId(currentUser,selected); if(confirm('Delete this message?')){ await deleteDoc(doc(db,"privateChats",chatId,"messages",selectedMsgIndex)); } document.getElementById('chatOptions').style.display='none';}
+async function editMsg(){if(!selectedMsgIndex ||!window._selectedDoc) return; if(window._selectedDoc.from!==currentUser) return alert('You can only edit your own messages'); let newText=prompt('Edit message:',window._selectedDoc.text); if(newText){ let chatId=getChatId(currentUser,selected); await updateDoc(doc(db,"privateChats",chatId,"messages",selectedMsgIndex),{text:newText,edited:true}); } document.getElementById('chatOptions').style.display='none';}
+window.sendChat = async function(){
+  let i=document.getElementById('chatInput'); if(!i.value.trim()||!selected) return;
+  if(isBlockedByMe(selected)||isBlockedByOther(selected)){alert('🚫 Blocked');return;}
+  let chatId=getChatId(currentUser,selected);
+  await addDoc(collection(db,"privateChats",chatId,"messages"),{
+    from:currentUser,
+    to:selected,
+    text:i.value,
+    time:new Date().toLocaleTimeString().slice(0,5),
+    status:'sent',
+    replyTo:replyTo,
+    edited:false,
+    createdAt:serverTimestamp()
+  });
+  i.value=''; replyTo=null; i.placeholder='Type a message';
+  await setDoc(doc(db,"typing",chatId),{[currentUser]:false},{merge:true});
+}
+document.getElementById('chatSend').onclick=()=>{window.sendChat();};
+document.getElementById('chatInput').onkeydown=e=>{if(e.key==='Enter') window.sendChat();};
+document.getElementById('chatInput').addEventListener('input',()=>{
+  if(!selected) return;
+  let chatId=getChatId(currentUser,selected);
+  setDoc(doc(db,"typing",chatId),{[currentUser]:true},{merge:true});
+  clearTimeout(typingTimeout);
+  typingTimeout=setTimeout(()=>{ setDoc(doc(db,"typing",chatId),{[currentUser]:false},{merge:true}); },1200);
+});
+function updateFocus(){
+  let rows=document.querySelectorAll('.app.show.row,.app.show.c-msg,.app.show.neon-card,.app.show.opt-btn');
+  if(!rows.length) return;
+  if(focusIndex<0) focusIndex=0;
+  if(focusIndex>=rows.length) focusIndex=rows.length-1;
+  rows.forEach(r=>r.classList.remove('active'));
+  let el=rows[focusIndex];
+  if(el){el.classList.add('active');el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',behavior:'smooth'});}
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();focusIndex++;updateFocus();}
+  else if(e.key==='ArrowUp'){e.preventDefault();focusIndex--;updateFocus();}
+  else if(e.key==='Enter'){let el=document.querySelectorAll('.app.show.row,.app.show.c-msg,.app.show.neon-card,.app.show.opt-btn')[focusIndex];if(el) el.click();}
+  else if(e.key==='SoftLeft' || e.key==='ContextMenu'){
+    let app=document.getElementById('inboxApp').classList.contains('show')?'inbox':document.getElementById('chatApp').classList.contains('show')?'chat':'global';
+    if(app==='inbox') toggleInboxOptions();
+    else if(app==='chat') toggleChatOptions();
+    else if(app==='global') openMention();
+  }
+  else if(e.key==='SoftRight' || e.key==='Backspace'){
+    e.preventDefault();
+    if(document.getElementById('chatApp').classList.contains('show')) showApp('inbox');
+    else if(document.getElementById('inboxApp').classList.contains('show')||document.getElementById('onlineApp').classList.contains('show')||document.getElementById('globalApp').classList.contains('show')) showApp('home');
+    else if(document.getElementById('blockedView').style.display==='flex') document.getElementById('blockedView').style.display='none';
+  }
+});
 </script>
 </body>
 </html>
