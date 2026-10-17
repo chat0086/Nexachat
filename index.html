@@ -7,21 +7,30 @@
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js" crossorigin>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:#020611;height:100vh;height:100dvh;height:var(--app-h,100vh);overflow:hidden;touch-action:manipulation}
 button,input{font:inherit}
 button:focus,input:focus{outline:2px solid #22d3ee;outline-offset:2px}
 button:disabled{opacity:.6;cursor:wait}
-#auth-screen{position:fixed;inset:0;background:#020a02;display:flex;align-items:center;justify-content:center;z-index:9999}
-#auth-screen::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,255,70,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,70,0.07) 1px,transparent 1px);background-size:30px 30px}
-.hacker-card{position:relative;z-index:2;width:92%;max-width:360px;background:rgba(0,20,0,0.92);border:1px solid #00ff46;box-shadow:0 0 25px rgba(0,255,70,0.35);border-radius:16px;padding:28px 22px;font-family:monospace}
-.hacker-logo{font-size:30px;font-weight:900;color:#00ff46;text-align:center;text-shadow:0 0 12px #00ff46}
-.hacker-sub{text-align:center;color:#7aff9a;font-size:11px;margin:6px 0 22px}
-.hacker-input{width:100%;background:#000e00;border:1px solid #00ff46;color:#00ff46;border-radius:10px;padding:13px 14px;margin-bottom:14px;outline:none;font-size:15px;font-family:monospace}
-.hacker-btn{width:100%;background:#00ff46;color:#000;font-weight:900;border:none;border-radius:10px;padding:12px;margin-top:8px;cursor:pointer;font-size:15px;font-family:monospace}
-.hacker-btn2{width:100%;background:transparent;color:#00ff46;font-weight:900;border:1px solid #00ff46;border-radius:10px;padding:12px;margin-top:10px;cursor:pointer;font-family:monospace}
-.hacker-link{color:#7aff9a;font-size:12px;text-align:center;margin-top:16px;font-family:monospace}
+#auth-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0b1128,#060a1c);display:flex;align-items:center;justify-content:center;z-index:9999}
+#auth-screen::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 20%, #1a2a55 0%, transparent 40%),radial-gradient(circle at 90% 80%, #1a2a55 0%, transparent 40%)}
+.hacker-card{position:relative;z-index:2;width:100%;max-width:100%;min-height:100vh;padding:18px 12px 10px;font-family:'Segoe UI',Arial,sans-serif}
+.hacker-logo{text-align:center;margin-bottom:18px}
+.logo-icon{width:48px;height:48px;margin:0 auto 6px;border:2px solid #d4af37;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#d4af37;box-shadow:0 0 12px rgba(212,175,55,.4)}
+.logo-text{color:#e8d5a0;font-size:24px;letter-spacing:1px;font-weight:700}
+.logo-text span{color:#fff}
+.hacker-sub{text-align:center;color:#fff;font-size:13px;margin:10px 0 18px}
+.hacker-sub b{color:#e8d5a0;font-weight:600}
+.hacker-input{width:100%;background:#111a38;border:1.5px solid #d4af37;color:#fff;border-radius:16px;padding:10px 12px;margin-bottom:12px;outline:none;font-size:13px;font-family:'Segoe UI',Arial,sans-serif}
+.hacker-btn{width:100%;background:linear-gradient(180deg,#f0d48a,#d4af37);color:#0b1128;font-weight:700;border:none;border-radius:12px;padding:11px;margin-top:4px;cursor:pointer;font-size:16px;font-family:'Segoe UI',Arial,sans-serif}
+.hacker-btn2{width:100%;background:transparent;color:#e8d5a0;font-weight:700;border:1.5px solid #d4af37;border-radius:12px;padding:11px;margin-top:12px;cursor:pointer;font-size:16px;font-family:'Segoe UI',Arial,sans-serif}
+.hacker-link{color:#888;font-size:10px;text-align:center;margin-top:18px;letter-spacing:1px;font-family:'Segoe UI',Arial,sans-serif}
+.input{position:relative}
+.eye{position:absolute;right:12px;top:10px;cursor:pointer;font-size:14px;color:#ccc}
 .app{display:none;height:100vh;height:100dvh;height:var(--app-h,100vh);flex-direction:column;min-height:0}
 .app.show{display:flex}
 #homeApp{background:#020611;padding:14px 12px;overflow-y:auto}
@@ -31,6 +40,7 @@ button:disabled{opacity:.6;cursor:wait}
 .neon-icon{width:52px;height:52px;flex-shrink:0;border-radius:50%;border:2px solid #e879f9;display:flex;align-items:center;justify-content:center;font-size:24px}
 .neon-card h3{color:#fff;font-size:15px;font-weight:800}
 .neon-card p{color:#a5b4d4;font-size:12px}
+.home-badge{display:none;margin-left:auto;background:#22c55e;color:#000;font-weight:900;font-size:12px;min-width:24px;height:24px;padding:0 7px;border-radius:12px;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(34,197,94,.8)}
 #globalApp{background:#070e28;color:#fff;position:relative}
 .top-g{height:48px;flex-shrink:0;background:#101a3a;border-bottom:2px solid #22d3ee;display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:8px}
 .online-badge{background:#0a2e1f;border:1px solid #22c55e;color:#4ade80;font-size:10px;padding:3px 7px;border-radius:12px;white-space:nowrap}
@@ -53,6 +63,10 @@ button:disabled{opacity:.6;cursor:wait}
 .list{flex:1;min-height:0;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
 .row{min-height:60px;flex-shrink:0;background:#0f1733;border:1px solid #1e2a50;border-radius:12px;display:flex;align-items:center;padding:8px 10px;gap:8px;cursor:pointer;transition:0.15s;overflow-wrap:anywhere}
 .row:hover,.row.active,.row:focus{border-color:#22d3ee!important;background:#152047!important;box-shadow:0 0 12px rgba(34,211,238,0.35);outline:none}
+.row.unread{background:#0c2a24;border:1.5px solid #22c55e;box-shadow:0 0 14px rgba(34,197,94,0.55)}
+.row.unread:hover,.row.unread.active,.row.unread:focus{background:#10382f!important;border-color:#4ade80!important}
+.row.unread .avatar{border-color:#22c55e}
+.unread-badge{flex-shrink:0;background:#22c55e;color:#000;font-weight:900;font-size:12px;min-width:24px;height:24px;padding:0 7px;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(34,197,94,.8)}
 .avatar{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:#1e293b;border:1.5px solid #334155;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
 .status.online{background:#0a2e1f;color:#4ade80;border:1px solid #22c55e;padding:2px 6px;border-radius:10px;font-size:9px}
 .status.offline{background:#1a1a1a;color:#94a3b8;border:1px solid #333;padding:2px 6px;border-radius:10px;font-size:9px}
@@ -82,13 +96,16 @@ button:disabled{opacity:.6;cursor:wait}
 
 <div id="auth-screen">
   <div class="hacker-card">
-    <div class="hacker-logo">&gt; NEXACHAT_</div>
-    <div class="hacker-sub">OWNER: ZIDDI MALIK // SECURE LOGIN</div>
-    <input id="username" class="hacker-input" placeholder="> username" autocomplete="username" maxlength="25">
-    <input id="password" type="password" class="hacker-input" placeholder="> password" autocomplete="current-password">
-    <button id="loginBtn" class="hacker-btn">[ LOGIN ]</button>
-    <button id="signupBtn" class="hacker-btn2">[ SIGN UP ]</button>
-    <div class="hacker-link">System v2.1 • Firebase Live</div>
+    <div class="hacker-logo">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">Nexa <span>Chat</span></div>
+    </div>
+    <div class="hacker-sub">👑 Owner <b>Ziddi Malik</b></div>
+    <div class="input"><span style="position:absolute;left:12px;top:10px">👤</span><input id="username" class="hacker-input" style="padding-left:36px" placeholder="Enter your username" autocomplete="username" maxlength="25"></div>
+    <div class="input"><span style="position:absolute;left:12px;top:10px">🔒</span><input id="password" type="password" class="hacker-input" style="padding-left:36px;padding-right:36px" placeholder="Enter your password" autocomplete="current-password"><span class="eye" onclick="showPass()">👁️</span></div>
+    <button id="loginBtn" class="hacker-btn">Login</button>
+    <button id="signupBtn" class="hacker-btn2">Create</button>
+    <div class="hacker-link">Secure • Private • Trusted</div>
   </div>
 </div>
 
@@ -96,7 +113,7 @@ button:disabled{opacity:.6;cursor:wait}
   <div class="neon-top"><div>⬡</div><div><h1 style="color:#fff;font-size:22px">NexaChat</h1></div><div style="margin-left:auto;color:#fff;font-size:11px" id="meHome"></div></div>
   <div class="neon-card" tabindex="0" onclick="showApp('online')"><div class="neon-icon">👥</div><div><h3>ONLINE USERS</h3><p>See who's online</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
   <div class="neon-card" tabindex="0" onclick="showApp('global')"><div class="neon-icon">🌐</div><div><h3>GLOBE LOUNGE</h3><p>Join public chat</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
-  <div class="neon-card" tabindex="0" onclick="showApp('inbox')"><div class="neon-icon">✉️</div><div><h3>NEXA INBOX</h3><p>Secure & private chats</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
+  <div class="neon-card" tabindex="0" onclick="showApp('inbox')"><div class="neon-icon">✉️</div><div><h3>NEXA INBOX</h3><p>Secure & private chats</p></div><span id="homeInboxBadge" class="home-badge"></span><div style="margin-left:auto;color:#22d3ee" id="homeInboxArrow">❯</div></div>
   <div style="flex:1;min-height:8px"></div><div class="soft"><span>Options</span><span onclick="showApp('home')">Back</span></div>
 </div>
 
@@ -124,7 +141,7 @@ button:disabled{opacity:.6;cursor:wait}
     <button class="opt-btn" tabindex="0" onclick="blockUser()">🚫 Block User</button>
     <button class="opt-btn" tabindex="0" onclick="unblockUser()">✅ Unblock User</button>
     <button class="opt-btn" tabindex="0" onclick="showBlocked()">👥 Blocked Users</button>
-    <button class="opt-btn" tabindex="0" style="color:#ff6b6b" onclick="removeFromInbox()">🗑️ Remove from Inbox</button>
+    <button class="opt-btn" tabindex="0" style="color:#ff6b6b" onclick="removeFromInbox()">🗑️ Delete ID</button>
     <button class="opt-btn" id="logoutBtn" type="button" tabindex="0" style="color:#ff6b6b">🚪 Logout</button>
   </div>
   <div id="blockedView">
@@ -149,6 +166,16 @@ button:disabled{opacity:.6;cursor:wait}
 
 <script>
 (function () {
+  // FAST OPEN: if user was logged in before, skip the login page and show home instantly
+  try {
+    var cached = localStorage.getItem('nexa_current');
+    if (cached) {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('homeApp').classList.add('show');
+      document.getElementById('meHome').textContent = cached;
+    }
+  } catch (_) {}
+
   function setAppHeight() {
     document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
   }
@@ -156,7 +183,10 @@ button:disabled{opacity:.6;cursor:wait}
   window.addEventListener('resize', setAppHeight);
   window.addEventListener('orientationchange', function () { setTimeout(setAppHeight, 200); });
   window.addEventListener('load', setAppHeight);
-
+  window.showPass = function(){
+    var p = document.getElementById("password");
+    p.type = (p.type === "password") ? "text" : "password";
+  };
   function notReady() {
     if (!window.__nexaReady) {
       alert('Firebase could not load. Please check your internet connection and reload the page.');
@@ -172,7 +202,8 @@ button:disabled{opacity:.6;cursor:wait}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
-  getFirestore, collection, addDoc, doc, setDoc, deleteDoc,
+  getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
+  collection, addDoc, doc, setDoc, deleteDoc,
   updateDoc, onSnapshot, query, orderBy, limit, serverTimestamp, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
@@ -191,12 +222,28 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+
+// FAST LOAD: local cache so data appears instantly on next open
+let db;
+try {
+  db = initializeFirestore(app, {
+    localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+  });
+} catch (_) {
+  db = getFirestore(app);
+}
+
 const auth = getAuth(app);
 const $ = id => document.getElementById(id);
 
-const ONLINE_WINDOW = 120000;
-const HEARTBEAT_MS = 30000;
+// ONLINE / OFFLINE SETTINGS
+const ONLINE_WINDOW = 75000;
+const HEARTBEAT_MS = 25000;
+const TYPING_REFRESH_MS = 2000;
+const TYPING_STOP_MS = 1500;
+const TYPING_SHOW_MS = 5000;
+const FRESH_MS = 60000;
+const INBOX_WATCH_LIMIT = 30;
 
 let currentUser = null;
 let demoUsers = [];
@@ -204,6 +251,7 @@ let allUsers = [];
 let remoteContacts = [];
 let blockMap = readJSON('nexa_blockMap', {});
 let removedMap = readJSON('nexa_removed', {});
+let removedAtMap = readJSON('nexa_removed_at', {});
 let contactsMap = readJSON('nexa_contacts', {});
 let selected = null;
 let selectedInbox = null;
@@ -213,12 +261,16 @@ let replyTo = null;
 let focusIndex = 0;
 let globalUnsub = null;
 let privateUnsub = null;
-let typingTimeout = null;
 let usersUnsub = null;
 let globalTypingUnsub = null;
 let privateTypingUnsub = null;
 let globalTypingTimer = null;
 let privateTypingTimer = null;
+let globalTypingHide = null;
+let privateTypingHide = null;
+let globalLastTypingWrite = 0;
+let privateLastTypingWrite = 0;
+let privateTypingChatId = null;
 let mentionOpen = false;
 let lastMentionQuery = '';
 let messageCache = [];
@@ -228,6 +280,17 @@ let authStateVersion = 0;
 let usersErrorShown = false;
 let lastOnlineSig = '';
 let permErrorShown = false;
+let serverSkew = 0;
+let lastOwnSeen = 0;
+
+// UNREAD + SOUND STATE
+const inboxListeners = new Map();
+const notifiedMsgs = new Set();
+let unreadMap = {};
+let lastMsgMap = {};
+let inboxRefreshTimer = null;
+let audioCtx = null;
+let masterBus = null;
 
 window.__nexaReady = true;
 
@@ -254,8 +317,12 @@ function safeText(value) {
   return String(value ?? '');
 }
 
+function nowMs() {
+  return Date.now() - serverSkew;
+}
+
 function isOnline(u) {
-  return !!u && u.online === true && u.lastSeenMs > 0 && (Date.now() - u.lastSeenMs) < ONLINE_WINDOW;
+  return !!u && u.online === true && u.lastSeenMs > 0 && (nowMs() - u.lastSeenMs) < ONLINE_WINDOW;
 }
 
 function refreshOnline() {
@@ -266,6 +333,14 @@ function updateCounts() {
   const count = demoUsers.length + (currentUser ? 1 : 0);
   $('globalOnlineCount').textContent = '● Online: ' + count;
   $('onlineCount').textContent = '● Online: ' + count;
+}
+
+function updateChatStatus() {
+  if (!selected || !$('chatApp').classList.contains('show')) return;
+  const user = allUsers.find(u => u.id.toLowerCase() === selected.toLowerCase());
+  $('chatStatus').textContent = isBlockedByMe(selected) ? 'Blocked'
+    : isBlockedByOther(selected) ? 'Blocked You'
+    : isOnline(user) ? 'Online' : 'Offline';
 }
 
 function setBusy(value) {
@@ -289,21 +364,364 @@ function showAuth() {
   document.querySelectorAll('.app').forEach(a => a.classList.remove('show'));
 }
 
+/* ---------- SOUND / RING (LOUD) ---------- */
+
+function unlockAudio() {
+  try {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (_) {}
+  try {
+    if (currentUser && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  } catch (_) {}
+}
+
+['click', 'touchstart', 'keydown'].forEach(ev =>
+  document.addEventListener(ev, unlockAudio, { passive: true })
+);
+
+// master volume + compressor: very loud but without crackling
+function getBus() {
+  if (!audioCtx) return null;
+  if (!masterBus) {
+    const comp = audioCtx.createDynamicsCompressor();
+    comp.threshold.value = -18;
+    comp.knee.value = 20;
+    comp.ratio.value = 8;
+    comp.attack.value = 0.003;
+    comp.release.value = 0.25;
+    const gain = audioCtx.createGain();
+    gain.gain.value = 1.8;
+    gain.connect(comp);
+    comp.connect(audioCtx.destination);
+    masterBus = gain;
+  }
+  return masterBus;
+}
+
+function beep(freq, when, dur, vol) {
+  const bus = getBus();
+  if (!bus) return;
+  try {
+    const t0 = audioCtx.currentTime + when;
+    const o1 = audioCtx.createOscillator();
+    const o2 = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    const g2 = audioCtx.createGain();
+    o1.type = 'sine';
+    o1.frequency.value = freq;
+    o2.type = 'triangle';
+    o2.frequency.value = freq * 2;
+    g2.gain.value = 0.3;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o1.connect(g);
+    o2.connect(g2);
+    g2.connect(g);
+    g.connect(bus);
+    o1.start(t0);
+    o2.start(t0);
+    o1.stop(t0 + dur + 0.05);
+    o2.stop(t0 + dur + 0.05);
+  } catch (_) {}
+}
+
+// kind: 'ring' = loud pleasant tone for new message, 'soft' = short pop
+function playSound(kind) {
+  try {
+    unlockAudio();
+    if (!audioCtx) return;
+
+    const go = () => {
+      if (kind === 'ring') {
+        const notes = [
+          [1047, 0], [1319, 0.18], [1568, 0.36], [2093, 0.54],
+          [1568, 1.0], [1319, 1.18], [1568, 1.36], [2093, 1.54]
+        ];
+        notes.forEach(n => beep(n[0], n[1], 0.55, 0.9));
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+      } else {
+        beep(1175, 0, 0.3, 0.6);
+        beep(1568, 0.12, 0.35, 0.6);
+      }
+    };
+
+    if (audioCtx.state === 'running') go();
+    else audioCtx.resume().then(go).catch(() => {});
+  } catch (_) {}
+}
+
+function notify(title, body) {
+  try {
+    if (document.visibilityState === 'hidden' && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body, tag: 'nexachat' });
+    }
+  } catch (_) {}
+}
+
+function msgAge(m) {
+  const c = m && m.createdAt;
+  if (!c || typeof c.toMillis !== 'function') return Infinity;
+  return Math.abs(nowMs() - c.toMillis());
+}
+
+function isFresh(m) {
+  return msgAge(m) < FRESH_MS;
+}
+
+// ring for fresh messages, or for messages that arrive live after the first load
+function shouldRing(m, baselined) {
+  const age = msgAge(m);
+  if (age === Infinity) return false;
+  if (age < FRESH_MS) return true;
+  return baselined && (lastOwnSeen === 0 || age < 300000);
+}
+
+/* ---------- DELETE ID HELPERS ---------- */
+
+function unremoveId(id) {
+  if (!currentUser) return;
+  const low = String(id).toLowerCase();
+  if (Array.isArray(removedMap[currentUser])) {
+    removedMap[currentUser] = removedMap[currentUser].filter(x => x !== low);
+    saveRemovedMap();
+  }
+  if (removedAtMap[currentUser]) {
+    delete removedAtMap[currentUser][low];
+    saveRemovedAtMap();
+  }
+}
+
+/* ---------- UNREAD (INBOX) ---------- */
+
+function isViewingChat(id) {
+  return !!selected && selected.toLowerCase() === id.toLowerCase() &&
+    $('chatApp').classList.contains('show') && document.visibilityState === 'visible';
+}
+
+function totalUnread() {
+  return Object.values(unreadMap).reduce((a, b) => a + b, 0);
+}
+
+function updateUnreadBadges() {
+  const t = totalUnread();
+  const badge = $('homeInboxBadge');
+  const arrow = $('homeInboxArrow');
+  if (badge) {
+    badge.textContent = t > 99 ? '99+' : String(t);
+    badge.style.display = t > 0 ? 'flex' : 'none';
+  }
+  if (arrow) arrow.style.marginLeft = t > 0 ? '8px' : 'auto';
+  document.title = t > 0 ? '(' + t + ') NexaChat' : 'NexaChat';
+}
+
+function scheduleInboxRefresh() {
+  if (inboxRefreshTimer) return;
+  inboxRefreshTimer = setTimeout(() => {
+    inboxRefreshTimer = null;
+    renderLists();
+    updateUnreadBadges();
+  }, 150);
+}
+
+function previewText(id) {
+  const l = lastMsgMap[id];
+  if (!l || !l.text) return '';
+  const t = String(l.text).replace(/\s+/g, ' ');
+  return (l.mine ? 'You: ' : '') + (t.length > 28 ? t.slice(0, 28) + '…' : t);
+}
+
+function attachInboxListener(id) {
+  const chatId = getChatId(currentUser, id);
+  const q = query(
+    collection(db, 'privateChats', chatId, 'messages'),
+    orderBy('createdAt', 'desc'),
+    limit(INBOX_WATCH_LIMIT)
+  );
+
+  const rec = { unsub: null, baselined: false };
+
+  rec.unsub = onSnapshot(q, snap => {
+    if (!currentUser) return;
+    const me = currentUser.toLowerCase();
+    const viewing = isViewingChat(id);
+    const blocked = isBlockedByMe(id) || isBlockedByOther(id);
+
+    let unread = 0;
+    let last = null;
+    let newestIncomingMs = 0;
+
+    snap.docs.forEach((d, i) => {
+      const m = d.data({ serverTimestamps: 'estimate' }) || {};
+      if (i === 0) last = m;
+      if (String(m.to || '').toLowerCase() === me) {
+        if (m.createdAt && typeof m.createdAt.toMillis === 'function') {
+          newestIncomingMs = Math.max(newestIncomingMs, m.createdAt.toMillis());
+        }
+        if (m.status !== 'seen') unread++;
+      }
+    });
+
+    // a deleted ID comes back only when a NEWER message arrives from that user
+    if (isRemoved(id)) {
+      if (!removedAtMap[currentUser]) removedAtMap[currentUser] = {};
+      const removedAt = removedAtMap[currentUser][id.toLowerCase()];
+      if (!removedAt) {
+        removedAtMap[currentUser][id.toLowerCase()] = nowMs();
+        saveRemovedAtMap();
+      } else if (newestIncomingMs > removedAt) {
+        unremoveId(id);
+      }
+    }
+
+    snap.docChanges().forEach(ch => {
+      if (ch.type !== 'added') return;
+      const m = ch.doc.data({ serverTimestamps: 'estimate' }) || {};
+      const incoming = String(m.from || '').toLowerCase() === id.toLowerCase() &&
+        String(m.to || '').toLowerCase() === me;
+      if (!incoming || m.status === 'seen') return;
+      if (!shouldRing(m, rec.baselined)) return;
+
+      const key = chatId + '/' + ch.doc.id;
+      if (notifiedMsgs.has(key)) return;
+      notifiedMsgs.add(key);
+      if (blocked) return;
+
+      if (viewing) {
+        playSound('soft');
+      } else {
+        playSound('ring');
+        notify('New message from ' + id, String(m.text || '').slice(0, 80));
+      }
+    });
+
+    if (!snap.metadata.fromCache) rec.baselined = true;
+
+    unreadMap[id] = (viewing || blocked || isRemoved(id)) ? 0 : unread;
+
+    if (last) {
+      let ms = 0;
+      if (last.createdAt && typeof last.createdAt.toMillis === 'function') ms = last.createdAt.toMillis();
+      lastMsgMap[id] = {
+        text: String(last.text || ''),
+        mine: String(last.from || '').toLowerCase() === me,
+        ms
+      };
+    }
+
+    scheduleInboxRefresh();
+  }, error => console.warn('Inbox listener failed for ' + id + ':', error));
+
+  inboxListeners.set(id, rec);
+}
+
+function syncInboxListeners() {
+  if (!currentUser) return;
+  const me = currentUser.toLowerCase();
+  const wanted = new Set(Array.from(getContacts()).filter(id => isValidUsername(id) && id !== me));
+
+  inboxListeners.forEach((rec, id) => {
+    if (!wanted.has(id)) {
+      try { rec.unsub(); } catch (_) {}
+      inboxListeners.delete(id);
+      delete unreadMap[id];
+      delete lastMsgMap[id];
+    }
+  });
+
+  wanted.forEach(id => {
+    if (!inboxListeners.has(id)) attachInboxListener(id);
+  });
+}
+
+function stopInboxListeners() {
+  inboxListeners.forEach(rec => { try { rec.unsub(); } catch (_) {} });
+  inboxListeners.clear();
+  unreadMap = {};
+  lastMsgMap = {};
+  notifiedMsgs.clear();
+  clearTimer(inboxRefreshTimer);
+  inboxRefreshTimer = null;
+  updateUnreadBadges();
+}
+
+/* ---------- TYPING INDICATOR (sender side) ---------- */
+
+function pingGlobalTyping() {
+  if (!currentUser) return;
+  const now = Date.now();
+  if (now - globalLastTypingWrite > TYPING_REFRESH_MS) {
+    globalLastTypingWrite = now;
+    setDoc(doc(db, 'typing', 'global'), { [currentUser]: now }, { merge: true })
+      .catch(error => console.warn('Typing update failed:', error));
+  }
+  clearTimer(globalTypingTimer);
+  globalTypingTimer = setTimeout(stopGlobalTyping, TYPING_STOP_MS);
+}
+
+function stopGlobalTyping() {
+  clearTimer(globalTypingTimer);
+  globalTypingTimer = null;
+  if (!currentUser || !globalLastTypingWrite) return;
+  globalLastTypingWrite = 0;
+  setDoc(doc(db, 'typing', 'global'), { [currentUser]: false }, { merge: true })
+    .catch(error => console.warn('Typing reset failed:', error));
+}
+
+function pingPrivateTyping() {
+  if (!currentUser || !selected) return;
+  const chatId = getChatId(currentUser, selected);
+  const now = Date.now();
+  if (privateTypingChatId !== chatId) {
+    stopPrivateTyping();
+    privateTypingChatId = chatId;
+    privateLastTypingWrite = 0;
+  }
+  if (now - privateLastTypingWrite > TYPING_REFRESH_MS) {
+    privateLastTypingWrite = now;
+    setDoc(doc(db, 'typing', chatId), { [currentUser]: now }, { merge: true })
+      .catch(error => console.warn('Typing update failed:', error));
+  }
+  clearTimer(privateTypingTimer);
+  privateTypingTimer = setTimeout(stopPrivateTyping, TYPING_STOP_MS);
+}
+
+function stopPrivateTyping() {
+  clearTimer(privateTypingTimer);
+  privateTypingTimer = null;
+  if (!currentUser || !privateTypingChatId || !privateLastTypingWrite) return;
+  const chatId = privateTypingChatId;
+  privateLastTypingWrite = 0;
+  setDoc(doc(db, 'typing', chatId), { [currentUser]: false }, { merge: true })
+    .catch(error => console.warn('Typing reset failed:', error));
+}
+
 function stopGlobalListeners() {
+  stopGlobalTyping();
   if (globalUnsub) globalUnsub();
   if (globalTypingUnsub) globalTypingUnsub();
   globalUnsub = null;
   globalTypingUnsub = null;
+  clearTimer(globalTypingHide);
   $('globalTyping').style.display = 'none';
   $('mentionPopup').style.display = 'none';
   mentionOpen = false;
 }
 
 function stopPrivateListeners() {
+  stopPrivateTyping();
   if (privateUnsub) privateUnsub();
   if (privateTypingUnsub) privateTypingUnsub();
   privateUnsub = null;
   privateTypingUnsub = null;
+  clearTimer(privateTypingHide);
   $('typingInd').style.display = 'none';
   $('chatOptions').style.display = 'none';
   selectedMsgIndex = null;
@@ -337,7 +755,7 @@ function isBlockedByOther(target) {
 }
 
 function isRemoved(target) {
-  return Array.isArray(removedMap[currentUser]) && removedMap[currentUser].includes(target);
+  return Array.isArray(removedMap[currentUser]) && removedMap[currentUser].includes(String(target).toLowerCase());
 }
 
 function saveBlockMap() {
@@ -346,6 +764,10 @@ function saveBlockMap() {
 
 function saveRemovedMap() {
   try { localStorage.setItem('nexa_removed', JSON.stringify(removedMap)); } catch (_) {}
+}
+
+function saveRemovedAtMap() {
+  try { localStorage.setItem('nexa_removed_at', JSON.stringify(removedAtMap)); } catch (_) {}
 }
 
 function saveContactsMap() {
@@ -367,10 +789,8 @@ function addContact(id) {
     saveContactsMap();
   }
 
-  if (Array.isArray(removedMap[currentUser]) && removedMap[currentUser].includes(low)) {
-    removedMap[currentUser] = removedMap[currentUser].filter(x => x !== low);
-    saveRemovedMap();
-  }
+  unremoveId(low);
+  syncInboxListeners();
 
   setDoc(doc(db, 'users', currentUser), { contacts: arrayUnion(low) }, { merge: true })
     .catch(error => console.warn('Contact sync failed:', error));
@@ -413,18 +833,24 @@ function initUsersListener() {
     allUsers = [];
 
     snap.forEach(d => {
-      const u = d.data() || {};
+      const u = d.data({ serverTimestamps: 'estimate' }) || {};
       const realId = String(u.id || d.id).trim().toLowerCase();
 
       if (!isValidUsername(realId)) return;
 
-      if (currentUser && realId === String(currentUser).toLowerCase()) {
-        remoteContacts = Array.isArray(u.contacts) ? u.contacts.filter(x => typeof x === 'string') : [];
-        return;
-      }
-
       let lastSeenMs = 0;
       if (u.lastSeen && typeof u.lastSeen.toMillis === 'function') lastSeenMs = u.lastSeen.toMillis();
+
+      if (currentUser && realId === String(currentUser).toLowerCase()) {
+        remoteContacts = Array.isArray(u.contacts) ? u.contacts.filter(x => typeof x === 'string') : [];
+
+        if (lastSeenMs && lastSeenMs !== lastOwnSeen && !d.metadata.hasPendingWrites && !snap.metadata.fromCache) {
+          lastOwnSeen = lastSeenMs;
+          const diff = Date.now() - lastSeenMs;
+          serverSkew = Math.abs(diff) < 600000 ? diff : 0;
+        }
+        return;
+      }
 
       allUsers.push({
         id: realId,
@@ -436,8 +862,10 @@ function initUsersListener() {
 
     refreshOnline();
     lastOnlineSig = allUsers.map(u => u.id + (isOnline(u) ? '1' : '0')).join(',');
+    syncInboxListeners();
     renderLists();
     updateCounts();
+    updateChatStatus();
   }, error => {
     console.error('Users listener failed:', error);
     if (!usersErrorShown) {
@@ -463,6 +891,10 @@ window.showApp = function(id) {
     initGlobalListener();
     initGlobalTyping();
   }
+
+  refreshOnline();
+  updateCounts();
+  updateUnreadBadges();
 
   focusIndex = 0;
   setTimeout(updateFocus, 100);
@@ -539,15 +971,14 @@ $('logoutBtn').addEventListener('click', async () => {
   const oldUser = currentUser;
 
   try {
+    stopGlobalListeners();
+    stopPrivateListeners();
+    stopInboxListeners();
     await setOffline(oldUser);
 
     if (usersUnsub) usersUnsub();
     usersUnsub = null;
 
-    stopGlobalListeners();
-    stopPrivateListeners();
-
-    clearTimer(typingTimeout);
     clearTimer(globalTypingTimer);
     clearTimer(privateTypingTimer);
 
@@ -556,6 +987,7 @@ $('logoutBtn').addEventListener('click', async () => {
     selectedMsgIndex = null;
     replyTo = null;
 
+    try { localStorage.removeItem('nexa_current'); } catch (_) {}
     await signOut(auth);
   } catch (error) {
     showError('Could not log out.', error);
@@ -573,6 +1005,8 @@ onAuthStateChanged(auth, async user => {
     allUsers = [];
     demoUsers = [];
     remoteContacts = [];
+    serverSkew = 0;
+    lastOwnSeen = 0;
     usersErrorShown = false;
     permErrorShown = false;
     try { localStorage.removeItem('nexa_current'); } catch (_) {}
@@ -582,7 +1016,7 @@ onAuthStateChanged(auth, async user => {
 
     stopGlobalListeners();
     stopPrivateListeners();
-    clearTimer(typingTimeout);
+    stopInboxListeners();
     clearTimer(globalTypingTimer);
     clearTimer(privateTypingTimer);
 
@@ -620,19 +1054,21 @@ onAuthStateChanged(auth, async user => {
   try { localStorage.setItem('nexa_current', currentUser); } catch (_) {}
   setUserDetails();
 
-  try {
-    await registerUser();
-  } catch (error) {
+  registerUser().catch(error => {
     console.error('Could not register user profile:', error);
     if (version === authStateVersion) {
       showError('Login succeeded, but the user profile could not be saved. Check Firestore rules.', error);
     }
-  }
-
-  if (version !== authStateVersion || !auth.currentUser) return;
+  });
 
   initUsersListener();
-  showApp('home');
+  syncInboxListeners();
+
+  if (document.querySelector('.app.show')) {
+    $('auth-screen').style.display = 'none';
+  } else {
+    showApp('home');
+  }
 });
 
 function initGlobalListener() {
@@ -644,9 +1080,11 @@ function initGlobalListener() {
     limit(10)
   );
 
+  let baselined = false;
+
   globalUnsub = onSnapshot(q, snap => {
     const docs = [];
-    snap.forEach(d => docs.push({ id: d.id, data: d.data() || {} }));
+    snap.forEach(d => docs.push({ id: d.id, data: d.data({ serverTimestamps: 'estimate' }) || {} }));
     docs.reverse();
 
     const area = $('globalArea');
@@ -683,6 +1121,22 @@ function initGlobalListener() {
     });
 
     area.scrollTop = area.scrollHeight;
+
+    // sound for new global messages from others
+    if (currentUser) {
+      const me = currentUser.toLowerCase();
+      snap.docChanges().forEach(ch => {
+        if (ch.type !== 'added') return;
+        const m = ch.doc.data({ serverTimestamps: 'estimate' }) || {};
+        if (String(m.name || '').toLowerCase() === me) return;
+        if (!shouldRing(m, baselined)) return;
+        const mentioned = String(m.mention || '').toLowerCase() === me;
+        playSound(mentioned ? 'ring' : 'soft');
+        if (mentioned) notify(String(m.name || 'Someone') + ' mentioned you', String(m.text || '').slice(0, 80));
+      });
+    }
+
+    if (!snap.metadata.fromCache) baselined = true;
   }, error => {
     console.error('Global chat listener failed:', error);
     $('globalArea').textContent = 'Could not load messages. Check your internet and Firebase rules.';
@@ -735,10 +1189,10 @@ async function sendGlobal() {
     mentionVal = null;
   }
 
-  // Clear the box immediately so a second tap can never send the same text again
   input.value = '';
   $('mentionPopup').style.display = 'none';
   mentionOpen = false;
+  stopGlobalTyping();
 
   try {
     await addDoc(collection(db, 'globalChat'), {
@@ -753,9 +1207,6 @@ async function sendGlobal() {
     showError('Could not send global message.', error);
     return;
   }
-
-  setDoc(doc(db, 'typing', 'global'), { [currentUser]: false }, { merge: true })
-    .catch(error => console.warn('Typing reset failed:', error));
 }
 
 window.sendGlobal = sendGlobal;
@@ -820,13 +1271,20 @@ function insertMention(id) {
 
 window.insertMention = insertMention;
 
+/* ---------- TYPING INDICATOR (receiver side) ---------- */
+
+function isTypingValue(v) {
+  return v === true || (typeof v === 'number' && v > 0);
+}
+
 function initGlobalTyping() {
   if (globalTypingUnsub) globalTypingUnsub();
 
   globalTypingUnsub = onSnapshot(doc(db, 'typing', 'global'), snap => {
     const el = $('globalTyping');
+    clearTimer(globalTypingHide);
 
-    if (!snap.exists()) {
+    if (!snap.exists() || snap.metadata.fromCache) {
       el.style.display = 'none';
       return;
     }
@@ -834,12 +1292,13 @@ function initGlobalTyping() {
     const data = snap.data() || {};
     const typers = Object.keys(data).filter(k =>
       k.toLowerCase() !== String(currentUser || '').toLowerCase() &&
-      isValidUsername(k) && data[k] === true
+      isValidUsername(k) && isTypingValue(data[k])
     );
 
     if (typers.length) {
-      el.textContent = typers.join(', ') + ' is typing...';
+      el.textContent = typers.join(', ') + (typers.length > 1 ? ' are typing...' : ' is typing...');
       el.style.display = 'block';
+      globalTypingHide = setTimeout(() => { el.style.display = 'none'; }, TYPING_SHOW_MS);
     } else {
       el.style.display = 'none';
     }
@@ -867,18 +1326,7 @@ $('globalInput').addEventListener('input', () => {
     lastMentionQuery = '';
   }
 
-  if (currentUser) {
-    setDoc(doc(db, 'typing', 'global'), { [currentUser]: true }, { merge: true })
-      .catch(error => console.warn('Typing update failed:', error));
-
-    clearTimer(globalTypingTimer);
-    globalTypingTimer = setTimeout(() => {
-      if (currentUser) {
-        setDoc(doc(db, 'typing', 'global'), { [currentUser]: false }, { merge: true })
-          .catch(error => console.warn('Typing reset failed:', error));
-      }
-    }, 1200);
-  }
+  if (value.trim()) pingGlobalTyping(); else stopGlobalTyping();
 });
 
 function showMentionSuggestions(search) {
@@ -935,12 +1383,13 @@ window.renderLists = function() {
   onlineListEl.replaceChildren();
   inboxEl.replaceChildren();
 
-  // Online Users: empty search -> only online users; typing -> online + offline matches
-  const onlineFiltered = qOnline
+  // ONLINE USERS page: normally only online users. When searching, offline users are also found (marked offline).
+  const onlineFiltered = (qOnline
     ? allUsers.filter(u =>
         isValidUsername(u.id) &&
         (u.id.toLowerCase().includes(qOnline) || u.name.toLowerCase().includes(qOnline)))
-    : demoUsers.filter(u => isValidUsername(u.id));
+    : demoUsers.filter(u => isValidUsername(u.id))
+  ).slice().sort((a, b) => (isOnline(b) ? 1 : 0) - (isOnline(a) ? 1 : 0));
 
   if (!onlineFiltered.length) {
     addEmpty(onlineListEl, qOnline ? 'No users found' : 'No users online');
@@ -948,14 +1397,27 @@ window.renderLists = function() {
     onlineFiltered.forEach(u => onlineListEl.appendChild(createUserRow(u, false)));
   }
 
-  // Inbox: empty search -> only my chats; typing -> any registered user
   const contacts = getContacts();
-  const inboxFiltered = qInbox
+
+  // INBOX page: normally your chats. When searching, every registered user is found (online or offline).
+  const inboxFiltered = (qInbox
     ? allUsers.filter(u =>
         isValidUsername(u.id) &&
         (u.id.toLowerCase().includes(qInbox) || u.name.toLowerCase().includes(qInbox)))
     : allUsers.filter(u =>
-        isValidUsername(u.id) && contacts.has(u.id.toLowerCase()) && !isRemoved(u.id));
+        isValidUsername(u.id) && contacts.has(u.id.toLowerCase()) && !isRemoved(u.id))
+  ).slice();
+
+  // unread chats first, then latest message first
+  inboxFiltered.sort((a, b) => {
+    const ua = (unreadMap[a.id] || 0) > 0;
+    const ub = (unreadMap[b.id] || 0) > 0;
+    if (ua !== ub) return ua ? -1 : 1;
+    const ma = (lastMsgMap[a.id] && lastMsgMap[a.id].ms) || 0;
+    const mb = (lastMsgMap[b.id] && lastMsgMap[b.id].ms) || 0;
+    if (ma !== mb) return mb - ma;
+    return (isOnline(b) ? 1 : 0) - (isOnline(a) ? 1 : 0);
+  });
 
   if (!inboxFiltered.length) {
     addEmpty(inboxEl, qInbox ? 'No users found.' : 'No chats yet. Search a registered ID.');
@@ -964,6 +1426,8 @@ window.renderLists = function() {
   }
 
   renderBlocked();
+  updateCounts();
+  updateUnreadBadges();
   setTimeout(updateFocus, 50);
 };
 
@@ -976,8 +1440,11 @@ function addEmpty(parent, message) {
 
 function createUserRow(u, inbox) {
   const on = isOnline(u);
+  const blocked = isBlockedByMe(u.id) || isBlockedByOther(u.id);
+  const unread = inbox && !blocked ? (unreadMap[u.id] || 0) : 0;
+
   const row = document.createElement('div');
-  row.className = 'row';
+  row.className = 'row' + (unread > 0 ? ' unread' : '');
   row.tabIndex = 0;
 
   const avatar = document.createElement('div');
@@ -989,30 +1456,41 @@ function createUserRow(u, inbox) {
   info.style.minWidth = '0';
 
   const name = document.createElement('div');
-  name.style.cssText = 'color:#fff;font-weight:700;overflow-wrap:anywhere';
+  name.style.cssText = 'color:#fff;font-weight:' + (unread > 0 ? '900' : '700') + ';overflow-wrap:anywhere';
   name.textContent = u.name +
     (inbox && isBlockedByMe(u.id) ? ' (You Blocked)' : '') +
     (inbox && isBlockedByOther(u.id) ? ' (Blocked You)' : '');
 
   const detail = document.createElement('div');
-  detail.style.cssText = 'color:#94a3b8;font-size:10px';
-  detail.textContent = inbox && isBlockedByMe(u.id) ? '🚫 You Blocked' :
-    inbox && isBlockedByOther(u.id) ? '🚫 Blocked You' :
-    on ? '● Online' : '○ Offline - Tap to chat';
+  detail.style.cssText = 'font-size:10px;color:' + (unread > 0 ? '#4ade80' : '#94a3b8') + ';font-weight:' + (unread > 0 ? '700' : '400');
+
+  let detailText;
+  if (inbox && isBlockedByMe(u.id)) detailText = '🚫 You Blocked';
+  else if (inbox && isBlockedByOther(u.id)) detailText = '🚫 Blocked You';
+  else if (unread > 0) detailText = '🔔 ' + unread + ' new • ' + previewText(u.id);
+  else if (inbox && previewText(u.id)) detailText = previewText(u.id);
+  else detailText = (on ? '● Online' : '○ Offline') + ' • ID: ' + u.id;
+  detail.textContent = detailText;
 
   info.append(name, detail);
   row.append(avatar, info);
 
   if (inbox) {
+    if (unread > 0) {
+      const badge = document.createElement('div');
+      badge.className = 'unread-badge';
+      badge.textContent = unread > 99 ? '99+' : String(unread);
+      row.appendChild(badge);
+    }
     const status = document.createElement('div');
     status.className = 'status ' + (on ? 'online' : 'offline');
     status.textContent = on ? '● Online' : '○ Offline';
     row.appendChild(status);
   } else {
-    const arrow = document.createElement('div');
-    arrow.style.color = '#22d3ee';
-    arrow.textContent = on ? '❯' : '○';
-    row.appendChild(arrow);
+    const status = document.createElement('div');
+    status.className = 'status ' + (on ? 'online' : 'offline');
+    status.textContent = on ? '● Online' : '○ Offline';
+    row.appendChild(status);
   }
 
   row.addEventListener('click', () => {
@@ -1050,6 +1528,7 @@ function blockUser() {
     $('chatStatus').textContent = 'Blocked';
   }
 
+  unreadMap[selectedInbox] = 0;
   renderLists();
 }
 window.blockUser = blockUser;
@@ -1112,17 +1591,32 @@ window.unblockSpecific = function(id) {
   renderLists();
 };
 
+// DELETE ID: removes the user only from your inbox list (chat history is not touched)
 function removeFromInbox() {
   if (!selectedInbox) return alert('Please select a user first.');
 
-  if (!Array.isArray(removedMap[currentUser])) removedMap[currentUser] = [];
-  if (!removedMap[currentUser].includes(selectedInbox)) {
-    removedMap[currentUser].push(selectedInbox);
+  const id = String(selectedInbox).toLowerCase();
+
+  if (!confirm('Delete ' + id + ' from your inbox?')) {
+    $('inboxOptions').style.display = 'none';
+    return;
   }
 
+  if (!Array.isArray(removedMap[currentUser])) removedMap[currentUser] = [];
+  if (!removedMap[currentUser].includes(id)) {
+    removedMap[currentUser].push(id);
+  }
+  if (!removedAtMap[currentUser]) removedAtMap[currentUser] = {};
+  removedAtMap[currentUser][id] = nowMs();
+
   saveRemovedMap();
+  saveRemovedAtMap();
+  unreadMap[selectedInbox] = 0;
+  unreadMap[id] = 0;
+  selectedInbox = null;
   $('inboxOptions').style.display = 'none';
   renderLists();
+  updateUnreadBadges();
 }
 window.removeFromInbox = removeFromInbox;
 
@@ -1135,6 +1629,8 @@ window.openChat = function(id) {
   selectedMsgIndex = null;
   window._selectedDoc = null;
   replyTo = null;
+  messageCache = [];
+  unreadMap[id] = 0;
   $('chatInput').value = '';
   $('chatInput').placeholder = 'Type a message';
   $('chatMsgs').replaceChildren();
@@ -1143,6 +1639,7 @@ window.openChat = function(id) {
   const byOther = isBlockedByOther(id);
 
   $('chatName').textContent = id;
+  refreshOnline();
   const user = allUsers.find(u => u.id.toLowerCase() === id.toLowerCase());
   $('chatStatus').textContent = byMe ? 'Blocked' : byOther ? 'Blocked You' : isOnline(user) ? 'Online' : 'Offline';
 
@@ -1164,6 +1661,26 @@ function getChatId(a, b) {
   return [a.toLowerCase(), b.toLowerCase()].sort().join('_');
 }
 
+// WhatsApp style: messages are marked "seen" only while the chat is really open and visible
+function markChatSeen() {
+  if (!currentUser || !selected) return;
+  if (document.visibilityState !== 'visible') return;
+  if (!$('chatApp').classList.contains('show')) return;
+
+  const chatId = getChatId(currentUser, selected);
+  const me = currentUser.toLowerCase();
+
+  messageCache.forEach(item => {
+    const m = item.data;
+    if (item.id && String(m.to || '').toLowerCase() === me && m.status !== 'seen') {
+      updateDoc(
+        doc(db, 'privateChats', chatId, 'messages', item.id),
+        { status: 'seen' }
+      ).catch(error => console.warn('Could not mark message as seen:', error));
+    }
+  });
+}
+
 function initPrivateListener() {
   if (privateUnsub) privateUnsub();
   if (!selected || !currentUser) return;
@@ -1177,7 +1694,7 @@ function initPrivateListener() {
 
   privateUnsub = onSnapshot(q, snap => {
     const docs = [];
-    snap.forEach(d => docs.push({ id: d.id, data: d.data() || {} }));
+    snap.forEach(d => docs.push({ id: d.id, data: d.data({ serverTimestamps: 'estimate' }) || {} }));
     docs.reverse();
 
     const area = $('chatMsgs');
@@ -1234,20 +1751,10 @@ function initPrivateListener() {
       });
 
       area.appendChild(bubble);
-
-      if (
-        !isMe &&
-        String(m.to || '').toLowerCase() === currentUser.toLowerCase() &&
-        m.status !== 'seen'
-      ) {
-        updateDoc(
-          doc(db, 'privateChats', chatId, 'messages', item.id),
-          { status: 'seen' }
-        ).catch(error => console.warn('Could not mark message as seen:', error));
-      }
     });
 
     area.scrollTop = area.scrollHeight;
+    markChatSeen();
   }, error => {
     console.error('Private chat listener failed:', error);
     showError('Could not load private messages.', error);
@@ -1262,16 +1769,18 @@ function initPrivateTyping() {
 
   privateTypingUnsub = onSnapshot(doc(db, 'typing', chatId), snap => {
     const el = $('typingInd');
+    clearTimer(privateTypingHide);
 
-    if (!snap.exists()) {
+    if (!snap.exists() || snap.metadata.fromCache) {
       el.style.display = 'none';
       return;
     }
 
     const data = snap.data() || {};
-    if (data[selected] === true) {
+    if (isTypingValue(data[selected])) {
       el.style.display = 'block';
       el.textContent = selected + ' is typing...';
+      privateTypingHide = setTimeout(() => { el.style.display = 'none'; }, TYPING_SHOW_MS);
     } else {
       el.style.display = 'none';
     }
@@ -1369,10 +1878,10 @@ window.sendChat = async function() {
   const chatId = getChatId(currentUser, selected);
   const replyValue = replyTo;
 
-  // Clear the box immediately so a second tap can never send the same text again
   input.value = '';
   replyTo = null;
   input.placeholder = 'Type a message';
+  stopPrivateTyping();
 
   try {
     await addDoc(collection(db, 'privateChats', chatId, 'messages'), {
@@ -1393,10 +1902,6 @@ window.sendChat = async function() {
     showError('Could not send private message.', error);
     return;
   }
-
-  setDoc(doc(db, 'typing', chatId), {
-    [currentUser]: false
-  }, { merge: true }).catch(error => console.warn('Typing reset failed:', error));
 };
 
 $('chatSend').addEventListener('click', () => window.sendChat());
@@ -1409,21 +1914,7 @@ $('chatInput').addEventListener('keydown', e => {
 
 $('chatInput').addEventListener('input', () => {
   if (!selected || !currentUser) return;
-
-  const chatId = getChatId(currentUser, selected);
-
-  setDoc(doc(db, 'typing', chatId), {
-    [currentUser]: true
-  }, { merge: true }).catch(error => console.warn('Typing update failed:', error));
-
-  clearTimer(privateTypingTimer);
-  privateTypingTimer = setTimeout(() => {
-    if (currentUser) {
-      setDoc(doc(db, 'typing', chatId), {
-        [currentUser]: false
-      }, { merge: true }).catch(error => console.warn('Typing reset failed:', error));
-    }
-  }, 1200);
+  if ($('chatInput').value.trim()) pingPrivateTyping(); else stopPrivateTyping();
 });
 
 $('chatBackBtn').addEventListener('click', () => showApp('inbox'));
@@ -1445,7 +1936,6 @@ function getFocusableElements() {
 }
 
 function updateFocus() {
-  // Do not steal focus while the user is typing in a visible input (search box etc.)
   const ae = document.activeElement;
   if (ae && ae.tagName === 'INPUT' && ae.offsetParent !== null) return;
 
@@ -1551,34 +2041,55 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// Heartbeat: keeps my "online" fresh and refreshes others' status
+/* ---------- ONLINE / OFFLINE ENGINE ---------- */
+
 setInterval(() => {
   if (!currentUser) return;
-
   if (document.visibilityState === 'visible') {
     registerUser().catch(error => console.warn('Heartbeat failed:', error));
   }
+}, HEARTBEAT_MS);
+
+setInterval(() => {
+  if (!currentUser) return;
 
   refreshOnline();
   updateCounts();
+  updateChatStatus();
 
   const sig = allUsers.map(u => u.id + (isOnline(u) ? '1' : '0')).join(',');
   if (sig !== lastOnlineSig) {
     lastOnlineSig = sig;
     renderLists();
   }
-}, HEARTBEAT_MS);
+}, 8000);
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && currentUser) {
+  if (!currentUser) return;
+  if (document.visibilityState === 'visible') {
     registerUser().catch(error => console.warn('Online update failed:', error));
-  } else if (document.visibilityState === 'hidden' && currentUser) {
+    try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch (_) {}
+    // user came back to an open chat: now the messages are really seen
+    if ($('chatApp').classList.contains('show')) {
+      unreadMap[selected] = 0;
+      markChatSeen();
+      updateUnreadBadges();
+    }
+  } else {
+    stopGlobalTyping();
+    stopPrivateTyping();
     setOffline();
   }
 });
 
+window.addEventListener('online', () => {
+  if (currentUser) registerUser().catch(error => console.warn('Online update failed:', error));
+});
+
 window.addEventListener('pagehide', () => {
   if (currentUser) {
+    stopGlobalTyping();
+    stopPrivateTyping();
     setDoc(doc(db, 'users', currentUser), {
       online: false,
       lastSeen: serverTimestamp()
