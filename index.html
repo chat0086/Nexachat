@@ -6,9 +6,12 @@
 <title>NexaChat</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
+body{background:#020611;height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation}
+button,input{font:inherit}
+button:focus,input:focus{outline:2px solid #22d3ee;outline-offset:2px}
+button:disabled{opacity:.6;cursor:wait}
 #auth-screen{position:fixed;inset:0;background:#020a02;display:flex;align-items:center;justify-content:center;z-index:9999}
-#auth-screen::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,255,70,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,70,0.07) 1px, transparent 1px);background-size:30px 30px}
+#auth-screen::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,255,70,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,70,0.07) 1px,transparent 1px);background-size:30px 30px}
 .hacker-card{position:relative;z-index:2;width:92%;max-width:360px;background:rgba(0,20,0,0.92);border:1px solid #00ff46;box-shadow:0 0 25px rgba(0,255,70,0.35);border-radius:16px;padding:28px 22px;font-family:monospace}
 .hacker-logo{font-size:30px;font-weight:900;color:#00ff46;text-align:center;text-shadow:0 0 12px #00ff46}
 .hacker-sub{text-align:center;color:#7aff9a;font-size:11px;margin:6px 0 22px}
@@ -16,24 +19,24 @@ body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
 .hacker-btn{width:100%;background:#00ff46;color:#000;font-weight:900;border:none;border-radius:10px;padding:12px;margin-top:8px;cursor:pointer;font-size:15px;font-family:monospace}
 .hacker-btn2{width:100%;background:transparent;color:#00ff46;font-weight:900;border:1px solid #00ff46;border-radius:10px;padding:12px;margin-top:10px;cursor:pointer;font-family:monospace}
 .hacker-link{color:#7aff9a;font-size:12px;text-align:center;margin-top:16px;font-family:monospace}
-.app{display:none;height:100vh;flex-direction:column}
+.app{display:none;height:100vh;height:100dvh;flex-direction:column;min-height:0}
 .app.show{display:flex}
-#homeApp{background:#020611;padding:14px 12px}
-.neon-top{background:#101a3a;border:1.5px solid #22d3ee;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px}
-.neon-welcome{margin-top:18px;background:#0f1733;border:2px solid #c084fc;border-radius:16px;padding:18px 16px;display:flex;justify-content:space-between;align-items:center}
+#homeApp{background:#020611;padding:14px 12px;overflow-y:auto}
+.neon-top{background:#101a3a;border:1.5px solid #22d3ee;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.neon-welcome{margin-top:18px;background:#0f1733;border:2px solid #c084fc;border-radius:16px;padding:18px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-shrink:0}
 .neon-welcome small{color:#7dd3fc;font-size:13px}
-.neon-welcome h2{color:#fff;font-size:32px;font-weight:900}
-.neon-explore{border:2px solid #ff6ad5;color:#ffb4e6;padding:8px 16px;border-radius:10px;font-weight:900;cursor:pointer}
-.neon-card{margin-top:18px;background:#0f1733;border:1.5px solid #22d3ee;border-radius:16px;padding:16px 14px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.15s}
-.neon-card:focus{outline:2px solid #c084fc;transform:scale(1.02)}
-.neon-icon{width:52px;height:52px;border-radius:50%;border:2px solid #e879f9;display:flex;align-items:center;justify-content:center;font-size:24px}
+.neon-welcome h2{color:#fff;font-size:32px;font-weight:900;overflow-wrap:anywhere}
+.neon-explore{border:2px solid #ff6ad5;color:#ffb4e6;padding:8px 16px;border-radius:10px;font-weight:900;cursor:pointer;background:transparent}
+.neon-card{margin-top:18px;background:#0f1733;border:1.5px solid #22d3ee;border-radius:16px;padding:16px 14px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.15s;flex-shrink:0}
+.neon-card:focus,.neon-card.active{outline:2px solid #c084fc;transform:scale(1.01)}
+.neon-icon{width:52px;height:52px;flex-shrink:0;border-radius:50%;border:2px solid #e879f9;display:flex;align-items:center;justify-content:center;font-size:24px}
 .neon-card h3{color:#fff;font-size:15px;font-weight:800}
 .neon-card p{color:#a5b4d4;font-size:12px}
 #globalApp{background:#070e28;color:#fff;position:relative}
-.top-g{height:48px;background:#101a3a;border-bottom:2px solid #22d3ee;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
-.online-badge{background:#0a2e1f;border:1px solid #22c55e;color:#4ade80;font-size:10px;padding:3px 7px;border-radius:12px}
-.chat-area{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
-.msg{max-width:85%;border-radius:12px;padding:8px 10px;border:1.2px solid}
+.top-g{height:48px;flex-shrink:0;background:#101a3a;border-bottom:2px solid #22d3ee;display:flex;align-items:center;justify-content:space-between;padding:0 10px;gap:8px}
+.online-badge{background:#0a2e1f;border:1px solid #22c55e;color:#4ade80;font-size:10px;padding:3px 7px;border-radius:12px;white-space:nowrap}
+.chat-area{flex:1;min-height:0;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.msg{max-width:85%;overflow-wrap:anywhere;border-radius:12px;padding:8px 10px;border:1.2px solid}
 .msg.other{align-self:flex-start;background:#1a2040;border-color:#a78bfa}
 .msg.me{align-self:flex-end;background:linear-gradient(135deg,#0e7490,#a21caf);border-color:#22d3ee}
 .msg.highlight{border-color:#fde047!important;box-shadow:0 0 14px rgba(253,224,71,0.7)!important}
@@ -44,35 +47,35 @@ body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
 #globalTyping{display:none;padding:6px 12px;color:#fde047;font-size:11px;font-style:italic;background:#0f1a33;border-top:1px solid #1e2a50}
 #onlineApp{background:#070e28;color:#fff}
 #inboxApp{background:#070e28;color:#fff;position:relative}
-.top-i{height:52px;background:#0a1030;border-bottom:2px solid #22d3ee;display:flex;align-items:center;justify-content:center}
+.top-i{height:52px;flex-shrink:0;background:#0a1030;border-bottom:2px solid #22d3ee;display:flex;align-items:center;justify-content:center}
 .top-i h1{font-size:22px;color:#22d3ee;text-shadow:0 0 8px #22d3ee}
-.search-box{height:48px;background:#0a1030;padding:6px 10px;border-bottom:1px solid #1e2a50}
-.search-box input{width:100%;height:100%;background:#070e28;border:1.2px solid #22d3ee;border-radius:10px;color:#fff;padding:0 10px 0 36px;font-size:13px;outline:none}
-.list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
-.row{height:60px;background:#0f1733;border:1px solid #1e2a50;border-radius:12px;display:flex;align-items:center;padding:0 10px;gap:8px;cursor:pointer;transition:0.15s}
-.row:hover,.row.active,.row:focus{border-color:#22d3ee!important;background:#152047!important;box-shadow:0 0 12px rgba(34,211,238,0.35);transform:scale(1.01);outline:none}
-.avatar{width:42px;height:42px;border-radius:50%;background:#1e293b;border:1.5px solid #334155;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+.search-box{height:48px;flex-shrink:0;background:#0a1030;padding:6px 10px;border-bottom:1px solid #1e2a50}
+.search-box input{width:100%;height:100%;background:#070e28;border:1.2px solid #22d3ee;border-radius:10px;color:#fff;padding:0 10px 0 12px;font-size:13px;outline:none}
+.list{flex:1;min-height:0;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.row{min-height:60px;flex-shrink:0;background:#0f1733;border:1px solid #1e2a50;border-radius:12px;display:flex;align-items:center;padding:8px 10px;gap:8px;cursor:pointer;transition:0.15s;overflow-wrap:anywhere}
+.row:hover,.row.active,.row:focus{border-color:#22d3ee!important;background:#152047!important;box-shadow:0 0 12px rgba(34,211,238,0.35);outline:none}
+.avatar{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:#1e293b;border:1.5px solid #334155;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
 .status.online{background:#0a2e1f;color:#4ade80;border:1px solid #22c55e;padding:2px 6px;border-radius:10px;font-size:9px}
 .status.offline{background:#1a1a1a;color:#94a3b8;border:1px solid #333;padding:2px 6px;border-radius:10px;font-size:9px}
-#inboxOptions{position:absolute;bottom:38px;left:6px;width:210px;background:#0f1733;border:2px solid #22d3ee;border-radius:12px;padding:6px;display:none;z-index:99;box-shadow:0 0 18px rgba(34,211,238,0.5)}
+#inboxOptions{position:absolute;bottom:38px;left:6px;width:210px;background:#0f1733;border:2px solid #22d3ee;border-radius:12px;padding:6px;display:none;z-index:99;box-shadow:0 0 18px rgba(34,211,238,0.5);max-height:75%;overflow-y:auto}
 .opt-btn{width:100%;padding:10px;background:#101a3a;border:1px solid #1e2a50;border-radius:8px;color:#fff;margin-bottom:6px;cursor:pointer;text-align:left;font-size:12px}
-.opt-btn:hover,.opt-btn:focus{background:#152047;border-color:#22d3ee;outline:none}
+.opt-btn:hover,.opt-btn:focus,.opt-btn.active{background:#152047;border-color:#22d3ee;outline:none}
 #blockedView{position:absolute;inset:0;background:#070e28;z-index:100;display:none;flex-direction:column}
 #chatApp{background:#0b141a;color:#fff;position:relative}
-.chat-top{height:56px;background:#202c33;display:flex;align-items:center;padding:0 10px;gap:10px;border-bottom:1px solid #2a3942}
-.chat-msgs{flex:1;overflow-y:auto;padding:12px 8px;display:flex;flex-direction:column;gap:8px;background:#0b141a;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
-.c-msg{max-width:75%;padding:7px 10px;border-radius:10px;font-size:13px;position:relative;cursor:pointer;transition:0.15s;border:1px solid transparent}
+.chat-top{height:56px;flex-shrink:0;background:#202c33;display:flex;align-items:center;padding:0 10px;gap:10px;border-bottom:1px solid #2a3942}
+.chat-msgs{flex:1;min-height:0;overflow-y:auto;padding:12px 8px;display:flex;flex-direction:column;gap:8px;background:#0b141a;-webkit-overflow-scrolling:touch}
+.c-msg{max-width:75%;overflow-wrap:anywhere;padding:7px 10px;border-radius:10px;font-size:13px;position:relative;cursor:pointer;transition:0.15s;border:1px solid transparent}
 .c-msg.me{align-self:flex-end;background:#005c4b;color:#e9edef;border-bottom-right-radius:2px}
 .c-msg.other{align-self:flex-start;background:#202c33;color:#e9edef;border-bottom-left-radius:2px}
-.c-msg:hover,.c-msg.active,.c-msg:focus{background:#1e3a5f!important;border-color:#22d3ee!important;box-shadow:0 0 10px rgba(34,211,238,0.4);transform:scale(1.02);outline:none}
+.c-msg:hover,.c-msg.active,.c-msg:focus{background:#1e3a5f!important;border-color:#22d3ee!important;box-shadow:0 0 10px rgba(34,211,238,0.4);outline:none}
 .c-meta{font-size:9px;color:#94a3b8;margin-top:4px;display:flex;justify-content:flex-end;gap:4px;align-items:center}
 .tick{font-size:11px}.tick.seen{color:#53bdeb}.tick.delivered{color:#fff}
-.reply-preview{font-size:10px;background:rgba(0,0,0,0.25);border-left:2px solid #22d3ee;padding:3px 6px;border-radius:4px;margin-bottom:4px;color:#7dd3fc}
-#typingInd{display:none;padding:6px 12px;color:#00ff46;font-size:11px;font-style:italic}
-.inputbar{height:50px;background:#202c33;display:flex;align-items:center;padding:0 8px;gap:8px}
-.inputbar input{flex:1;height:34px;background:#2a3942;border:none;border-radius:18px;color:#fff;padding:0 14px;outline:none}
-.send{width:34px;height:34px;background:#00a884;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:800;cursor:pointer}
-.soft{height:32px;background:#000;display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:11px;color:#7aff9a;border-top:1px solid #222}
+.reply-preview{font-size:10px;background:rgba(0,0,0,0.25);border-left:2px solid #22d3ee;padding:3px 6px;border-radius:4px;margin-bottom:4px;color:#7dd3fc;overflow-wrap:anywhere}
+#typingInd{display:none;flex-shrink:0;padding:6px 12px;color:#00ff46;font-size:11px;font-style:italic}
+.inputbar{height:50px;flex-shrink:0;background:#202c33;display:flex;align-items:center;padding:0 8px;gap:8px}
+.inputbar input{min-width:0;flex:1;height:34px;background:#2a3942;border:none;border-radius:18px;color:#fff;padding:0 14px;outline:none}
+.send{width:34px;height:34px;flex-shrink:0;background:#00a884;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:800;cursor:pointer;border:0}
+.soft{height:32px;flex-shrink:0;background:#000;display:flex;justify-content:space-between;align-items:center;padding:0 10px;font-size:11px;color:#7aff9a;border-top:1px solid #222}
 #chatOptions{position:absolute;bottom:38px;left:6px;width:200px;background:#0f1733;border:2px solid #22d3ee;border-radius:12px;padding:6px;display:none;z-index:99;box-shadow:0 0 18px rgba(34,211,238,0.5)}
 </style>
 </head>
@@ -80,28 +83,28 @@ body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
 
 <div id="auth-screen">
   <div class="hacker-card">
-    <div class="hacker-logo">> NEXACHAT_</div>
+    <div class="hacker-logo">&gt; NEXACHAT_</div>
     <div class="hacker-sub">OWNER: ZIDDI MALIK // SECURE LOGIN</div>
-    <input id="username" class="hacker-input" placeholder="> username">
-    <input id="password" type="password" class="hacker-input" placeholder="> password">
+    <input id="username" class="hacker-input" placeholder="> username" autocomplete="username" maxlength="25">
+    <input id="password" type="password" class="hacker-input" placeholder="> password" autocomplete="current-password">
     <button id="loginBtn" class="hacker-btn">[ LOGIN ]</button>
     <button id="signupBtn" class="hacker-btn2">[ SIGN UP ]</button>
-    <div class="hacker-link">System v2.1 • Encrypted • Secure Node • Firebase Live</div>
+    <div class="hacker-link">System v2.1 • Firebase Live</div>
   </div>
 </div>
 
 <div id="homeApp" class="app">
   <div class="neon-top"><div>⬡</div><div><h1 style="color:#fff;font-size:22px">NexaChat</h1><p id="ownerP" style="color:#c4b5fd;font-size:12px">Ziddi Malik</p></div><div style="margin-left:auto;color:#fff;font-size:11px" id="meHome"></div></div>
-  <div class="neon-welcome"><div><small>Welcome back</small><h2 id="welcomeH2">Legend</h2></div><div class="neon-explore" onclick="localStorage.clear();location.reload()">LOGOUT</div></div>
+  <div class="neon-welcome"><div><small>Welcome back</small><h2 id="welcomeH2">Legend</h2></div><button class="neon-explore" id="logoutBtn" type="button">LOGOUT</button></div>
   <div class="neon-card" tabindex="0" onclick="showApp('online')"><div class="neon-icon">👥</div><div><h3>ONLINE USERS</h3><p>See who's online</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
   <div class="neon-card" tabindex="0" onclick="showApp('global')"><div class="neon-icon">🌐</div><div><h3>GLOBE LOUNGE</h3><p>Join public chat</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
   <div class="neon-card" tabindex="0" onclick="showApp('inbox')"><div class="neon-icon">✉️</div><div><h3>NEXA INBOX</h3><p>Secure & private chats</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
-  <div style="flex:1"></div><div class="soft"><span>Options</span><span>Back</span></div>
+  <div style="flex:1;min-height:8px"></div><div class="soft"><span>Options</span><span onclick="showApp('home')">Back</span></div>
 </div>
 
 <div id="onlineApp" class="app">
   <div class="top-g"><h2>Online Users</h2><div class="online-badge" id="onlineCount">● Online</div></div>
-  <div class="search-box"><input id="searchOnline" placeholder="Search ID or name"></div>
+  <div class="search-box"><input id="searchOnline" placeholder="Search ID or name" autocomplete="off"></div>
   <div class="list" id="onlineList"></div>
   <div class="soft"><span style="color:#00ff46">Open Chat</span><span onclick="showApp('home')">Back</span></div>
 </div>
@@ -111,13 +114,13 @@ body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
   <div class="chat-area" id="globalArea"></div>
   <div id="mentionPopup"></div>
   <div id="globalTyping">Someone is typing...</div>
-  <div style="height:42px;background:#101a3a;border-top:2px solid #22d3ee;display:flex;padding:0 8px;align-items:center"><input id="globalInput" placeholder="Type @ to mention..." style="flex:1;background:#070e28;border:1px solid #475569;border-radius:8px;color:#fff;padding:8px"><button onclick="sendGlobal()" style="margin-left:6px;background:#22d3ee;border:none;border-radius:8px;padding:8px 12px;font-weight:800">SEND</button></div>
+  <div style="height:42px;flex-shrink:0;background:#101a3a;border-top:2px solid #22d3ee;display:flex;padding:0 8px;align-items:center"><input id="globalInput" autocomplete="off" placeholder="Type @ to mention..." style="min-width:0;flex:1;background:#070e28;border:1px solid #475569;border-radius:8px;color:#fff;padding:8px"><button id="globalSendBtn" style="margin-left:6px;background:#22d3ee;border:none;border-radius:8px;padding:8px 12px;font-weight:800">SEND</button></div>
   <div class="soft"><span onclick="openMention()">Tag @</span><span onclick="showApp('home')">Back</span></div>
 </div>
 
 <div id="inboxApp" class="app">
   <div class="top-i"><h1>💬 Nexa Inbox</h1></div>
-  <div class="search-box"><input id="searchInbox" placeholder="🔍 Search ID or name"></div>
+  <div class="search-box"><input id="searchInbox" placeholder="🔍 Search ID or name" autocomplete="off"></div>
   <div class="list" id="inboxList"></div>
   <div id="inboxOptions">
     <button class="opt-btn" tabindex="0" onclick="blockUser()">🚫 Block User</button>
@@ -126,17 +129,17 @@ body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
     <button class="opt-btn" tabindex="0" style="color:#ff6b6b" onclick="removeFromInbox()">🗑️ Remove from Inbox</button>
   </div>
   <div id="blockedView">
-    <div class="top-g"><h2>Blocked Users</h2><div style="color:#22d3ee;cursor:pointer" onclick="document.getElementById('blockedView').style.display='none'">✕ Close</div></div>
+    <div class="top-g"><h2>Blocked Users</h2><button type="button" style="color:#22d3ee;background:transparent;border:0;cursor:pointer" onclick="document.getElementById('blockedView').style.display='none';updateFocus()">✕ Close</button></div>
     <div class="list" id="blockedList"></div>
   </div>
   <div class="soft"><span onclick="toggleInboxOptions()" style="color:#00ff46;font-weight:900;cursor:pointer">Options</span><span onclick="showApp('home')" style="cursor:pointer">Back</span></div>
 </div>
 
 <div id="chatApp" class="app">
-  <div class="chat-top"><div onclick="showApp('inbox')" style="font-size:24px;font-weight:800;cursor:pointer">‹</div><div><div style="font-weight:700"><span id="chatName">User</span> ●</div><div style="font-size:11px;color:#8696a0" id="chatStatus">Online</div></div></div>
+  <div class="chat-top"><button id="chatBackBtn" type="button" style="font-size:24px;font-weight:800;color:#fff;background:transparent;border:0;cursor:pointer">‹</button><div><div style="font-weight:700"><span id="chatName">User</span></div><div style="font-size:11px;color:#8696a0" id="chatStatus">Online</div></div></div>
   <div class="chat-msgs" id="chatMsgs"></div>
   <div id="typingInd">●●● typing...</div>
-  <div class="inputbar"><input id="chatInput" placeholder="Type a message"><div class="send" id="chatSend">➤</div></div>
+  <div class="inputbar"><input id="chatInput" autocomplete="off" placeholder="Type a message"><button class="send" id="chatSend" type="button">➤</button></div>
   <div id="chatOptions">
     <button class="opt-btn" tabindex="0" onclick="replyMsg()">↩️ Reply</button>
     <button class="opt-btn" tabindex="0" onclick="editMsg()">✏️ Edit</button>
@@ -147,10 +150,17 @@ body{background:#020611;height:100vh;overflow:hidden;touch-action:manipulation}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, doc, setDoc, deleteDoc, updateDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getFirestore, collection, addDoc, doc, setDoc, deleteDoc,
+  updateDoc, onSnapshot, query, orderBy, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",
+  apiKey: "AIzaSyDwDjLlhRxNNfIF1N9B9j4PUTqT0fq34y50",
   authDomain: "nexachat-28ecc.firebaseapp.com",
   projectId: "nexachat-28ecc",
   storageBucket: "nexachat-28ecc.firebasestorage.app",
@@ -161,301 +171,1275 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const $ = id => document.getElementById(id);
+
+let currentUser = null;
+let demoUsers = [];
+let allUsers = [];
+let blockMap = readJSON('nexa_blockMap', {});
+let removedMap = readJSON('nexa_removed', {});
+let selected = null;
+let selectedInbox = null;
+let selectedMsgIndex = null;
+let mentionIndex = 0;
+let replyTo = null;
+let focusIndex = 0;
+let globalUnsub = null;
+let privateUnsub = null;
+let typingTimeout = null;
+let usersUnsub = null;
+let globalTypingUnsub = null;
+let privateTypingUnsub = null;
+let globalTypingTimer = null;
+let privateTypingTimer = null;
+let mentionOpen = false;
+let lastMentionQuery = '';
+let messageCache = [];
+let busy = false;
+let authReady = false;
+let authStateVersion = 0;
+
+function readJSON(key, fallback) {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || 'null');
+    return value && typeof value === 'object' ? value : fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  })[ch]);
+}
+
+function isValidUsername(id) {
+  return typeof id === 'string' && /^[a-zA-Z0-9_]{2,25}$/.test(id);
+}
+
+function safeText(value) {
+  return String(value ?? '');
+}
+
+function setBusy(value) {
+  busy = value;
+  $('loginBtn').disabled = value;
+  $('signupBtn').disabled = value;
+  $('loginBtn').style.opacity = value ? '.6' : '1';
+  $('signupBtn').style.opacity = value ? '.6' : '1';
+}
+
+function clearTimer(timer) {
+  if (timer) clearTimeout(timer);
+}
+
+function usernameEmail(username) {
+  return username.trim().toLowerCase() + '@nexachat.invalid';
+}
+
+function showAuth() {
+  $('auth-screen').style.display = 'flex';
+  document.querySelectorAll('.app').forEach(a => a.classList.remove('show'));
+}
+
+function stopGlobalListeners() {
+  if (globalUnsub) globalUnsub();
+  if (globalTypingUnsub) globalTypingUnsub();
+  globalUnsub = null;
+  globalTypingUnsub = null;
+  $('globalTyping').style.display = 'none';
+  $('mentionPopup').style.display = 'none';
+  mentionOpen = false;
+}
+
+function stopPrivateListeners() {
+  if (privateUnsub) privateUnsub();
+  if (privateTypingUnsub) privateTypingUnsub();
+  privateUnsub = null;
+  privateTypingUnsub = null;
+  $('typingInd').style.display = 'none';
+  $('chatOptions').style.display = 'none';
+  selectedMsgIndex = null;
+  window._selectedDoc = null;
+}
+
+function showError(prefix, error) {
+  console.error(prefix, error);
+  let message = error?.message || 'Please check your internet connection and Firebase rules.';
+  if (error?.code === 'auth/email-already-in-use') message = 'This username is already registered. Please log in.';
+  if (error?.code === 'auth/invalid-credential' || error?.code === 'auth/wrong-password' || error?.code === 'auth/user-not-found' || error?.code === 'auth/invalid-login-credentials') message = 'Incorrect username or password.';
+  if (error?.code === 'auth/weak-password') message = 'Password must contain at least 6 characters.';
+  if (error?.code === 'auth/too-many-requests') message = 'Too many attempts. Please try again later.';
+  if (error?.code === 'auth/network-request-failed') message = 'Internet connection failed. Please try again.';
+  if (error?.code === 'auth/operation-not-allowed') message = 'Email/Password sign-in is disabled. Enable it in Firebase Authentication settings.';
+  if (error?.code === 'auth/invalid-api-key') message = 'Firebase API key is invalid. Check firebaseConfig.';
+  alert(prefix + '\n' + message);
+}
+
+function isBlockedByMe(target) {
+  return Array.isArray(blockMap[currentUser]) && blockMap[currentUser].includes(target);
+}
+
+function isBlockedByOther(target) {
+  return Array.isArray(blockMap[target]) && blockMap[target].includes(currentUser);
+}
+
+function isRemoved(target) {
+  return Array.isArray(removedMap[currentUser]) && removedMap[currentUser].includes(target);
+}
+
+function saveBlockMap() {
+  localStorage.setItem('nexa_blockMap', JSON.stringify(blockMap));
+}
+
+function saveRemovedMap() {
+  localStorage.setItem('nexa_removed', JSON.stringify(removedMap));
+}
+
+function setUserDetails() {
+  $('welcomeH2').textContent = currentUser || 'Legend';
+  $('meHome').textContent = currentUser || '';
+}
+
+async function registerUser() {
+  if (!currentUser) return;
+  await setDoc(doc(db, 'users', currentUser), {
+    id: currentUser,
+    name: currentUser,
+    online: true,
+    lastSeen: serverTimestamp()
+  }, { merge: true });
+}
+
+async function setOffline(username = currentUser) {
+  if (!username) return;
+  try {
+    await setDoc(doc(db, 'users', username), {
+      id: username,
+      name: username,
+      online: false,
+      lastSeen: serverTimestamp()
+    }, { merge: true });
+  } catch (error) {
+    console.warn('Could not update offline status:', error);
+  }
+}
+
+function initUsersListener() {
+  if (usersUnsub) usersUnsub();
+
+  usersUnsub = onSnapshot(collection(db, 'users'), snap => {
+    demoUsers = [];
+    allUsers = [];
+
+    snap.forEach(d => {
+      const u = d.data() || {};
+      const realId = String(u.id || d.id).trim().toLowerCase();
+
+      if (!isValidUsername(realId)) return;
+      if (realId.toLowerCase() === String(currentUser || '').toLowerCase()) return;
+
+      const userObj = {
+        id: realId,
+        name: String(u.name || realId),
+        online: u.online === true
+      };
+
+      allUsers.push(userObj);
+      if (userObj.online) demoUsers.push(userObj);
+    });
+
+    renderLists();
+
+    const count = demoUsers.length + (currentUser ? 1 : 0);
+    $('globalOnlineCount').textContent = '● Online: ' + count;
+    $('onlineCount').textContent = '● Online: ' + count;
+  }, error => {
+    console.error('Users listener failed:', error);
+    alert('Could not load users. Check Firestore rules and internet connection.');
+  });
+}
+
+window.showApp = function(id) {
+  const target = $(id + 'App');
+  if (!target) return;
+
+  if (id !== 'global') stopGlobalListeners();
+  if (id !== 'chat') stopPrivateListeners();
+
+  document.querySelectorAll('.app').forEach(a => a.classList.remove('show'));
+  $('auth-screen').style.display = 'none';
+  target.classList.add('show');
+
+  if (id === 'inbox' || id === 'online') renderLists();
+  if (id === 'global') {
+    initGlobalListener();
+    initGlobalTyping();
+  }
+
+  focusIndex = 0;
+  setTimeout(updateFocus, 100);
+};
+
+function validateLoginForm() {
+  const u = $('username').value.trim();
+  const p = $('password').value;
+
+  if (!isValidUsername(u)) {
+    alert('Username must be 2–25 characters and use only letters, numbers or underscores.');
+    $('username').focus();
+    return null;
+  }
+
+  if (!p) {
+    alert('Please enter your password.');
+    $('password').focus();
+    return null;
+  }
+
+  return { username: u.toLowerCase(), password: p };
+}
+
+async function enterAccount(isSignup) {
+  if (busy || !authReady) {
+    if (!authReady) alert('Firebase is starting. Please try again in a moment.');
+    return;
+  }
+
+  const details = validateLoginForm();
+  if (!details) return;
+
+  if (isSignup && details.password.length < 6) {
+    alert('Password must contain at least 6 characters.');
+    $('password').focus();
+    return;
+  }
+
+  setBusy(true);
+
+  try {
+    const email = usernameEmail(details.username);
+
+    if (isSignup) {
+      await createUserWithEmailAndPassword(auth, email, details.password);
+    } else {
+      await signInWithEmailAndPassword(auth, email, details.password);
+    }
+  } catch (error) {
+    showError(isSignup ? 'Could not create account.' : 'Login failed.', error);
+  } finally {
+    setBusy(false);
+  }
+}
+
+$('signupBtn').addEventListener('click', () => enterAccount(true));
+$('loginBtn').addEventListener('click', () => enterAccount(false));
+
+$('password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('loginBtn').click();
+});
+
+$('username').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('password').focus();
+});
+
+$('logoutBtn').addEventListener('click', async () => {
+  if (busy) return;
+  setBusy(true);
+
+  const oldUser = currentUser;
+
+  try {
+    await setOffline(oldUser);
+
+    if (usersUnsub) usersUnsub();
+    usersUnsub = null;
+
+    stopGlobalListeners();
+    stopPrivateListeners();
+
+    clearTimer(typingTimeout);
+    clearTimer(globalTypingTimer);
+    clearTimer(privateTypingTimer);
+
+    selected = null;
+    selectedInbox = null;
+    selectedMsgIndex = null;
+    replyTo = null;
+
+    await signOut(auth);
+  } catch (error) {
+    showError('Could not log out.', error);
+  } finally {
+    setBusy(false);
+  }
+});
+
+onAuthStateChanged(auth, async user => {
+  const version = ++authStateVersion;
+  authReady = true;
+
+  if (!user) {
+    currentUser = null;
+    localStorage.removeItem('nexa_current');
+
+    if (usersUnsub) usersUnsub();
+    usersUnsub = null;
+
+    stopGlobalListeners();
+    stopPrivateListeners();
+    clearTimer(typingTimeout);
+    clearTimer(globalTypingTimer);
+    clearTimer(privateTypingTimer);
+
+    showAuth();
+    setBusy(false);
+    return;
+  }
+
+  const email = String(user.email || '');
+  const suffix = '@nexachat.invalid';
+
+  if (!email.toLowerCase().endsWith(suffix)) {
+    try { await signOut(auth); } catch (_) {}
+    showAuth();
+    return;
+  }
+
+  const username = email.slice(0, -suffix.length).toLowerCase();
+
+  if (!isValidUsername(username)) {
+    currentUser = null;
+    try { await signOut(auth); } catch (_) {}
+    showAuth();
+    return;
+  }
+
+  currentUser = username;
+  localStorage.setItem('nexa_current', currentUser);
+  setUserDetails();
+
+  try {
+    await registerUser();
+  } catch (error) {
+    console.error('Could not register user profile:', error);
+    if (version === authStateVersion) {
+      showError('Login succeeded, but the user profile could not be saved. Check Firestore rules.', error);
+    }
+  }
+
+  if (version !== authStateVersion || !auth.currentUser) return;
+
+  initUsersListener();
+  showApp('home');
+});
+
+function initGlobalListener() {
+  if (globalUnsub) globalUnsub();
+
+  const q = query(
+    collection(db, 'globalChat'),
+    orderBy('createdAt', 'desc'),
+    limit(10)
+  );
+
+  globalUnsub = onSnapshot(q, snap => {
+    const docs = [];
+    snap.forEach(d => docs.push({ id: d.id, data: d.data() || {} }));
+    docs.reverse();
+
+    const area = $('globalArea');
+    area.replaceChildren();
+
+    docs.forEach(item => {
+      const m = item.data;
+      const sender = String(m.name || 'User');
+      const text = String(m.text || '');
+      const isMe = sender.toLowerCase() === String(currentUser || '').toLowerCase();
+      const mention = String(m.mention || '');
+      const isMentioned = mention && currentUser &&
+        mention.toLowerCase() === currentUser.toLowerCase();
+
+      const bubble = document.createElement('div');
+      bubble.className = 'msg ' + (isMe ? 'me' : 'other') + (isMentioned ? ' highlight' : '');
+
+      const name = document.createElement('div');
+      name.style.cssText = 'font-size:10px;font-weight:800;margin-bottom:2px;color:' +
+        (isMe ? '#a5f3fc' : '#f0abfc');
+      name.textContent = sender;
+      bubble.appendChild(name);
+
+      const body = document.createElement('div');
+      appendMentionText(body, text, mention);
+      bubble.appendChild(body);
+
+      const time = document.createElement('div');
+      time.style.cssText = 'font-size:9px;color:#94a3b8;text-align:right;margin-top:3px';
+      time.textContent = String(m.time || '');
+      bubble.appendChild(time);
+
+      area.appendChild(bubble);
+    });
+
+    area.scrollTop = area.scrollHeight;
+  }, error => {
+    console.error('Global chat listener failed:', error);
+    $('globalArea').textContent = 'Could not load messages. Check your internet and Firebase rules.';
+  });
+}
+
+function appendMentionText(container, text, mention) {
+  if (!mention || mention === 'undefined') {
+    container.textContent = text;
+    return;
+  }
+
+  const escaped = mention.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  let regex;
+
+  try {
+    regex = new RegExp('@' + escaped + '(?![a-zA-Z0-9_])', 'ig');
+  } catch (_) {
+    container.textContent = text;
+    return;
+  }
+
+  let last = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    container.appendChild(document.createTextNode(text.slice(last, match.index)));
+    const span = document.createElement('span');
+    span.className = 'mention';
+    span.textContent = match[0];
+    container.appendChild(span);
+    last = match.index + match[0].length;
+  }
+
+  container.appendChild(document.createTextNode(text.slice(last)));
+}
+
+async function sendGlobal() {
+  const input = $('globalInput');
+  const text = input.value.trim();
+
+  if (!currentUser) return alert('Please log in first.');
+  if (!text) return;
+  if (text.length > 2000) return alert('Message is too long. Maximum 2000 characters.');
+
+  const match = text.match(/@([a-zA-Z0-9_]{2,25})(?![a-zA-Z0-9_])/);
+  let mentionVal = match ? match[1] : null;
+
+  if (mentionVal && !allUsers.some(u => u.id.toLowerCase() === mentionVal.toLowerCase())) {
+    mentionVal = null;
+  }
+
+  try {
+    await addDoc(collection(db, 'globalChat'), {
+      name: currentUser,
+      text,
+      time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+      mention: mentionVal,
+      createdAt: serverTimestamp()
+    });
+
+    input.value = '';
+    $('mentionPopup').style.display = 'none';
+    mentionOpen = false;
+    await setDoc(doc(db, 'typing', 'global'), { [currentUser]: false }, { merge: true });
+  } catch (error) {
+    showError('Could not send global message.', error);
+  }
+}
 
 window.sendGlobal = sendGlobal;
+
+function openMention() {
+  const pop = $('mentionPopup');
+
+  if (mentionOpen) {
+    pop.style.display = 'none';
+    mentionOpen = false;
+    return;
+  }
+
+  const validUsers = demoUsers.filter(u => isValidUsername(u.id));
+  pop.replaceChildren();
+
+  if (!validUsers.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'color:#777;padding:8px;font-size:11px';
+    empty.textContent = 'No users online';
+    pop.appendChild(empty);
+  } else {
+    validUsers.forEach((u, index) => {
+      const item = document.createElement('div');
+      item.className = 'mention-item' + (index === mentionIndex ? ' active' : '');
+      item.textContent = '@' + u.id;
+      item.tabIndex = 0;
+      item.addEventListener('click', () => insertMention(u.id));
+      pop.appendChild(item);
+    });
+  }
+
+  pop.style.display = 'block';
+  mentionOpen = true;
+  setTimeout(updateFocus, 30);
+}
+
 window.openMention = openMention;
-window.toggleInboxOptions = toggleInboxOptions;
-window.blockUser = blockUser;
-window.unblockUser = unblockUser;
-window.showBlocked = showBlocked;
-window.removeFromInbox = removeFromInbox;
-window.toggleChatOptions = toggleChatOptions;
-window.replyMsg = replyMsg;
-window.editMsg = editMsg;
-window.deleteMsg = deleteMsg;
 
-let currentUser=localStorage.getItem('nexa_current')||null;
-let demoUsers=[];
-let allUsers=[]; // all users including offline for search
-let blockMap=JSON.parse(localStorage.getItem('nexa_blockMap')||'{}');
-let selected=null, selectedInbox=null, selectedMsgIndex=null, mentionIndex=0, replyTo=null, focusIndex=0;
-let globalUnsub=null, privateUnsub=null, typingTimeout=null, usersUnsub=null, globalTypingUnsub=null, privateTypingUnsub=null;
+function insertMention(id) {
+  if (!isValidUsername(id)) return;
 
-function isValidUsername(id){
-  if(!id) return false;
-  if(id==='undefined') return false;
-  if(id.length>25) return false; // REMOVE RANDOM LONG IDs LIKE 49cvHKI...
-  if(id.length<2) return false;
-  return true;
+  const input = $('globalInput');
+  const value = input.value;
+  const cursor = typeof input.selectionStart === 'number' ? input.selectionStart : value.length;
+  const before = value.slice(0, cursor);
+  const after = value.slice(cursor);
+  const atIndex = before.lastIndexOf('@');
+
+  if (atIndex >= 0 && !/\s/.test(before.slice(atIndex + 1))) {
+    input.value = before.slice(0, atIndex) + '@' + id + ' ' + after;
+  } else {
+    input.value = before + (before && !/\s$/.test(before) ? ' ' : '') + '@' + id + ' ' + after;
+  }
+
+  $('mentionPopup').style.display = 'none';
+  mentionOpen = false;
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
 }
 
-function initUsersListener(){
-  if(usersUnsub) usersUnsub();
-  usersUnsub = onSnapshot(collection(db,"users"),(snap)=>{
-    demoUsers=[];
-    allUsers=[];
-    snap.forEach(d=>{
-      let u=d.data();
-      let realId = u.id || d.id;
-      if(!isValidUsername(realId)) return; // REMOVE FAKE RANDOM IDS
-      if(realId===currentUser) return;
-      let realName = u.name || realId;
-      let userObj={id:realId,name:realName,online:u.online||false};
-      allUsers.push(userObj);
-      if(userObj.online){ demoUsers.push(userObj); }
-    });
-    renderLists();
-    let onlineCount = demoUsers.length;
-    let el1=document.getElementById('globalOnlineCount');
-    let el2=document.getElementById('onlineCount');
-    if(el1) el1.innerText = '● Online: ' + (onlineCount+1);
-    if(el2) el2.innerText = '● Online: ' + (onlineCount+1);
-  });
-}
+window.insertMention = insertMention;
 
-window.showApp = function(id){
-  document.querySelectorAll('.app').forEach(a=>a.classList.remove('show'));
-  document.getElementById('auth-screen').style.display='none';
-  document.getElementById(id+'App').classList.add('show');
-  if(id==='inbox'||id==='online')renderLists();
-  if(id==='global'){initGlobalListener(); initGlobalTyping();}
-  focusIndex=0; setTimeout(()=>{updateFocus();},120);
-}
-document.getElementById('signupBtn').onclick=()=>{let u=document.getElementById('username').value.trim();if(!u)return alert('Please enter username');currentUser=u;localStorage.setItem('nexa_current',currentUser);document.getElementById('welcomeH2').innerText=currentUser;document.getElementById('meHome').innerText=currentUser;registerUser();initUsersListener();showApp('home');};
-document.getElementById('loginBtn').onclick=()=>{let u=document.getElementById('username').value.trim();if(!u)return alert('Please enter username');currentUser=u;localStorage.setItem('nexa_current',currentUser);document.getElementById('welcomeH2').innerText=currentUser;document.getElementById('meHome').innerText=currentUser;registerUser();initUsersListener();showApp('home');};
-if(currentUser){document.getElementById('welcomeH2').innerText=currentUser;document.getElementById('meHome').innerText=currentUser;document.getElementById('auth-screen').style.display='none';showApp('home');registerUser();initUsersListener();}
+function initGlobalTyping() {
+  if (globalTypingUnsub) globalTypingUnsub();
 
-async function registerUser(){
-  if(!currentUser) return;
-  await setDoc(doc(db,"users",currentUser),{id:currentUser,name:currentUser,online:true,lastSeen:serverTimestamp()},{merge:true});
-}
+  globalTypingUnsub = onSnapshot(doc(db, 'typing', 'global'), snap => {
+    const el = $('globalTyping');
 
-function initGlobalListener(){
-  if(globalUnsub) globalUnsub();
-  const q = query(collection(db,"globalChat"),orderBy("createdAt","asc"));
-  globalUnsub = onSnapshot(q, async (snap)=>{
-    let docs = [];
-    snap.forEach(d=>docs.push({id:d.id, data:d.data()}));
-    if(docs.length > 20){
-      let toDelete = docs.slice(0, docs.length - 20);
-      for(let old of toDelete){ await deleteDoc(doc(db,"globalChat",old.id)); }
-      docs = docs.slice(docs.length - 20);
+    if (!snap.exists()) {
+      el.style.display = 'none';
+      return;
     }
-    let area=document.getElementById('globalArea'); area.innerHTML='';
-    docs.forEach(item=>{
-      let m=item.data;
-      let isMe=m.name===currentUser;
-      let isMentioned=m.mention && currentUser && m.mention.toLowerCase()===currentUser.toLowerCase();
-      let d=document.createElement('div');
-      d.className='msg '+(isMe?'me':'other')+(isMentioned?' highlight':'');
-      let txt=m.text||'';
-      if(m.mention && m.mention!=='undefined'){txt=txt.replace(new RegExp('@'+m.mention,'ig'),'<span class="mention">@'+m.mention+'</span>');}
-      d.innerHTML='<div style="font-size:10px;font-weight:800;margin-bottom:2px;color:'+(isMe?'#a5f3fc':'#f0abfc')+'">'+(m.name||'User')+'</div>'+txt+'<div style="font-size:9px;color:#94a3b8;text-align:right;margin-top:3px">'+(m.time||'')+'</div>';
-      area.appendChild(d);
-    });
-    area.scrollTop=area.scrollHeight;
-  });
+
+    const data = snap.data() || {};
+    const typers = Object.keys(data).filter(k =>
+      k.toLowerCase() !== String(currentUser || '').toLowerCase() &&
+      isValidUsername(k) && data[k] === true
+    );
+
+    if (typers.length) {
+      el.textContent = typers.join(', ') + ' is typing...';
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }, error => console.error('Global typing listener failed:', error));
 }
 
-async function sendGlobal(){
-  let i=document.getElementById('globalInput'); if(!i.value.trim())return;
-  let mm=i.value.match(/@([a-z0-9_]+)/i);
-  let mentionVal = (mm && mm[1]!=='undefined')? mm[1] : null;
-  await addDoc(collection(db,"globalChat"),{
-    name:currentUser,
-    text:i.value,
-    time:new Date().toLocaleTimeString().slice(0,5),
-    mention:mentionVal,
-    createdAt:serverTimestamp()
-  });
-  i.value=''; document.getElementById('mentionPopup').style.display='none';
-  await setDoc(doc(db,"typing","global"),{[currentUser]:false},{merge:true});
-}
+$('globalInput').addEventListener('input', () => {
+  const input = $('globalInput');
+  const value = input.value;
+  const cursor = typeof input.selectionStart === 'number' ? input.selectionStart : value.length;
+  const beforeCursor = value.slice(0, cursor);
+  const atIndex = beforeCursor.lastIndexOf('@');
+  const candidate = atIndex >= 0 ? beforeCursor.slice(atIndex + 1) : '';
 
-function openMention(){
-  let pop=document.getElementById('mentionPopup');
-  if(pop.style.display==='block'){pop.style.display='none';return;}
-  let validUsers = demoUsers.filter(u=>isValidUsername(u.id));
-  if(validUsers.length===0){pop.innerHTML='<div style="color:#777;padding:8px;font-size:11px">No users online</div>';}
-  else{
-    pop.innerHTML=validUsers.map((u,j)=>`<div class="mention-item ${j===mentionIndex?'active':''}" onclick="insertMention('${u.id}')">@${u.id}</div>`).join('');
+  if (atIndex >= 0 && !/\s/.test(candidate) && candidate.length <= 25) {
+    const queryText = candidate.toLowerCase();
+
+    if (!mentionOpen || queryText !== lastMentionQuery) {
+      lastMentionQuery = queryText;
+      showMentionSuggestions(queryText);
+    }
+  } else {
+    $('mentionPopup').style.display = 'none';
+    mentionOpen = false;
+    lastMentionQuery = '';
   }
-  pop.style.display='block';
-}
-window.insertMention = function(id){if(!isValidUsername(id)) return; let inp=document.getElementById('globalInput');inp.value+=' @'+id+' ';document.getElementById('mentionPopup').style.display='none';inp.focus();}
 
-function initGlobalTyping(){
-  if(globalTypingUnsub) globalTypingUnsub();
-  globalTypingUnsub = onSnapshot(doc(db,"typing","global"),(snap)=>{
-    let el=document.getElementById('globalTyping');
-    if(!snap.exists()){el.style.display='none';return;}
-    let data=snap.data();
-    let typers=Object.keys(data).filter(k=>k!==currentUser && isValidUsername(k) && data[k]===true);
-    if(typers.length>0){el.innerText=typers.join(', ')+' is typing...';el.style.display='block';}
-    else{el.style.display='none';}
-  });
-}
-document.getElementById('globalInput').addEventListener('input',()=>{
-  let v=document.getElementById('globalInput').value;
-  if(v.includes('@')){openMention();}
-  setDoc(doc(db,"typing","global"),{[currentUser]:true},{merge:true});
-  clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(async()=>{ await setDoc(doc(db,"typing","global"),{[currentUser]:false},{merge:true}); },1200);
+  if (currentUser) {
+    setDoc(doc(db, 'typing', 'global'), { [currentUser]: true }, { merge: true })
+      .catch(error => console.warn('Typing update failed:', error));
+
+    clearTimer(globalTypingTimer);
+    globalTypingTimer = setTimeout(() => {
+      if (currentUser) {
+        setDoc(doc(db, 'typing', 'global'), { [currentUser]: false }, { merge: true })
+          .catch(error => console.warn('Typing reset failed:', error));
+      }
+    }, 1200);
+  }
 });
-document.getElementById('globalInput').onkeydown=e=>{if(e.key==='Enter')sendGlobal();};
 
-function isBlockedByMe(t){return (blockMap[currentUser]||[]).includes(t);}
-function isBlockedByOther(t){return (blockMap[t]||[]).includes(currentUser);}
+function showMentionSuggestions(search) {
+  const pop = $('mentionPopup');
+  const matches = demoUsers.filter(u =>
+    isValidUsername(u.id) &&
+    (u.id.toLowerCase().includes(search) || u.name.toLowerCase().includes(search))
+  );
 
-window.renderLists = function(){
-  let qOnline=document.getElementById('searchOnline')?.value.toLowerCase()||'';
-  let qInbox=document.getElementById('searchInbox')?.value.toLowerCase()||'';
+  pop.replaceChildren();
 
-  // ONLINE PAGE: Only online when no search, if search then include offline too
-  let onlineListEl=document.getElementById('onlineList');
-  if(onlineListEl){
-    let source = qOnline? allUsers : demoUsers;
-    let filtered = source.filter(u=>{
-      if(!isValidUsername(u.id)) return false;
-      if(!qOnline) return true;
-      return u.id.toLowerCase().includes(qOnline)||u.name.toLowerCase().includes(qOnline);
+  if (!matches.length) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'color:#777;padding:8px;font-size:11px';
+    empty.textContent = 'No users found';
+    pop.appendChild(empty);
+  } else {
+    matches.forEach(u => {
+      const item = document.createElement('div');
+      item.className = 'mention-item';
+      item.textContent = '@' + u.id;
+      item.tabIndex = 0;
+      item.addEventListener('click', () => insertMention(u.id));
+      pop.appendChild(item);
     });
-    onlineListEl.innerHTML=filtered.length?filtered.map(u=>`<div class="row" tabindex="0" onclick="selectOnlineUser('${u.id}')"><div class="avatar">${(u.name||u.id)[0]}</div><div style="flex:1"><div style="color:#fff;font-weight:800;font-size:14px">${u.name}</div><div style="color:${u.online?'#4ade80':'#94a3b8'};font-size:11px">${u.online?'● Online':'○ Offline'}</div></div><div style="color:#22d3ee">❯</div></div>`).join(''):'<div style="color:#777;text-align:center;padding:20px">No users found</div>';
   }
 
-  // INBOX: Same logic - only online when empty, search offline too, and remove random long IDs
-  let inboxEl=document.getElementById('inboxList');
-  if(inboxEl){
-    let source = qInbox? allUsers : demoUsers;
-    let filtered = source.filter(u=>{
-      if(!isValidUsername(u.id)) return false;
-      if(!qInbox) return true;
-      return u.id.toLowerCase().includes(qInbox)||u.name.toLowerCase().includes(qInbox);
-    });
-    inboxEl.innerHTML=filtered.length?filtered.map(u=>{let byMe=isBlockedByMe(u.id);let byOther=isBlockedByOther(u.id);return `<div class="row" tabindex="0" onclick="selectedInbox='${u.id}';openChat('${u.id}')"><div class="avatar">${(u.name||u.id)[0]}</div><div style="flex:1"><div style="color:#fff;font-weight:700">${u.name} ${byMe?'(You Blocked)':''} ${byOther?'(Blocked You)':''}</div><div style="color:#94a3b8;font-size:10px">${byMe?'🚫 You Blocked': byOther?'🚫 Blocked You' : u.online?'● Online':'○ Offline - Tap to chat'}</div></div><div class="status ${u.online?'online':'offline'}">${u.online?'● Online':'○ Offline'}</div></div>`;}).join(''):'<div style="color:#777;text-align:center;padding:20px">No users - Search offline ID</div>';
-  }
-  renderBlocked();setTimeout(updateFocus,80);
+  pop.style.display = 'block';
+  mentionOpen = true;
 }
-window.selectOnlineUser = function(id){selectedInbox=id;openChat(id);}
-document.getElementById('searchOnline').oninput=renderLists;document.getElementById('searchInbox').oninput=renderLists;
-function toggleInboxOptions(){let el=document.getElementById('inboxOptions');el.style.display=el.style.display==='block'?'none':'block';setTimeout(updateFocus,50);}
-function blockUser(){if(!selectedInbox) return alert('Please select a user first');if(!blockMap[currentUser]) blockMap[currentUser]=[];if(!blockMap[currentUser].includes(selectedInbox)){blockMap[currentUser].push(selectedInbox);localStorage.setItem('nexa_blockMap',JSON.stringify(blockMap));}document.getElementById('inboxOptions').style.display='none';renderLists();}
-function unblockUser(){if(!selectedInbox) return alert('Please select a user first');blockMap[currentUser]=(blockMap[currentUser]||[]).filter(x=>x!==selectedInbox);localStorage.setItem('nexa_blockMap',JSON.stringify(blockMap));document.getElementById('inboxOptions').style.display='none';renderLists();}
-function showBlocked(){document.getElementById('blockedView').style.display='flex';document.getElementById('inboxOptions').style.display='none';renderBlocked();}
-function renderBlocked(){let el=document.getElementById('blockedList');if(!el) return;let list=blockMap[currentUser]||[];if(list.length===0){el.innerHTML='<div style="color:#777;text-align:center;padding:20px">No blocked users</div>';return;}el.innerHTML=list.map(id=>`<div class="row" tabindex="0"><div class="avatar">${id[0]}</div><div style="flex:1;color:#fff">${id}</div><button onclick="unblockSpecific('${id}')" style="background:#00ff46;border:none;border-radius:6px;padding:5px 10px;font-weight:800;cursor:pointer">Unblock</button></div>`).join('');}
-window.unblockSpecific = function(id){blockMap[currentUser]=blockMap[currentUser].filter(x=>x!==id);localStorage.setItem('nexa_blockMap',JSON.stringify(blockMap));renderLists();}
-function removeFromInbox(){if(!selectedInbox) return alert('Please select a user first');document.getElementById('inboxOptions').style.display='none';}
 
-window.openChat = function(id){
-  selected=id;
-  let byMe=isBlockedByMe(id); let byOther=isBlockedByOther(id);
-  document.getElementById('chatName').innerText=id;
-  document.getElementById('chatStatus').innerText=byMe?'Blocked':byOther?'Blocked You':'Online';
+$('globalInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    sendGlobal();
+  } else if (e.key === 'Escape') {
+    $('mentionPopup').style.display = 'none';
+    mentionOpen = false;
+  }
+});
+
+$('globalSendBtn').addEventListener('click', sendGlobal);
+
+window.renderLists = function() {
+  const qOnline = $('searchOnline').value.trim().toLowerCase();
+  const qInbox = $('searchInbox').value.trim().toLowerCase();
+
+  const onlineListEl = $('onlineList');
+  const inboxEl = $('inboxList');
+
+  onlineListEl.replaceChildren();
+  inboxEl.replaceChildren();
+
+  const onlineSource = demoUsers;
+  const onlineFiltered = onlineSource.filter(u =>
+    isValidUsername(u.id) &&
+    (u.id.toLowerCase().includes(qOnline) || u.name.toLowerCase().includes(qOnline))
+  );
+
+  if (!onlineFiltered.length) {
+    addEmpty(onlineListEl, 'No users found');
+  } else {
+    onlineFiltered.forEach(u => onlineListEl.appendChild(createUserRow(u, false)));
+  }
+
+  const inboxFiltered = allUsers.filter(u =>
+    isValidUsername(u.id) &&
+    !isRemoved(u.id) &&
+    (u.id.toLowerCase().includes(qInbox) || u.name.toLowerCase().includes(qInbox))
+  );
+
+  if (!inboxFiltered.length) {
+    addEmpty(inboxEl, 'No users found. Search a registered ID.');
+  } else {
+    inboxFiltered.forEach(u => inboxEl.appendChild(createUserRow(u, true)));
+  }
+
+  renderBlocked();
+  setTimeout(updateFocus, 50);
+};
+
+function addEmpty(parent, message) {
+  const el = document.createElement('div');
+  el.style.cssText = 'color:#777;text-align:center;padding:20px';
+  el.textContent = message;
+  parent.appendChild(el);
+}
+
+function createUserRow(u, inbox) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.tabIndex = 0;
+
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  avatar.textContent = (u.name || u.id).charAt(0).toUpperCase();
+
+  const info = document.createElement('div');
+  info.style.flex = '1';
+  info.style.minWidth = '0';
+
+  const name = document.createElement('div');
+  name.style.cssText = 'color:#fff;font-weight:700;overflow-wrap:anywhere';
+  name.textContent = u.name +
+    (inbox && isBlockedByMe(u.id) ? ' (You Blocked)' : '') +
+    (inbox && isBlockedByOther(u.id) ? ' (Blocked You)' : '');
+
+  const detail = document.createElement('div');
+  detail.style.cssText = 'color:#94a3b8;font-size:10px';
+  detail.textContent = inbox && isBlockedByMe(u.id) ? '🚫 You Blocked' :
+    inbox && isBlockedByOther(u.id) ? '🚫 Blocked You' :
+    u.online ? '● Online' : '○ Offline - Tap to chat';
+
+  info.append(name, detail);
+  row.append(avatar, info);
+
+  if (inbox) {
+    const status = document.createElement('div');
+    status.className = 'status ' + (u.online ? 'online' : 'offline');
+    status.textContent = u.online ? '● Online' : '○ Offline';
+    row.appendChild(status);
+  } else {
+    const arrow = document.createElement('div');
+    arrow.style.color = '#22d3ee';
+    arrow.textContent = '❯';
+    row.appendChild(arrow);
+  }
+
+  row.addEventListener('click', () => {
+    selectedInbox = u.id;
+    openChat(u.id);
+  });
+
+  return row;
+}
+
+$('searchOnline').addEventListener('input', renderLists);
+$('searchInbox').addEventListener('input', renderLists);
+
+function toggleInboxOptions() {
+  const el = $('inboxOptions');
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  setTimeout(updateFocus, 40);
+}
+window.toggleInboxOptions = toggleInboxOptions;
+
+function blockUser() {
+  if (!selectedInbox) return alert('Please select a user first.');
+  if (!Array.isArray(blockMap[currentUser])) blockMap[currentUser] = [];
+
+  if (!blockMap[currentUser].includes(selectedInbox)) {
+    blockMap[currentUser].push(selectedInbox);
+    saveBlockMap();
+  }
+
+  $('inboxOptions').style.display = 'none';
+
+  if (selected === selectedInbox) {
+    stopPrivateListeners();
+    $('chatMsgs').replaceChildren();
+    $('chatStatus').textContent = 'Blocked';
+  }
+
+  renderLists();
+}
+window.blockUser = blockUser;
+
+function unblockUser() {
+  if (!selectedInbox) return alert('Please select a user first.');
+  blockMap[currentUser] = (blockMap[currentUser] || []).filter(x => x !== selectedInbox);
+  saveBlockMap();
+  $('inboxOptions').style.display = 'none';
+  renderLists();
+}
+window.unblockUser = unblockUser;
+
+function showBlocked() {
+  $('blockedView').style.display = 'flex';
+  $('inboxOptions').style.display = 'none';
+  renderBlocked();
+  setTimeout(updateFocus, 40);
+}
+window.showBlocked = showBlocked;
+
+function renderBlocked() {
+  const el = $('blockedList');
+  if (!el) return;
+  el.replaceChildren();
+
+  const list = Array.isArray(blockMap[currentUser]) ? blockMap[currentUser] : [];
+
+  if (!list.length) {
+    addEmpty(el, 'No blocked users');
+    return;
+  }
+
+  list.forEach(id => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.tabIndex = 0;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = id.charAt(0).toUpperCase();
+
+    const label = document.createElement('div');
+    label.style.cssText = 'flex:1;color:#fff;overflow-wrap:anywhere';
+    label.textContent = id;
+
+    const button = document.createElement('button');
+    button.textContent = 'Unblock';
+    button.style.cssText = 'background:#00ff46;border:none;border-radius:6px;padding:5px 10px;font-weight:800;cursor:pointer';
+    button.addEventListener('click', () => window.unblockSpecific(id));
+
+    row.append(avatar, label, button);
+    el.appendChild(row);
+  });
+}
+
+window.unblockSpecific = function(id) {
+  blockMap[currentUser] = (blockMap[currentUser] || []).filter(x => x !== id);
+  saveBlockMap();
+  renderLists();
+};
+
+function removeFromInbox() {
+  if (!selectedInbox) return alert('Please select a user first.');
+
+  if (!Array.isArray(removedMap[currentUser])) removedMap[currentUser] = [];
+  if (!removedMap[currentUser].includes(selectedInbox)) {
+    removedMap[currentUser].push(selectedInbox);
+  }
+
+  saveRemovedMap();
+  $('inboxOptions').style.display = 'none';
+  renderLists();
+}
+window.removeFromInbox = removeFromInbox;
+
+window.openChat = function(id) {
+  if (!isValidUsername(id)) return alert('Invalid username.');
+
+  stopPrivateListeners();
+  selected = id;
+  selectedInbox = id;
+  selectedMsgIndex = null;
+  window._selectedDoc = null;
+  replyTo = null;
+  $('chatInput').value = '';
+  $('chatInput').placeholder = 'Type a message';
+  $('chatMsgs').replaceChildren();
+
+  const byMe = isBlockedByMe(id);
+  const byOther = isBlockedByOther(id);
+
+  $('chatName').textContent = id;
+  const user = allUsers.find(u => u.id.toLowerCase() === id.toLowerCase());
+  $('chatStatus').textContent = byMe ? 'Blocked' : byOther ? 'Blocked You' : user?.online ? 'Online' : 'Offline';
+
   showApp('chat');
-  if(byMe||byOther){document.getElementById('chatMsgs').innerHTML=`<div style="background:#3f1a1a;border:1px solid #ff4444;color:#ffaaaa;padding:14px;border-radius:10px;text-align:center;margin:30px 10px">${byMe?'🚫 You blocked this user':'🚫 Blocked You'}<br><small>Message will not be delivered</small></div>`;return;}
+
+  if (byMe || byOther) {
+    const notice = document.createElement('div');
+    notice.style.cssText = 'background:#3f1a1a;border:1px solid #ff4444;color:#ffaaaa;padding:14px;border-radius:10px;text-align:center;margin:30px 10px';
+    notice.textContent = byMe ? '🚫 You blocked this user. Messages will not be delivered.' : '🚫 This user has blocked you. Messages will not be delivered.';
+    $('chatMsgs').appendChild(notice);
+    return;
+  }
+
   initPrivateListener();
   initPrivateTyping();
+};
+
+function getChatId(a, b) {
+  return [a.toLowerCase(), b.toLowerCase()].sort().join('_');
 }
-function getChatId(a,b){return [a,b].sort().join('_');}
-function initPrivateListener(){
-  if(privateUnsub) privateUnsub();
-  let chatId=getChatId(currentUser,selected);
-  const q = query(collection(db,"privateChats",chatId,"messages"),orderBy("createdAt","asc"));
-  privateUnsub = onSnapshot(q, async (snap)=>{
-    let docs=[];
-    snap.forEach(d=>docs.push({id:d.id, data:d.data()}));
-    if(docs.length > 20){
-      let toDelete = docs.slice(0, docs.length - 20);
-      for(let old of toDelete){ await deleteDoc(doc(db,"privateChats",chatId,"messages",old.id)); }
-      docs = docs.slice(docs.length - 20);
-    }
-    let area=document.getElementById('chatMsgs'); area.innerHTML='';
-    docs.forEach(item=>{
-      let m=item.data;
-      let isMe=m.from===currentUser;
-      let tick=''; if(isMe){ if(m.status==='seen') tick='<span class="tick seen">✓✓</span>'; else if(m.status==='delivered') tick='<span class="tick delivered">✓✓</span>'; else tick='<span class="tick">✓</span>';}
-      let replyHtml=m.replyTo?`<div class="reply-preview">↩ ${m.replyTo}</div>`:'';
-      let editTag=m.edited?' <small style="color:#888">(edited)</small>':'';
-      let d=document.createElement('div');
-      d.className='c-msg '+(isMe?'me':'other');
-      d.setAttribute('tabindex','0');
-      d.innerHTML=`${replyHtml}${m.text}${editTag}<div class="c-meta"><span>${m.time||''}</span>${tick}</div>`;
-      d.onclick=()=>{ selectedMsgIndex=item.id; window._selectedDoc=m; };
-      area.appendChild(d);
-      if(!isMe && m.status!=='seen'){
-        updateDoc(doc(db,"privateChats",chatId,"messages",item.id),{status:'seen'});
+
+function initPrivateListener() {
+  if (privateUnsub) privateUnsub();
+  if (!selected || !currentUser) return;
+
+  const chatId = getChatId(currentUser, selected);
+  const q = query(
+    collection(db, 'privateChats', chatId, 'messages'),
+    orderBy('createdAt', 'desc'),
+    limit(10)
+  );
+
+  privateUnsub = onSnapshot(q, snap => {
+    const docs = [];
+    snap.forEach(d => docs.push({ id: d.id, data: d.data() || {} }));
+    docs.reverse();
+
+    const area = $('chatMsgs');
+    area.replaceChildren();
+    messageCache = docs;
+
+    docs.forEach(item => {
+      const m = item.data;
+      const isMe = String(m.from || '').toLowerCase() === currentUser.toLowerCase();
+
+      const bubble = document.createElement('div');
+      bubble.className = 'c-msg ' + (isMe ? 'me' : 'other');
+      bubble.tabIndex = 0;
+
+      if (m.replyTo) {
+        const reply = document.createElement('div');
+        reply.className = 'reply-preview';
+        reply.textContent = '↩ ' + String(m.replyTo);
+        bubble.appendChild(reply);
+      }
+
+      const body = document.createElement('div');
+      body.textContent = String(m.text || '');
+      bubble.appendChild(body);
+
+      if (m.edited) {
+        const edit = document.createElement('small');
+        edit.style.color = '#888';
+        edit.textContent = ' (edited)';
+        bubble.appendChild(edit);
+      }
+
+      const meta = document.createElement('div');
+      meta.className = 'c-meta';
+
+      const time = document.createElement('span');
+      time.textContent = String(m.time || '');
+      meta.appendChild(time);
+
+      if (isMe) {
+        const tick = document.createElement('span');
+        tick.className = 'tick' + (m.status === 'seen' ? ' seen' : m.status === 'delivered' ? ' delivered' : '');
+        tick.textContent = m.status === 'seen' || m.status === 'delivered' ? '✓✓' : '✓';
+        meta.appendChild(tick);
+      }
+
+      bubble.appendChild(meta);
+
+      bubble.addEventListener('click', () => {
+        selectedMsgIndex = item.id;
+        window._selectedDoc = m;
+        document.querySelectorAll('#chatMsgs .c-msg').forEach(el => el.classList.remove('active'));
+        bubble.classList.add('active');
+      });
+
+      area.appendChild(bubble);
+
+      if (
+        !isMe &&
+        String(m.to || '').toLowerCase() === currentUser.toLowerCase() &&
+        m.status !== 'seen'
+      ) {
+        updateDoc(
+          doc(db, 'privateChats', chatId, 'messages', item.id),
+          { status: 'seen' }
+        ).catch(error => console.warn('Could not mark message as seen:', error));
       }
     });
-    area.scrollTop=area.scrollHeight;
+
+    area.scrollTop = area.scrollHeight;
+  }, error => {
+    console.error('Private chat listener failed:', error);
+    showError('Could not load private messages.', error);
   });
 }
-function initPrivateTyping(){
-  if(privateTypingUnsub) privateTypingUnsub();
-  if(!selected) return;
-  let chatId=getChatId(currentUser,selected);
-  privateTypingUnsub = onSnapshot(doc(db,"typing",chatId),(snap)=>{
-    let el=document.getElementById('typingInd');
-    if(!snap.exists()){el.style.display='none';return;}
-    let data=snap.data();
-    let other=selected;
-    if(data[other]===true){el.style.display='block'; el.innerText=other+' is typing...';}
-    else{el.style.display='none';}
-  });
+
+function initPrivateTyping() {
+  if (privateTypingUnsub) privateTypingUnsub();
+  if (!selected || !currentUser) return;
+
+  const chatId = getChatId(currentUser, selected);
+
+  privateTypingUnsub = onSnapshot(doc(db, 'typing', chatId), snap => {
+    const el = $('typingInd');
+
+    if (!snap.exists()) {
+      el.style.display = 'none';
+      return;
+    }
+
+    const data = snap.data() || {};
+    if (data[selected] === true) {
+      el.style.display = 'block';
+      el.textContent = selected + ' is typing...';
+    } else {
+      el.style.display = 'none';
+    }
+  }, error => console.error('Private typing listener failed:', error));
 }
-function toggleChatOptions(){let el=document.getElementById('chatOptions');el.style.display=el.style.display==='block'?'none':'block';if(!window._selectedDoc) alert('Please select a message first');else setTimeout(updateFocus,30);}
-function replyMsg(){if(!window._selectedDoc) return; replyTo=window._selectedDoc.text; document.getElementById('chatInput').placeholder='Reply to: '+replyTo.slice(0,20); document.getElementById('chatInput').focus(); document.getElementById('chatOptions').style.display='none';}
-async function deleteMsg(){if(!selectedMsgIndex) return; let chatId=getChatId(currentUser,selected); if(confirm('Delete this message?')){ await deleteDoc(doc(db,"privateChats",chatId,"messages",selectedMsgIndex)); } document.getElementById('chatOptions').style.display='none';}
-async function editMsg(){if(!selectedMsgIndex ||!window._selectedDoc) return; if(window._selectedDoc.from!==currentUser) return alert('You can only edit your own messages'); let newText=prompt('Edit message:',window._selectedDoc.text); if(newText){ let chatId=getChatId(currentUser,selected); await updateDoc(doc(db,"privateChats",chatId,"messages",selectedMsgIndex),{text:newText,edited:true}); } document.getElementById('chatOptions').style.display='none';}
-window.sendChat = async function(){
-  let i=document.getElementById('chatInput'); if(!i.value.trim()||!selected) return;
-  if(isBlockedByMe(selected)||isBlockedByOther(selected)){alert('🚫 Blocked');return;}
-  let chatId=getChatId(currentUser,selected);
-  await addDoc(collection(db,"privateChats",chatId,"messages"),{
-    from:currentUser,
-    to:selected,
-    text:i.value,
-    time:new Date().toLocaleTimeString().slice(0,5),
-    status:'sent',
-    replyTo:replyTo,
-    edited:false,
-    createdAt:serverTimestamp()
-  });
-  i.value=''; replyTo=null; i.placeholder='Type a message';
-  await setDoc(doc(db,"typing",chatId),{[currentUser]:false},{merge:true});
-}
-document.getElementById('chatSend').onclick=()=>{window.sendChat();};
-document.getElementById('chatInput').onkeydown=e=>{if(e.key==='Enter') window.sendChat();};
-document.getElementById('chatInput').addEventListener('input',()=>{
-  if(!selected) return;
-  let chatId=getChatId(currentUser,selected);
-  setDoc(doc(db,"typing",chatId),{[currentUser]:true},{merge:true});
-  clearTimeout(typingTimeout);
-  typingTimeout=setTimeout(()=>{ setDoc(doc(db,"typing",chatId),{[currentUser]:false},{merge:true}); },1200);
-});
-function updateFocus(){
-  let rows=document.querySelectorAll('.app.show.row,.app.show.c-msg,.app.show.neon-card,.app.show.opt-btn');
-  if(!rows.length) return;
-  if(focusIndex<0) focusIndex=0;
-  if(focusIndex>=rows.length) focusIndex=rows.length-1;
-  rows.forEach(r=>r.classList.remove('active'));
-  let el=rows[focusIndex];
-  if(el){el.classList.add('active');el.focus({preventScroll:true});el.scrollIntoView({block:'nearest',behavior:'smooth'});}
-}
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowDown'){e.preventDefault();focusIndex++;updateFocus();}
-  else if(e.key==='ArrowUp'){e.preventDefault();focusIndex--;updateFocus();}
-  else if(e.key==='Enter'){let el=document.querySelectorAll('.app.show.row,.app.show.c-msg,.app.show.neon-card,.app.show.opt-btn')[focusIndex];if(el) el.click();}
-  else if(e.key==='SoftLeft' || e.key==='ContextMenu'){
-    let app=document.getElementById('inboxApp').classList.contains('show')?'inbox':document.getElementById('chatApp').classList.contains('show')?'chat':'global';
-    if(app==='inbox') toggleInboxOptions();
-    else if(app==='chat') toggleChatOptions();
-    else if(app==='global') openMention();
+
+function toggleChatOptions() {
+  if (!window._selectedDoc || !selectedMsgIndex) {
+    alert('Please select a message first.');
+    return;
   }
-  else if(e.key==='SoftRight' || e.key==='Backspace'){
+
+  const el = $('chatOptions');
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  setTimeout(updateFocus, 30);
+}
+window.toggleChatOptions = toggleChatOptions;
+
+function replyMsg() {
+  if (!window._selectedDoc) return;
+
+  replyTo = String(window._selectedDoc.text || '');
+  $('chatInput').placeholder = 'Reply to: ' + replyTo.slice(0, 20);
+  $('chatInput').focus();
+  $('chatOptions').style.display = 'none';
+}
+window.replyMsg = replyMsg;
+
+async function deleteMsg() {
+  if (!selectedMsgIndex || !window._selectedDoc || !selected) return;
+
+  if (String(window._selectedDoc.from || '').toLowerCase() !== currentUser.toLowerCase()) {
+    alert('You can only delete your own messages.');
+    $('chatOptions').style.display = 'none';
+    return;
+  }
+
+  const chatId = getChatId(currentUser, selected);
+
+  if (confirm('Delete this message?')) {
+    try {
+      await deleteDoc(doc(db, 'privateChats', chatId, 'messages', selectedMsgIndex));
+      selectedMsgIndex = null;
+      window._selectedDoc = null;
+    } catch (error) {
+      showError('Could not delete message.', error);
+    }
+  }
+
+  $('chatOptions').style.display = 'none';
+}
+window.deleteMsg = deleteMsg;
+
+async function editMsg() {
+  if (!selectedMsgIndex || !window._selectedDoc || !selected) return;
+
+  if (String(window._selectedDoc.from || '').toLowerCase() !== currentUser.toLowerCase()) {
+    alert('You can only edit your own messages.');
+    return;
+  }
+
+  const newText = prompt('Edit message:', String(window._selectedDoc.text || ''));
+
+  if (newText === null) return;
+  if (!newText.trim()) return alert('Message cannot be empty.');
+  if (newText.length > 2000) return alert('Message is too long.');
+
+  const chatId = getChatId(currentUser, selected);
+
+  try {
+    await updateDoc(doc(db, 'privateChats', chatId, 'messages', selectedMsgIndex), {
+      text: newText.trim(),
+      edited: true
+    });
+  } catch (error) {
+    showError('Could not edit message.', error);
+  }
+
+  $('chatOptions').style.display = 'none';
+}
+window.editMsg = editMsg;
+
+window.sendChat = async function() {
+  const input = $('chatInput');
+  const text = input.value.trim();
+
+  if (!currentUser) return alert('Please log in first.');
+  if (!text || !selected) return;
+  if (text.length > 2000) return alert('Message is too long. Maximum 2000 characters.');
+  if (isBlockedByMe(selected) || isBlockedByOther(selected)) {
+    alert('🚫 Blocked');
+    return;
+  }
+
+  const chatId = getChatId(currentUser, selected);
+
+  try {
+    await addDoc(collection(db, 'privateChats', chatId, 'messages'), {
+      from: currentUser,
+      to: selected,
+      text,
+      time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+      status: 'sent',
+      replyTo: replyTo,
+      edited: false,
+      createdAt: serverTimestamp()
+    });
+
+    input.value = '';
+    replyTo = null;
+    input.placeholder = 'Type a message';
+
+    await setDoc(doc(db, 'typing', chatId), {
+      [currentUser]: false
+    }, { merge: true });
+  } catch (error) {
+    showError('Could not send private message.', error);
+  }
+};
+
+$('chatSend').addEventListener('click', () => window.sendChat());
+$('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
     e.preventDefault();
-    if(document.getElementById('chatApp').classList.contains('show')) showApp('inbox');
-    else if(document.getElementById('inboxApp').classList.contains('show')||document.getElementById('onlineApp').classList.contains('show')||document.getElementById('globalApp').classList.contains('show')) showApp('home');
-    else if(document.getElementById('blockedView').style.display==='flex') document.getElementById('blockedView').style.display='none';
+    window.sendChat();
+  }
+});
+
+$('chatInput').addEventListener('input', () => {
+  if (!selected || !currentUser) return;
+
+  const chatId = getChatId(currentUser, selected);
+
+  setDoc(doc(db, 'typing', chatId), {
+    [currentUser]: true
+  }, { merge: true }).catch(error => console.warn('Typing update failed:', error));
+
+  clearTimer(privateTypingTimer);
+  privateTypingTimer = setTimeout(() => {
+    if (currentUser) {
+      setDoc(doc(db, 'typing', chatId), {
+        [currentUser]: false
+      }, { merge: true }).catch(error => console.warn('Typing reset failed:', error));
+    }
+  }, 1200);
+});
+
+$('chatBackBtn').addEventListener('click', () => showApp('inbox'));
+
+function getFocusableElements() {
+  const activeApp = document.querySelector('.app.show');
+  if (!activeApp) return [];
+
+  const candidates = Array.from(activeApp.querySelectorAll(
+    '.row, .c-msg, .neon-card, .opt-btn, .mention-item, button, .neon-explore'
+  ));
+
+  return candidates.filter(el => {
+    if (el.disabled) return false;
+    if (el.getClientRects().length === 0) return false;
+    if (el.closest('[style*="display: none"]')) return false;
+    return true;
+  });
+}
+
+function updateFocus() {
+  const elements = getFocusableElements();
+  if (!elements.length) return;
+
+  focusIndex = Math.max(0, Math.min(focusIndex, elements.length - 1));
+  elements.forEach(el => el.classList.remove('active'));
+
+  const el = elements[focusIndex];
+  if (!el) return;
+
+  el.classList.add('active');
+
+  try {
+    el.focus({ preventScroll: true });
+  } catch (_) {
+    el.focus();
+  }
+
+  try {
+    el.scrollIntoView({ block: 'nearest' });
+  } catch (_) {}
+}
+
+function backAction() {
+  if ($('blockedView').style.display === 'flex') {
+    $('blockedView').style.display = 'none';
+    updateFocus();
+    return;
+  }
+
+  if ($('inboxOptions').style.display === 'block') {
+    $('inboxOptions').style.display = 'none';
+    updateFocus();
+    return;
+  }
+
+  if ($('chatOptions').style.display === 'block') {
+    $('chatOptions').style.display = 'none';
+    updateFocus();
+    return;
+  }
+
+  if (mentionOpen) {
+    $('mentionPopup').style.display = 'none';
+    mentionOpen = false;
+    return;
+  }
+
+  if ($('chatApp').classList.contains('show')) {
+    showApp('inbox');
+  } else if (
+    $('inboxApp').classList.contains('show') ||
+    $('onlineApp').classList.contains('show') ||
+    $('globalApp').classList.contains('show')
+  ) {
+    showApp('home');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  const target = e.target;
+  const typingInField = target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement;
+
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    if (typingInField) return;
+    e.preventDefault();
+    focusIndex += e.key === 'ArrowDown' ? 1 : -1;
+    updateFocus();
+    return;
+  }
+
+  if (e.key === 'Enter') {
+    if (typingInField) return;
+    const elements = getFocusableElements();
+    if (elements.length) {
+      e.preventDefault();
+      elements[Math.max(0, Math.min(focusIndex, elements.length - 1))]?.click();
+    }
+    return;
+  }
+
+  if (e.key === 'SoftLeft' || e.key === 'ContextMenu') {
+    e.preventDefault();
+    if ($('inboxApp').classList.contains('show')) toggleInboxOptions();
+    else if ($('chatApp').classList.contains('show')) toggleChatOptions();
+    else if ($('globalApp').classList.contains('show')) openMention();
+    return;
+  }
+
+  if (e.key === 'SoftRight') {
+    e.preventDefault();
+    backAction();
+    return;
+  }
+
+  if (e.key === 'Backspace' && !typingInField) {
+    e.preventDefault();
+    backAction();
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && currentUser) {
+    registerUser().catch(error => console.warn('Online update failed:', error));
+  } else if (document.visibilityState === 'hidden' && currentUser) {
+    setOffline();
+  }
+});
+
+window.addEventListener('pagehide', () => {
+  if (currentUser) {
+    setDoc(doc(db, 'users', currentUser), {
+      online: false,
+      lastSeen: serverTimestamp()
+    }, { merge: true }).catch(error => console.warn('Offline update failed:', error));
   }
 });
 </script>
