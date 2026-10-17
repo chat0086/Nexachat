@@ -4,9 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NexaChat</title>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#020611;height:100vh;height:100dvh;overflow:hidden;touch-action:manipulation}
+body{background:#020611;height:100vh;height:100dvh;height:var(--app-h,100vh);overflow:hidden;touch-action:manipulation}
 button,input{font:inherit}
 button:focus,input:focus{outline:2px solid #22d3ee;outline-offset:2px}
 button:disabled{opacity:.6;cursor:wait}
@@ -19,14 +22,10 @@ button:disabled{opacity:.6;cursor:wait}
 .hacker-btn{width:100%;background:#00ff46;color:#000;font-weight:900;border:none;border-radius:10px;padding:12px;margin-top:8px;cursor:pointer;font-size:15px;font-family:monospace}
 .hacker-btn2{width:100%;background:transparent;color:#00ff46;font-weight:900;border:1px solid #00ff46;border-radius:10px;padding:12px;margin-top:10px;cursor:pointer;font-family:monospace}
 .hacker-link{color:#7aff9a;font-size:12px;text-align:center;margin-top:16px;font-family:monospace}
-.app{display:none;height:100vh;height:100dvh;flex-direction:column;min-height:0}
+.app{display:none;height:100vh;height:100dvh;height:var(--app-h,100vh);flex-direction:column;min-height:0}
 .app.show{display:flex}
 #homeApp{background:#020611;padding:14px 12px;overflow-y:auto}
 .neon-top{background:#101a3a;border:1.5px solid #22d3ee;border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.neon-welcome{margin-top:18px;background:#0f1733;border:2px solid #c084fc;border-radius:16px;padding:18px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-shrink:0}
-.neon-welcome small{color:#7dd3fc;font-size:13px}
-.neon-welcome h2{color:#fff;font-size:32px;font-weight:900;overflow-wrap:anywhere}
-.neon-explore{border:2px solid #ff6ad5;color:#ffb4e6;padding:8px 16px;border-radius:10px;font-weight:900;cursor:pointer;background:transparent}
 .neon-card{margin-top:18px;background:#0f1733;border:1.5px solid #22d3ee;border-radius:16px;padding:16px 14px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:0.15s;flex-shrink:0}
 .neon-card:focus,.neon-card.active{outline:2px solid #c084fc;transform:scale(1.01)}
 .neon-icon{width:52px;height:52px;flex-shrink:0;border-radius:50%;border:2px solid #e879f9;display:flex;align-items:center;justify-content:center;font-size:24px}
@@ -94,8 +93,7 @@ button:disabled{opacity:.6;cursor:wait}
 </div>
 
 <div id="homeApp" class="app">
-  <div class="neon-top"><div>⬡</div><div><h1 style="color:#fff;font-size:22px">NexaChat</h1><p id="ownerP" style="color:#c4b5fd;font-size:12px">Ziddi Malik</p></div><div style="margin-left:auto;color:#fff;font-size:11px" id="meHome"></div></div>
-  <div class="neon-welcome"><div><small>Welcome back</small><h2 id="welcomeH2">Legend</h2></div><button class="neon-explore" id="logoutBtn" type="button">LOGOUT</button></div>
+  <div class="neon-top"><div>⬡</div><div><h1 style="color:#fff;font-size:22px">NexaChat</h1></div><div style="margin-left:auto;color:#fff;font-size:11px" id="meHome"></div></div>
   <div class="neon-card" tabindex="0" onclick="showApp('online')"><div class="neon-icon">👥</div><div><h3>ONLINE USERS</h3><p>See who's online</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
   <div class="neon-card" tabindex="0" onclick="showApp('global')"><div class="neon-icon">🌐</div><div><h3>GLOBE LOUNGE</h3><p>Join public chat</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
   <div class="neon-card" tabindex="0" onclick="showApp('inbox')"><div class="neon-icon">✉️</div><div><h3>NEXA INBOX</h3><p>Secure & private chats</p></div><div style="margin-left:auto;color:#22d3ee">❯</div></div>
@@ -127,6 +125,7 @@ button:disabled{opacity:.6;cursor:wait}
     <button class="opt-btn" tabindex="0" onclick="unblockUser()">✅ Unblock User</button>
     <button class="opt-btn" tabindex="0" onclick="showBlocked()">👥 Blocked Users</button>
     <button class="opt-btn" tabindex="0" style="color:#ff6b6b" onclick="removeFromInbox()">🗑️ Remove from Inbox</button>
+    <button class="opt-btn" id="logoutBtn" type="button" tabindex="0" style="color:#ff6b6b">🚪 Logout</button>
   </div>
   <div id="blockedView">
     <div class="top-g"><h2>Blocked Users</h2><button type="button" style="color:#22d3ee;background:transparent;border:0;cursor:pointer" onclick="document.getElementById('blockedView').style.display='none';updateFocus()">✕ Close</button></div>
@@ -148,11 +147,33 @@ button:disabled{opacity:.6;cursor:wait}
   <div class="soft"><span onclick="toggleChatOptions()" style="color:#00ff46;font-weight:900;cursor:pointer">Options</span><span onclick="showApp('inbox')" style="cursor:pointer">Back</span></div>
 </div>
 
+<script>
+(function () {
+  function setAppHeight() {
+    document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+  window.addEventListener('orientationchange', function () { setTimeout(setAppHeight, 200); });
+  window.addEventListener('load', setAppHeight);
+
+  function notReady() {
+    if (!window.__nexaReady) {
+      alert('Firebase could not load. Please check your internet connection and reload the page.');
+    }
+  }
+  var l = document.getElementById('loginBtn');
+  var s = document.getElementById('signupBtn');
+  if (l) l.addEventListener('click', notReady);
+  if (s) s.addEventListener('click', notReady);
+})();
+</script>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore, collection, addDoc, doc, setDoc, deleteDoc,
-  updateDoc, onSnapshot, query, orderBy, limit, serverTimestamp
+  updateDoc, onSnapshot, query, orderBy, limit, serverTimestamp, arrayUnion
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getAuth, createUserWithEmailAndPassword,
@@ -160,7 +181,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDwDjLlhRxNNfIF1N9B9j4PUTqT0fq34y50",
+  apiKey: "AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",
   authDomain: "nexachat-28ecc.firebaseapp.com",
   projectId: "nexachat-28ecc",
   storageBucket: "nexachat-28ecc.firebasestorage.app",
@@ -174,11 +195,16 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const $ = id => document.getElementById(id);
 
+const ONLINE_WINDOW = 120000;
+const HEARTBEAT_MS = 30000;
+
 let currentUser = null;
 let demoUsers = [];
 let allUsers = [];
+let remoteContacts = [];
 let blockMap = readJSON('nexa_blockMap', {});
 let removedMap = readJSON('nexa_removed', {});
+let contactsMap = readJSON('nexa_contacts', {});
 let selected = null;
 let selectedInbox = null;
 let selectedMsgIndex = null;
@@ -199,6 +225,11 @@ let messageCache = [];
 let busy = false;
 let authReady = false;
 let authStateVersion = 0;
+let usersErrorShown = false;
+let lastOnlineSig = '';
+let permErrorShown = false;
+
+window.__nexaReady = true;
 
 function readJSON(key, fallback) {
   try {
@@ -221,6 +252,20 @@ function isValidUsername(id) {
 
 function safeText(value) {
   return String(value ?? '');
+}
+
+function isOnline(u) {
+  return !!u && u.online === true && u.lastSeenMs > 0 && (Date.now() - u.lastSeenMs) < ONLINE_WINDOW;
+}
+
+function refreshOnline() {
+  demoUsers = allUsers.filter(isOnline);
+}
+
+function updateCounts() {
+  const count = demoUsers.length + (currentUser ? 1 : 0);
+  $('globalOnlineCount').textContent = '● Online: ' + count;
+  $('onlineCount').textContent = '● Online: ' + count;
 }
 
 function setBusy(value) {
@@ -274,7 +319,12 @@ function showError(prefix, error) {
   if (error?.code === 'auth/too-many-requests') message = 'Too many attempts. Please try again later.';
   if (error?.code === 'auth/network-request-failed') message = 'Internet connection failed. Please try again.';
   if (error?.code === 'auth/operation-not-allowed') message = 'Email/Password sign-in is disabled. Enable it in Firebase Authentication settings.';
-  if (error?.code === 'auth/invalid-api-key') message = 'Firebase API key is invalid. Check firebaseConfig.';
+  if (error?.code === 'auth/invalid-api-key' || error?.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.') message = 'Firebase API key is invalid. Check firebaseConfig.';
+  if (error?.code === 'permission-denied') {
+    if (permErrorShown) return;
+    permErrorShown = true;
+    message = 'Firestore Rules are blocking this action. Open Firebase Console > Firestore Database > Rules and allow signed-in users, then Publish.';
+  }
   alert(prefix + '\n' + message);
 }
 
@@ -291,15 +341,44 @@ function isRemoved(target) {
 }
 
 function saveBlockMap() {
-  localStorage.setItem('nexa_blockMap', JSON.stringify(blockMap));
+  try { localStorage.setItem('nexa_blockMap', JSON.stringify(blockMap)); } catch (_) {}
 }
 
 function saveRemovedMap() {
-  localStorage.setItem('nexa_removed', JSON.stringify(removedMap));
+  try { localStorage.setItem('nexa_removed', JSON.stringify(removedMap)); } catch (_) {}
+}
+
+function saveContactsMap() {
+  try { localStorage.setItem('nexa_contacts', JSON.stringify(contactsMap)); } catch (_) {}
+}
+
+function getContacts() {
+  const local = Array.isArray(contactsMap[currentUser]) ? contactsMap[currentUser] : [];
+  return new Set(local.concat(remoteContacts).map(x => String(x).toLowerCase()));
+}
+
+function addContact(id) {
+  if (!currentUser || !isValidUsername(id)) return;
+  const low = id.toLowerCase();
+
+  if (!Array.isArray(contactsMap[currentUser])) contactsMap[currentUser] = [];
+  if (!contactsMap[currentUser].includes(low)) {
+    contactsMap[currentUser].push(low);
+    saveContactsMap();
+  }
+
+  if (Array.isArray(removedMap[currentUser]) && removedMap[currentUser].includes(low)) {
+    removedMap[currentUser] = removedMap[currentUser].filter(x => x !== low);
+    saveRemovedMap();
+  }
+
+  setDoc(doc(db, 'users', currentUser), { contacts: arrayUnion(low) }, { merge: true })
+    .catch(error => console.warn('Contact sync failed:', error));
+  setDoc(doc(db, 'users', low), { contacts: arrayUnion(currentUser) }, { merge: true })
+    .catch(error => console.warn('Contact sync (other) failed:', error));
 }
 
 function setUserDetails() {
-  $('welcomeH2').textContent = currentUser || 'Legend';
   $('meHome').textContent = currentUser || '';
 }
 
@@ -331,7 +410,6 @@ function initUsersListener() {
   if (usersUnsub) usersUnsub();
 
   usersUnsub = onSnapshot(collection(db, 'users'), snap => {
-    demoUsers = [];
     allUsers = [];
 
     snap.forEach(d => {
@@ -339,26 +417,33 @@ function initUsersListener() {
       const realId = String(u.id || d.id).trim().toLowerCase();
 
       if (!isValidUsername(realId)) return;
-      if (realId.toLowerCase() === String(currentUser || '').toLowerCase()) return;
 
-      const userObj = {
+      if (currentUser && realId === String(currentUser).toLowerCase()) {
+        remoteContacts = Array.isArray(u.contacts) ? u.contacts.filter(x => typeof x === 'string') : [];
+        return;
+      }
+
+      let lastSeenMs = 0;
+      if (u.lastSeen && typeof u.lastSeen.toMillis === 'function') lastSeenMs = u.lastSeen.toMillis();
+
+      allUsers.push({
         id: realId,
         name: String(u.name || realId),
-        online: u.online === true
-      };
-
-      allUsers.push(userObj);
-      if (userObj.online) demoUsers.push(userObj);
+        online: u.online === true,
+        lastSeenMs
+      });
     });
 
+    refreshOnline();
+    lastOnlineSig = allUsers.map(u => u.id + (isOnline(u) ? '1' : '0')).join(',');
     renderLists();
-
-    const count = demoUsers.length + (currentUser ? 1 : 0);
-    $('globalOnlineCount').textContent = '● Online: ' + count;
-    $('onlineCount').textContent = '● Online: ' + count;
+    updateCounts();
   }, error => {
     console.error('Users listener failed:', error);
-    alert('Could not load users. Check Firestore rules and internet connection.');
+    if (!usersErrorShown) {
+      usersErrorShown = true;
+      alert('Could not load users. Check Firestore rules and internet connection.');
+    }
   });
 }
 
@@ -447,6 +532,8 @@ $('username').addEventListener('keydown', e => {
 
 $('logoutBtn').addEventListener('click', async () => {
   if (busy) return;
+  $('inboxOptions').style.display = 'none';
+  if (!confirm('Do you want to log out?')) return;
   setBusy(true);
 
   const oldUser = currentUser;
@@ -483,7 +570,12 @@ onAuthStateChanged(auth, async user => {
 
   if (!user) {
     currentUser = null;
-    localStorage.removeItem('nexa_current');
+    allUsers = [];
+    demoUsers = [];
+    remoteContacts = [];
+    usersErrorShown = false;
+    permErrorShown = false;
+    try { localStorage.removeItem('nexa_current'); } catch (_) {}
 
     if (usersUnsub) usersUnsub();
     usersUnsub = null;
@@ -493,6 +585,13 @@ onAuthStateChanged(auth, async user => {
     clearTimer(typingTimeout);
     clearTimer(globalTypingTimer);
     clearTimer(privateTypingTimer);
+
+    $('blockedView').style.display = 'none';
+    $('inboxOptions').style.display = 'none';
+    $('searchOnline').value = '';
+    $('searchInbox').value = '';
+    $('username').value = '';
+    $('password').value = '';
 
     showAuth();
     setBusy(false);
@@ -518,7 +617,7 @@ onAuthStateChanged(auth, async user => {
   }
 
   currentUser = username;
-  localStorage.setItem('nexa_current', currentUser);
+  try { localStorage.setItem('nexa_current', currentUser); } catch (_) {}
   setUserDetails();
 
   try {
@@ -591,7 +690,7 @@ function initGlobalListener() {
 }
 
 function appendMentionText(container, text, mention) {
-  if (!mention || mention === 'undefined') {
+  if (!mention || mention === 'undefined' || mention === 'null') {
     container.textContent = text;
     return;
   }
@@ -636,6 +735,11 @@ async function sendGlobal() {
     mentionVal = null;
   }
 
+  // Clear the box immediately so a second tap can never send the same text again
+  input.value = '';
+  $('mentionPopup').style.display = 'none';
+  mentionOpen = false;
+
   try {
     await addDoc(collection(db, 'globalChat'), {
       name: currentUser,
@@ -644,14 +748,14 @@ async function sendGlobal() {
       mention: mentionVal,
       createdAt: serverTimestamp()
     });
-
-    input.value = '';
-    $('mentionPopup').style.display = 'none';
-    mentionOpen = false;
-    await setDoc(doc(db, 'typing', 'global'), { [currentUser]: false }, { merge: true });
   } catch (error) {
+    if (!input.value) input.value = text;
     showError('Could not send global message.', error);
+    return;
   }
+
+  setDoc(doc(db, 'typing', 'global'), { [currentUser]: false }, { merge: true })
+    .catch(error => console.warn('Typing reset failed:', error));
 }
 
 window.sendGlobal = sendGlobal;
@@ -665,6 +769,7 @@ function openMention() {
     return;
   }
 
+  refreshOnline();
   const validUsers = demoUsers.filter(u => isValidUsername(u.id));
   pop.replaceChildren();
 
@@ -778,6 +883,7 @@ $('globalInput').addEventListener('input', () => {
 
 function showMentionSuggestions(search) {
   const pop = $('mentionPopup');
+  refreshOnline();
   const matches = demoUsers.filter(u =>
     isValidUsername(u.id) &&
     (u.id.toLowerCase().includes(search) || u.name.toLowerCase().includes(search))
@@ -818,6 +924,8 @@ $('globalInput').addEventListener('keydown', e => {
 $('globalSendBtn').addEventListener('click', sendGlobal);
 
 window.renderLists = function() {
+  refreshOnline();
+
   const qOnline = $('searchOnline').value.trim().toLowerCase();
   const qInbox = $('searchInbox').value.trim().toLowerCase();
 
@@ -827,26 +935,30 @@ window.renderLists = function() {
   onlineListEl.replaceChildren();
   inboxEl.replaceChildren();
 
-  const onlineSource = demoUsers;
-  const onlineFiltered = onlineSource.filter(u =>
-    isValidUsername(u.id) &&
-    (u.id.toLowerCase().includes(qOnline) || u.name.toLowerCase().includes(qOnline))
-  );
+  // Online Users: empty search -> only online users; typing -> online + offline matches
+  const onlineFiltered = qOnline
+    ? allUsers.filter(u =>
+        isValidUsername(u.id) &&
+        (u.id.toLowerCase().includes(qOnline) || u.name.toLowerCase().includes(qOnline)))
+    : demoUsers.filter(u => isValidUsername(u.id));
 
   if (!onlineFiltered.length) {
-    addEmpty(onlineListEl, 'No users found');
+    addEmpty(onlineListEl, qOnline ? 'No users found' : 'No users online');
   } else {
     onlineFiltered.forEach(u => onlineListEl.appendChild(createUserRow(u, false)));
   }
 
-  const inboxFiltered = allUsers.filter(u =>
-    isValidUsername(u.id) &&
-    !isRemoved(u.id) &&
-    (u.id.toLowerCase().includes(qInbox) || u.name.toLowerCase().includes(qInbox))
-  );
+  // Inbox: empty search -> only my chats; typing -> any registered user
+  const contacts = getContacts();
+  const inboxFiltered = qInbox
+    ? allUsers.filter(u =>
+        isValidUsername(u.id) &&
+        (u.id.toLowerCase().includes(qInbox) || u.name.toLowerCase().includes(qInbox)))
+    : allUsers.filter(u =>
+        isValidUsername(u.id) && contacts.has(u.id.toLowerCase()) && !isRemoved(u.id));
 
   if (!inboxFiltered.length) {
-    addEmpty(inboxEl, 'No users found. Search a registered ID.');
+    addEmpty(inboxEl, qInbox ? 'No users found.' : 'No chats yet. Search a registered ID.');
   } else {
     inboxFiltered.forEach(u => inboxEl.appendChild(createUserRow(u, true)));
   }
@@ -863,6 +975,7 @@ function addEmpty(parent, message) {
 }
 
 function createUserRow(u, inbox) {
+  const on = isOnline(u);
   const row = document.createElement('div');
   row.className = 'row';
   row.tabIndex = 0;
@@ -885,20 +998,20 @@ function createUserRow(u, inbox) {
   detail.style.cssText = 'color:#94a3b8;font-size:10px';
   detail.textContent = inbox && isBlockedByMe(u.id) ? '🚫 You Blocked' :
     inbox && isBlockedByOther(u.id) ? '🚫 Blocked You' :
-    u.online ? '● Online' : '○ Offline - Tap to chat';
+    on ? '● Online' : '○ Offline - Tap to chat';
 
   info.append(name, detail);
   row.append(avatar, info);
 
   if (inbox) {
     const status = document.createElement('div');
-    status.className = 'status ' + (u.online ? 'online' : 'offline');
-    status.textContent = u.online ? '● Online' : '○ Offline';
+    status.className = 'status ' + (on ? 'online' : 'offline');
+    status.textContent = on ? '● Online' : '○ Offline';
     row.appendChild(status);
   } else {
     const arrow = document.createElement('div');
     arrow.style.color = '#22d3ee';
-    arrow.textContent = '❯';
+    arrow.textContent = on ? '❯' : '○';
     row.appendChild(arrow);
   }
 
@@ -1031,7 +1144,7 @@ window.openChat = function(id) {
 
   $('chatName').textContent = id;
   const user = allUsers.find(u => u.id.toLowerCase() === id.toLowerCase());
-  $('chatStatus').textContent = byMe ? 'Blocked' : byOther ? 'Blocked You' : user?.online ? 'Online' : 'Offline';
+  $('chatStatus').textContent = byMe ? 'Blocked' : byOther ? 'Blocked You' : isOnline(user) ? 'Online' : 'Offline';
 
   showApp('chat');
 
@@ -1254,6 +1367,12 @@ window.sendChat = async function() {
   }
 
   const chatId = getChatId(currentUser, selected);
+  const replyValue = replyTo;
+
+  // Clear the box immediately so a second tap can never send the same text again
+  input.value = '';
+  replyTo = null;
+  input.placeholder = 'Type a message';
 
   try {
     await addDoc(collection(db, 'privateChats', chatId, 'messages'), {
@@ -1262,21 +1381,22 @@ window.sendChat = async function() {
       text,
       time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
       status: 'sent',
-      replyTo: replyTo,
+      replyTo: replyValue,
       edited: false,
       createdAt: serverTimestamp()
     });
 
-    input.value = '';
-    replyTo = null;
-    input.placeholder = 'Type a message';
-
-    await setDoc(doc(db, 'typing', chatId), {
-      [currentUser]: false
-    }, { merge: true });
+    addContact(selected);
   } catch (error) {
+    if (!input.value) input.value = text;
+    if (!replyTo) replyTo = replyValue;
     showError('Could not send private message.', error);
+    return;
   }
+
+  setDoc(doc(db, 'typing', chatId), {
+    [currentUser]: false
+  }, { merge: true }).catch(error => console.warn('Typing reset failed:', error));
 };
 
 $('chatSend').addEventListener('click', () => window.sendChat());
@@ -1325,6 +1445,10 @@ function getFocusableElements() {
 }
 
 function updateFocus() {
+  // Do not steal focus while the user is typing in a visible input (search box etc.)
+  const ae = document.activeElement;
+  if (ae && ae.tagName === 'INPUT' && ae.offsetParent !== null) return;
+
   const elements = getFocusableElements();
   if (!elements.length) return;
 
@@ -1346,6 +1470,7 @@ function updateFocus() {
     el.scrollIntoView({ block: 'nearest' });
   } catch (_) {}
 }
+window.updateFocus = updateFocus;
 
 function backAction() {
   if ($('blockedView').style.display === 'flex') {
@@ -1425,6 +1550,24 @@ document.addEventListener('keydown', e => {
     backAction();
   }
 });
+
+// Heartbeat: keeps my "online" fresh and refreshes others' status
+setInterval(() => {
+  if (!currentUser) return;
+
+  if (document.visibilityState === 'visible') {
+    registerUser().catch(error => console.warn('Heartbeat failed:', error));
+  }
+
+  refreshOnline();
+  updateCounts();
+
+  const sig = allUsers.map(u => u.id + (isOnline(u) ? '1' : '0')).join(',');
+  if (sig !== lastOnlineSig) {
+    lastOnlineSig = sig;
+    renderLists();
+  }
+}, HEARTBEAT_MS);
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && currentUser) {
