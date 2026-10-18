@@ -299,6 +299,10 @@ function readJSON(key, fallback) {
   }
 }
 
+function cleanUsername(val) {
+  return String(val || '').trim().replace(/\s+/g, '_').toLowerCase();
+}
+
 function isValidUsername(id) {
   return typeof id === 'string' && /^[a-zA-Z0-9_]{2,25}$/.test(id);
 }
@@ -324,7 +328,7 @@ function updateCounts() {
 function updateChatStatus() {
   if (!selected || !$('chatApp').classList.contains('show')) return;
   const user = allUsers.find(u => u.id.toLowerCase() === selected.toLowerCase());
-  $('chatStatus').textContent = isBlockedByMe(selected) ? 'Blocked'
+  $('chatStatus').textContent = isBlockedByMe(selected) ? (currentUser + ' has blocked u')
     : isBlockedByOther(selected) ? 'Blocked You'
     : isOnline(user) ? 'Online' : 'Offline';
 }
@@ -342,7 +346,7 @@ function clearTimer(timer) {
 }
 
 function usernameEmail(username) {
-  return username.trim().toLowerCase() + '@nexachat.invalid';
+  return cleanUsername(username) + '@nexachat.invalid';
 }
 
 function showAuth() {
@@ -871,7 +875,7 @@ window.showApp = function(id) {
 };
 
 function validateLoginForm() {
-  const u = $('username').value.trim();
+  const u = cleanUsername($('username').value);
   const p = $('password').value;
 
   if (!isValidUsername(u)) {
@@ -886,7 +890,7 @@ function validateLoginForm() {
     return null;
   }
 
-  return { username: u.toLowerCase(), password: p };
+  return { username: u, password: p };
 }
 
 async function enterAccount(isSignup) {
@@ -1426,14 +1430,14 @@ function createUserRow(u, inbox) {
   const name = document.createElement('div');
   name.style.cssText = 'color:#fff;font-weight:' + (unread > 0 ? '900' : '700') + ';overflow-wrap:anywhere';
   name.textContent = u.name +
-    (inbox && blockedByMe ? ' (You Blocked)' : '') +
+    (inbox && blockedByMe ? ' (' + currentUser + ' has blocked u)' : '') +
     (inbox && blockedByOther && !blockedByMe ? ' (Blocked You)' : '');
 
   const detail = document.createElement('div');
   detail.style.cssText = 'font-size:10px;color:' + (unread > 0 ? '#4ade80' : '#94a3b8') + ';font-weight:' + (unread > 0 ? '700' : '400');
 
   let detailText;
-  if (inbox && blockedByMe) detailText = '🚫 You Blocked';
+  if (inbox && blockedByMe) detailText = '🚫 ' + currentUser + ' has blocked u';
   else if (inbox && blockedByOther) detailText = '🚫 Blocked You';
   else if (unread > 0) detailText = '🔔 ' + unread + ' new • ' + previewText(u.id);
   else if (inbox && previewText(u.id)) detailText = previewText(u.id);
@@ -1493,7 +1497,7 @@ function blockUser() {
   if (selected === selectedInbox) {
     stopPrivateListeners();
     $('chatMsgs').replaceChildren();
-    $('chatStatus').textContent = 'Blocked';
+    $('chatStatus').textContent = currentUser + ' has blocked u';
   }
 
   unreadMap[selectedInbox] = 0;
@@ -1608,14 +1612,14 @@ window.openChat = function(id) {
   $('chatName').textContent = id;
   refreshOnline();
   const user = allUsers.find(u => u.id.toLowerCase() === id.toLowerCase());
-  $('chatStatus').textContent = byMe ? 'Blocked' : byOther ? 'Blocked You' : isOnline(user) ? 'Online' : 'Offline';
+  $('chatStatus').textContent = byMe ? (currentUser + ' has blocked u') : byOther ? 'Blocked You' : isOnline(user) ? 'Online' : 'Offline';
 
   showApp('chat');
 
   if (byMe || byOther) {
     const notice = document.createElement('div');
     notice.style.cssText = 'background:#3f1a1a;border:1px solid #ff4444;color:#ffaaaa;padding:14px;border-radius:10px;text-align:center;margin:30px 10px';
-    notice.textContent = byMe ? '🚫 You blocked this user. Messages will not be delivered.' : '🚫 This user has blocked you. Messages will not be delivered.';
+    notice.textContent = byMe ? ('🚫 ' + currentUser + ' has blocked u. Messages will not be delivered.') : '🚫 This user has blocked you. Messages will not be delivered.';
     $('chatMsgs').appendChild(notice);
     return;
   }
