@@ -166,7 +166,6 @@ button:disabled{opacity:.6;cursor:wait}
 
 <script>
 (function () {
-  // FAST OPEN: if user was logged in before, skip the login page and show home instantly
   try {
     var cached = localStorage.getItem('nexa_current');
     if (cached) {
@@ -223,7 +222,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// FAST LOAD: local cache so data appears instantly on next open
 let db;
 try {
   db = initializeFirestore(app, {
@@ -236,7 +234,6 @@ try {
 const auth = getAuth(app);
 const $ = id => document.getElementById(id);
 
-// ONLINE / OFFLINE SETTINGS
 const ONLINE_WINDOW = 75000;
 const HEARTBEAT_MS = 25000;
 const TYPING_REFRESH_MS = 2000;
@@ -283,7 +280,6 @@ let permErrorShown = false;
 let serverSkew = 0;
 let lastOwnSeen = 0;
 
-// UNREAD + SOUND STATE
 const inboxListeners = new Map();
 const notifiedMsgs = new Set();
 let unreadMap = {};
@@ -303,18 +299,8 @@ function readJSON(key, fallback) {
   }
 }
 
-function escapeHTML(value) {
-  return String(value ?? '').replace(/[&<>"']/g, ch => ({
-    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
-  })[ch]);
-}
-
 function isValidUsername(id) {
   return typeof id === 'string' && /^[a-zA-Z0-9_]{2,25}$/.test(id);
-}
-
-function safeText(value) {
-  return String(value ?? '');
 }
 
 function nowMs() {
@@ -364,8 +350,6 @@ function showAuth() {
   document.querySelectorAll('.app').forEach(a => a.classList.remove('show'));
 }
 
-/* ---------- SOUND / RING (LOUD) ---------- */
-
 function unlockAudio() {
   try {
     if (!audioCtx) {
@@ -386,7 +370,6 @@ function unlockAudio() {
   document.addEventListener(ev, unlockAudio, { passive: true })
 );
 
-// master volume + compressor: very loud but without crackling
 function getBus() {
   if (!audioCtx) return null;
   if (!masterBus) {
@@ -433,7 +416,6 @@ function beep(freq, when, dur, vol) {
   } catch (_) {}
 }
 
-// kind: 'ring' = loud pleasant tone for new message, 'soft' = short pop
 function playSound(kind) {
   try {
     unlockAudio();
@@ -472,19 +454,12 @@ function msgAge(m) {
   return Math.abs(nowMs() - c.toMillis());
 }
 
-function isFresh(m) {
-  return msgAge(m) < FRESH_MS;
-}
-
-// ring for fresh messages, or for messages that arrive live after the first load
 function shouldRing(m, baselined) {
   const age = msgAge(m);
   if (age === Infinity) return false;
   if (age < FRESH_MS) return true;
   return baselined && (lastOwnSeen === 0 || age < 300000);
 }
-
-/* ---------- DELETE ID HELPERS ---------- */
 
 function unremoveId(id) {
   if (!currentUser) return;
@@ -498,8 +473,6 @@ function unremoveId(id) {
     saveRemovedAtMap();
   }
 }
-
-/* ---------- UNREAD (INBOX) ---------- */
 
 function isViewingChat(id) {
   return !!selected && selected.toLowerCase() === id.toLowerCase() &&
@@ -569,7 +542,6 @@ function attachInboxListener(id) {
       }
     });
 
-    // a deleted ID comes back only when a NEWER message arrives from that user
     if (isRemoved(id)) {
       if (!removedAtMap[currentUser]) removedAtMap[currentUser] = {};
       const removedAt = removedAtMap[currentUser][id.toLowerCase()];
@@ -651,8 +623,6 @@ function stopInboxListeners() {
   inboxRefreshTimer = null;
   updateUnreadBadges();
 }
-
-/* ---------- TYPING INDICATOR (sender side) ---------- */
 
 function pingGlobalTyping() {
   if (!currentUser) return;
@@ -1122,7 +1092,6 @@ function initGlobalListener() {
 
     area.scrollTop = area.scrollHeight;
 
-    // sound for new global messages from others
     if (currentUser) {
       const me = currentUser.toLowerCase();
       snap.docChanges().forEach(ch => {
@@ -1131,8 +1100,10 @@ function initGlobalListener() {
         if (String(m.name || '').toLowerCase() === me) return;
         if (!shouldRing(m, baselined)) return;
         const mentioned = String(m.mention || '').toLowerCase() === me;
-        playSound(mentioned ? 'ring' : 'soft');
-        if (mentioned) notify(String(m.name || 'Someone') + ' mentioned you', String(m.text || '').slice(0, 80));
+        if (mentioned) {
+          playSound('ring');
+          notify(String(m.name || 'Someone') + ' mentioned you', String(m.text || '').slice(0, 80));
+        }
       });
     }
 
@@ -1271,8 +1242,6 @@ function insertMention(id) {
 
 window.insertMention = insertMention;
 
-/* ---------- TYPING INDICATOR (receiver side) ---------- */
-
 function isTypingValue(v) {
   return v === true || (typeof v === 'number' && v > 0);
 }
@@ -1383,7 +1352,6 @@ window.renderLists = function() {
   onlineListEl.replaceChildren();
   inboxEl.replaceChildren();
 
-  // ONLINE USERS page: normally only online users. When searching, offline users are also found (marked offline).
   const onlineFiltered = (qOnline
     ? allUsers.filter(u =>
         isValidUsername(u.id) &&
@@ -1399,7 +1367,6 @@ window.renderLists = function() {
 
   const contacts = getContacts();
 
-  // INBOX page: normally your chats. When searching, every registered user is found (online or offline).
   const inboxFiltered = (qInbox
     ? allUsers.filter(u =>
         isValidUsername(u.id) &&
@@ -1408,7 +1375,6 @@ window.renderLists = function() {
         isValidUsername(u.id) && contacts.has(u.id.toLowerCase()) && !isRemoved(u.id))
   ).slice();
 
-  // unread chats first, then latest message first
   inboxFiltered.sort((a, b) => {
     const ua = (unreadMap[a.id] || 0) > 0;
     const ub = (unreadMap[b.id] || 0) > 0;
@@ -1440,7 +1406,9 @@ function addEmpty(parent, message) {
 
 function createUserRow(u, inbox) {
   const on = isOnline(u);
-  const blocked = isBlockedByMe(u.id) || isBlockedByOther(u.id);
+  const blockedByMe = isBlockedByMe(u.id);
+  const blockedByOther = isBlockedByOther(u.id);
+  const blocked = blockedByMe || blockedByOther;
   const unread = inbox && !blocked ? (unreadMap[u.id] || 0) : 0;
 
   const row = document.createElement('div');
@@ -1458,15 +1426,15 @@ function createUserRow(u, inbox) {
   const name = document.createElement('div');
   name.style.cssText = 'color:#fff;font-weight:' + (unread > 0 ? '900' : '700') + ';overflow-wrap:anywhere';
   name.textContent = u.name +
-    (inbox && isBlockedByMe(u.id) ? ' (You Blocked)' : '') +
-    (inbox && isBlockedByOther(u.id) ? ' (Blocked You)' : '');
+    (inbox && blockedByMe ? ' (You Blocked)' : '') +
+    (inbox && blockedByOther && !blockedByMe ? ' (Blocked You)' : '');
 
   const detail = document.createElement('div');
   detail.style.cssText = 'font-size:10px;color:' + (unread > 0 ? '#4ade80' : '#94a3b8') + ';font-weight:' + (unread > 0 ? '700' : '400');
 
   let detailText;
-  if (inbox && isBlockedByMe(u.id)) detailText = '🚫 You Blocked';
-  else if (inbox && isBlockedByOther(u.id)) detailText = '🚫 Blocked You';
+  if (inbox && blockedByMe) detailText = '🚫 You Blocked';
+  else if (inbox && blockedByOther) detailText = '🚫 Blocked You';
   else if (unread > 0) detailText = '🔔 ' + unread + ' new • ' + previewText(u.id);
   else if (inbox && previewText(u.id)) detailText = previewText(u.id);
   else detailText = (on ? '● Online' : '○ Offline') + ' • ID: ' + u.id;
@@ -1591,7 +1559,6 @@ window.unblockSpecific = function(id) {
   renderLists();
 };
 
-// DELETE ID: removes the user only from your inbox list (chat history is not touched)
 function removeFromInbox() {
   if (!selectedInbox) return alert('Please select a user first.');
 
@@ -1661,7 +1628,6 @@ function getChatId(a, b) {
   return [a.toLowerCase(), b.toLowerCase()].sort().join('_');
 }
 
-// WhatsApp style: messages are marked "seen" only while the chat is really open and visible
 function markChatSeen() {
   if (!currentUser || !selected) return;
   if (document.visibilityState !== 'visible') return;
@@ -2041,8 +2007,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* ---------- ONLINE / OFFLINE ENGINE ---------- */
-
 setInterval(() => {
   if (!currentUser) return;
   if (document.visibilityState === 'visible') {
@@ -2069,7 +2033,6 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     registerUser().catch(error => console.warn('Online update failed:', error));
     try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch (_) {}
-    // user came back to an open chat: now the messages are really seen
     if ($('chatApp').classList.contains('show')) {
       unreadMap[selected] = 0;
       markChatSeen();
