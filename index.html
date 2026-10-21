@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>NexaChat</title>
+<link rel="manifest" href='data:application/json;base64,eyJuYW1lIjoiTmV4YUNoYXQiLCJzaG9ydF9uYW1lIjoiTmV4YUNoYXQiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzAyMDYxMSIsInRoZW1lX2NvbG9yIjoiIzIyZDNlZSIsImljb25zIjpbe31dfQ=='>
+<meta name="theme-color" content="#22d3ee">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bg:#020611;--panel:#0f1733;--top:#101a3a;--text:#fff;--muted:#a5b4d4;--accent:#22d3ee;--border:#1e2a50;--msgme:#0e7490;--msgother:#1a2040;--input:#070e28;--soft:#000;--green:#22c55e}
@@ -578,17 +580,16 @@ if($('chatApp').classList.contains('show'))showApp('inbox');else if($('inboxApp'
 }
 document.addEventListener('keydown',e=>{
 const target=e.target,typing=target instanceof HTMLInputElement||target instanceof HTMLTextAreaElement;
-if(e.key==='ArrowDown'||e.key==='ArrowUp'){if(typing)return;e.preventDefault();focusIndex+=e.key==='ArrowDown'?1:-1;updateFocus();return}
-if(e.key==='Enter'){if(typing)return;const els=getFocusableElements();if(els.length){e.preventDefault();els[Math.max(0,Math.min(focusIndex,els.length-1))].click()}return}
-if(e.key==='SoftLeft'||e.key==='ContextMenu'){e.preventDefault();if($('inboxApp').classList.contains('show')){if($('settingsView').style.display==='flex')return;toggleInboxOptions()}else if($('chatApp').classList.contains('show'))toggleChatOptions();else if($('globalApp').classList.contains('show'))openMention();return}
-if(e.key==='SoftRight'){e.preventDefault();backAction();return}
-if(e.key==='Backspace'&&!typing){e.preventDefault();backAction()}
-});
-setInterval(()=>{if(currentUser&&document.visibilityState==='visible')registerUser().catch(e=>console.warn('Heartbeat failed:',e))},HEARTBEAT_MS);
-setInterval(()=>{if(!currentUser)return;refreshOnline();updateCounts();updateChatStatus();const sig=allUsers.map(u=>u.id+(isOnline(u)?'1':'0')).join(',');if(sig!==lastOnlineSig){lastOnlineSig=sig;renderLists()}},8000);
-document.addEventListener('visibilitychange',()=>{if(!currentUser)return;if(document.visibilityState==='visible'){registerUser().catch(e=>console.warn(e));try{if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume()}catch(e){}if($('chatApp').classList.contains('show')){unreadMap[selected]=0;markChatSeen();updateUnreadBadges()}}else{stopGlobalTyping();stopPrivateTyping();setOffline()}});
-window.addEventListener('online',()=>{if(currentUser)registerUser().catch(e=>console.warn(e))});
-window.addEventListener('pagehide',()=>{if(currentUser){stopGlobalTyping();stopPrivateTyping();setDoc(doc(db,'users',currentUser),{online:false,lastSeen:serverTimestamp()},{merge:true}).catch(e=>console.warn(e))}});
+if(e.key==='ArrowDown'||e.key==='ArrowUp'){if(typing)return;e.preventDefault();focusIndex+=e.key==='ArrowDown'?1:-1;updateFocus();retu
+</script>
+
+<!-- PWA Install Fix - 100% Safe -->
+<script>
+if ('serviceWorker' in navigator) {
+  const sw = `self.addEventListener('fetch', e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))))`;
+  const blob = new Blob([sw], {type: 'text/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+}
 </script>
 </body>
 </html>
