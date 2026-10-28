@@ -1,26 +1,25 @@
 {
-"name": "NexaChat",
-"short_name": "NexaChat",
-"description": "NexaChat - Connect and chat with friends around the world.",
-"version": "1.0.0",
-"type": "web",
-"launch_path": "/Nexachat/",
-"icons": {
-"56": "/Nexachat/icon-56.png",
-"112": "/Nexachat/icon-112.png"
-},
-"developer": {
-"name": "Ziddi Malik"
-},
-"default_locale": "en-US",
-"locales": {
-"en-US": {
-"name": "NexaChat",
-"description": "Chat with friends around the world.",
-"subtitle": "Connect and chat"
-}
-},
-"categories": [
-"social"
-]
+  "version": "1.0.0",
+  "name": "NexaChat",
+  "description": "NexaChat - Connect and chat with friends around the world.",
+  "type": "web",
+  "launch_path": "/Nexachat/",
+  "icons": {
+    "56": "/Nexachat/icon-56.png",
+    "112": "/Nexachat/icon-112.png"
+  },
+  "developer": {
+    "name": "Ziddi Malik"
+  },
+  "default_locale": "en-US",
+  "locales": {
+    "en-US": {
+      "name": "NexaChat",
+      "description": "Chat with friends around the world.",
+      "subtitle": "Connect and chat"
+    }
+  },
+  "categories": [
+    "social"
+  ]
 }
