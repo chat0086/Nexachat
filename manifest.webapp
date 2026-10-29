@@ -3,13 +3,14 @@
   "name": "NexaChat",
   "description": "NexaChat - Connect and chat with friends around the world.",
   "type": "web",
-  "launch_path": "/Nexachat/",
+  "launch_path": "/Nexachat/index.html",
   "icons": {
     "56": "/Nexachat/icon-56.png",
     "112": "/Nexachat/icon-112.png"
   },
   "developer": {
-    "name": "Ziddi Malik"
+    "name": "Ziddi Malik",
+    "url": "https://chat0086.github.io/Nexachat/"
   },
   "default_locale": "en-US",
   "locales": {
