@@ -1,26 +1,26 @@
 {
-  "version": "1.0.0",
-  "name": "NexaChat",
-  "description": "NexaChat - Connect and chat with friends around the world.",
-  "type": "web",
-  "launch_path": "/Nexachat/index.html",
-  "icons": {
-    "56": "/Nexachat/icon-56.png",
-    "112": "/Nexachat/icon-112.png"
-  },
-  "developer": {
-    "name": "Ziddi Malik",
-    "url": "https://chat0086.github.io/Nexachat/"
-  },
-  "default_locale": "en-US",
-  "locales": {
-    "en-US": {
-      "name": "NexaChat",
-      "description": "Chat with friends around the world.",
-      "subtitle": "Connect and chat"
-    }
-  },
-  "categories": [
-    "social"
-  ]
+"version": "1.0.0",
+"name": "NexaChat",
+"description": "Connect with friends around the world! Send messages, share photos, videos, voice messages and status updates. Discover new friends and enjoy chatting with NexaChat.",
+"type": "web",
+"launch_path": "/Nexachat/",
+"icons": {
+"56": "/Nexachat/icon-56.png",
+"112": "/Nexachat/icon-112.png"
+},
+"developer": {
+"name": "Malik Talha",
+"url": "https://chat0086.github.io/Nexachat/"
+},
+"default_locale": "en-US",
+"locales": {
+"en-US": {
+"name": "NexaChat",
+"description": "Connect with friends worldwide. Chat instantly, share photos, videos, voice messages and status updates. Discover new friends and stay connected.",
+"subtitle": "Chat, Share & Make Friends"
+}
+},
+"categories": [
+"social"
+]
 }
