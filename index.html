@@ -402,6 +402,7 @@ window.showPass=function(){var p=document.getElementById('password');p.type=p.ty
       <button type="button" class="nx-big" id="newStBtn" style="background:#00a884;color:#000;border-color:#00a884;text-align:center;">New Status</button>
       <button type="button" class="nx-big" id="delStBtn" style="background:#ef4444;color:#fff;border-color:#ef4444;text-align:center;margin-top:6px;">Delete Status</button>
     </div>
+    <div class="soft"><span></span><span style="cursor:pointer" onclick="document.getElementById('myBack').click()">Back</span></div>
   </div>
 
   <div id="newStChoice" class="nx-ov">
@@ -411,12 +412,14 @@ window.showPass=function(){var p=document.getElementById('password');p.type=p.ty
       <button type="button" class="nx-big" id="stVidBtn">Video Status</button>
       <button type="button" class="nx-big" id="stTxtBtn">Text Status</button>
     </div>
+    <div class="soft"><span></span><span style="cursor:pointer" onclick="document.getElementById('newStBack').click()">Back</span></div>
   </div>
 
   <div id="txtComposer" class="nx-ov">
     <div class="top-g"><button type="button" class="nx-back" id="txtBack">‹</button><h2>Text Status</h2><button type="button" id="txtColor" style="background:transparent;border:0;font-size:12px;font-weight:800;color:#fff;cursor:pointer">Color</button></div>
     <textarea id="txtArea" maxlength="300" placeholder="Write your status..." style="flex:1;border:0;resize:none;color:#fff;font-size:24px;font-weight:700;text-align:center;padding:30px 16px;background:#0e7490"></textarea>
     <div style="padding:10px;flex-shrink:0"><button type="button" class="nx-big" id="txtUpload" style="text-align:center;background:#00a884;color:#000;border-color:#00a884">Upload</button></div>
+    <div class="soft"><span></span><span style="cursor:pointer" onclick="document.getElementById('txtBack').click()">Back</span></div>
   </div>
 </div>
 
@@ -831,7 +834,7 @@ a = 0;
 _a.label = 1;
 case 1:
 if (!(a < 6)) return [3 /*break*/, 5];
-return [4 /*yield*/, getDocs(query(collection.apply(void 0, __spreadArray(__spreadArray([db], pathArr, false), ['chunks'], false)), orderBy('i', 'asc')))];
+return [4 /*yield*/, (function(){var qq=query(collection.apply(void 0, __spreadArray(__spreadArray([db], pathArr, false), ['chunks'], false)), orderBy('i', 'asc'));return getDocs(qq).then(function(r){return (r.size>=n||r.metadata.fromCache)?r:r;},function(){return qq.get({source:'cache'});}).then(function(r){if(r.size>=n)return r;return qq.get({source:'cache'}).then(function(c){return c.size>r.size?c:r;},function(){return r;});});})()];
 case 2:
 snap = _a.sent();
 if (snap.size >= n)
@@ -3877,4 +3880,3 @@ window.addEventListener('load',function(){sweep();setTimeout(sweep,1500);setTime
   
 
   
-
