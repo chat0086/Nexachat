@@ -664,3 +664,168 @@ window.addEventListener('load',function(){sweep();setTimeout(sweep,1500);setTime
 <script src="voice.js"></script>
 </body>
 </html>
+try{if(window.__nxVars)window.__nxVars.init()}catch(e){}
+/* ===== NexaChat KaiOS key fix: old phone browsers give no/old e.key, so map keyCode ===== */
+(function(){
+try{
+var KP=window.KeyboardEvent&&KeyboardEvent.prototype;
+var d=KP&&Object.getOwnPropertyDescriptor(KP,'key');
+if(d&&d.get){
+var alias={Up:'ArrowUp',Down:'ArrowDown',Left:'ArrowLeft',Right:'ArrowRight',Esc:'Escape',Menu:'ContextMenu'};
+var codes={13:'Enter',8:'Backspace',27:'Escape',37:'ArrowLeft',38:'ArrowUp',39:'ArrowRight',40:'ArrowDown',112:'SoftLeft',113:'SoftRight'};
+Object.defineProperty(KP,'key',{configurable:true,enumerable:true,get:function(){
+var k=d.get.call(this);
+if(alias[k])return alias[k];
+if(!k||k==='Unidentified'){var c=this.keyCode||this.which;if(codes[c])return codes[c]}
+return k}});
+}
+}catch(e){}
+})();
+
+/* ===== NexaChat compatibility layer (plain ES5, works in old KaiOS / Jio / Jazz browsers) ===== */
+(function(){
+/* ---- DOM polyfills for old browsers ---- */
+function toNode(n){return (typeof n==='string')?document.createTextNode(n):n}
+function mkFrag(list){var f=document.createDocumentFragment();for(var i=0;i<list.length;i++)f.appendChild(toNode(list[i]));return f}
+var protos=[window.Element&&Element.prototype,window.Document&&Document.prototype,window.DocumentFragment&&DocumentFragment.prototype];
+protos.forEach(function(p){
+if(!p)return;
+if(!p.append)p.append=function(){this.appendChild(mkFrag(arguments))};
+if(!p.prepend)p.prepend=function(){this.insertBefore(mkFrag(arguments),this.firstChild)};
+if(!p.replaceChildren)p.replaceChildren=function(){while(this.firstChild)this.removeChild(this.firstChild);if(arguments.length)this.appendChild(mkFrag(arguments))};
+});
+if(window.Element&&Element.prototype){
+var EP=Element.prototype;
+if(!EP.after)EP.after=function(){var p=this.parentNode;if(p)p.insertBefore(mkFrag(arguments),this.nextSibling)};
+if(!EP.before)EP.before=function(){var p=this.parentNode;if(p)p.insertBefore(mkFrag(arguments),this)};
+if(!EP.replaceWith)EP.replaceWith=function(){var p=this.parentNode;if(p)p.replaceChild(mkFrag(arguments),this)};
+if(!EP.remove)EP.remove=function(){if(this.parentNode)this.parentNode.removeChild(this)};
+if(!EP.matches)EP.matches=EP.msMatchesSelector||EP.webkitMatchesSelector||EP.mozMatchesSelector;
+if(!EP.closest)EP.closest=function(s){var e=this;while(e&&e.nodeType===1){if(e.matches(s))return e;e=e.parentNode}return null};
+}
+if(window.NodeList&&!NodeList.prototype.forEach)NodeList.prototype.forEach=Array.prototype.forEach;
+if(window.HTMLCollection&&!HTMLCollection.prototype.forEach)HTMLCollection.prototype.forEach=Array.prototype.forEach;
+if(!Object.values)Object.values=function(o){return Object.keys(o).map(function(k){return o[k]})};
+if(!Object.entries)Object.entries=function(o){return Object.keys(o).map(function(k){return [k,o[k]]})};
+if(!String.prototype.padStart)String.prototype.padStart=function(n,s){var t=String(this);s=s===undefined?' ':String(s);while(t.length<n)t=s+t;return t};
+if(!Array.prototype.includes)Array.prototype.includes=function(x){return this.indexOf(x)!==-1};
+if(!String.prototype.includes)String.prototype.includes=function(x){return this.indexOf(x)!==-1};
+if(!String.prototype.endsWith)String.prototype.endsWith=function(x){var s=String(this);return s.slice(s.length-x.length)===x};
+if(typeof Promise!=='undefined'&&!Promise.prototype['finally'])Promise.prototype['finally']=function(f){return this.then(function(v){return Promise.resolve(f()).then(function(){return v})},function(e){return Promise.resolve(f()).then(function(){throw e})})};
+/* ---- flex-gap detection (old browsers ignore "gap") ---- */
+try{
+var t=document.createElement('div');
+t.style.cssText='display:flex;flex-direction:column;gap:1px;position:absolute;visibility:hidden;top:0;left:0';
+var a=document.createElement('div'),b=document.createElement('div');
+a.style.height='1px';b.style.height='1px';t.appendChild(a);t.appendChild(b);document.body.appendChild(t);
+var ok=t.offsetHeight===3;document.body.removeChild(t);
+if(!ok)document.documentElement.className+=' nogap';
+var gridOk=!!(window.CSS&&CSS.supports&&CSS.supports('display','grid'));
+window.__gridDisp=gridOk?'grid':'flex';
+if(!gridOk)document.documentElement.className+=' nogrid';
+}catch(e){window.__gridDisp='grid'}
+/* ---- WhatsApp-style video box: thumbnail + play button, loading and retry ---- */
+window.nxMakeVideo=function(o){
+var box=document.createElement('div');
+box.style.cssText='position:relative;background:#000;border-radius:8px;overflow:hidden;width:100%;min-height:110px';
+var vd=document.createElement('video');
+vd.controls=true;vd.setAttribute('playsinline','');vd.setAttribute('webkit-playsinline','');
+vd.preload=o.thumb?'metadata':'auto';
+vd.style.cssText='display:block;width:100%;background:#000;'+(o.full?'max-height:calc(100vh - 150px);max-height:calc(var(--app-h,100vh) - 150px);object-fit:contain;':'max-height:'+(o.maxH||'240px')+';');
+if(o.thumb)vd.poster=o.thumb;
+var ov=document.createElement('div');
+ov.style.cssText='position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.25);cursor:pointer';
+var badge=document.createElement('div');
+badge.style.cssText='width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid #fff;color:#fff;font-size:24px;line-height:48px;text-align:center';
+var lbl=document.createElement('div');
+lbl.style.cssText='color:#fff;font-size:11px;margin-top:6px;text-shadow:0 0 4px #000';
+ov.appendChild(badge);ov.appendChild(lbl);box.appendChild(vd);box.appendChild(ov);
+var ready=false,loading=false;
+function show(v){ov.style.display=v?'flex':'none'}
+function state(ic,tx){badge.textContent=ic;lbl.textContent=tx||''}
+function play(){try{var r=vd.play();if(r&&r['catch'])r['catch'](function(){})}catch(e){}}
+function load(playAfter){
+if(loading)return;loading=true;state('','Loading...');show(true);
+var p;
+try{p=o.getUrl?o.getUrl():Promise.resolve(o.src)}catch(e){p=Promise.reject(e)}
+p.then(function(u){
+if(!u)throw new Error('No video source');
+ready=true;loading=false;vd.src=o.thumb?u:u+'#t=0.1';
+try{vd.load()}catch(e){}
+state('▶','');show(true);
+if(playAfter||o.autoplay)play()
+})['catch'](function(err){loading=false;ready=false;console.warn('Video load failed:',err);state('','Tap to retry');show(true)})
+}
+ov.addEventListener('click',function(e){e.stopPropagation();if(ready)play();else load(true)});
+box.addEventListener('click',function(e){e.stopPropagation()});
+vd.addEventListener('playing',function(){show(false)});
+vd.addEventListener('play',function(){show(false)});
+vd.addEventListener('ended',function(){state('▶','');show(true);if(o.onEnded)o.onEnded()});
+vd.addEventListener('error',function(){if(!vd.getAttribute('src'))return;ready=false;state('','Cannot play - tap to retry');show(true)});
+if(o.lazy)state('▶','');else load(false);
+if(o.lazy&&o.autoLoad)load(false);
+box.vd=vd;
+box.activate=function(){if(!ready){load(true);return}if(vd.paused)play();else{try{vd.pause()}catch(e){}}};
+return box
+};
+/* chat bubble video: thumbnail with a play badge (opens full screen viewer on tap/Enter) */
+window.nxVideoThumb=function(o){
+var box=document.createElement('div');
+box.className='nx-vthumb';
+box.style.cssText='position:relative;background-color:#10182f;background-position:center;background-repeat:no-repeat;background-size:cover;border-radius:8px;overflow:hidden;width:100%;height:84px';
+if(o&&o.thumb)box.style.backgroundImage='url("'+o.thumb+'")';
+var b=document.createElement('div');
+b.style.cssText='position:absolute;left:50%;top:50%;margin:-18px 0 0 -18px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid #fff;color:#fff;font-size:16px;line-height:32px;text-align:center';
+b.textContent='\u25B6';
+var t=document.createElement('div');
+t.style.cssText='position:absolute;left:5px;bottom:3px;color:#fff;font-size:10px;text-shadow:0 0 3px #000';
+t.textContent='Video';
+box.appendChild(b);box.appendChild(t);
+return box
+};
+/* ---- Firebase (compat SDK) wrapped with the same function names the app uses ---- */
+if(typeof firebase==='undefined'){
+window.__fsFail=true;
+setTimeout(function(){alert('Could not load Firebase. Check your internet connection and reload the page.')},500);
+return;
+}
+var db;try{firebase.initializeApp({apiKey:"AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",authDomain:"nexachat-28ecc.firebaseapp.com",projectId:"nexachat-28ecc",storageBucket:"nexachat-28ecc.firebasestorage.app",messagingSenderId:"367209102337",appId:"1:367209102337:web:6f3a0e63b554f6dd145400",measurementId:"G-JLQW9XPDL6"});
+db=firebase.firestore();}catch(err){window.__fsFail=true;setTimeout(function(){alert("Firebase start nahi hua: "+(err&&err.message||err))},300);return}
+var oldBrowser=(typeof ReadableStream==='undefined'||typeof Symbol==='undefined'||/KaiOS|JioPhone|Jazz|UCBrowser|Opera Mini|Opera Mobi|Android [2-4]\.|Gecko\/(2|3|4|5|6)\d\b/i.test(navigator.userAgent||''));
+var slowNet=false;try{var cn=navigator.connection||navigator.mozConnection||navigator.webkitConnection;if(cn){var et=String(cn.effectiveType||'');slowNet=/2g/i.test(et)||cn.saveData===true||(cn.downlink>0&&cn.downlink<0.7)}}catch(e){}
+window.__slowNet=slowNet;
+try{if(oldBrowser||slowNet)db.settings({experimentalForceLongPolling:true,merge:true});else db.settings({experimentalAutoDetectLongPolling:true,merge:true})}catch(e){try{if(oldBrowser||slowNet)db.settings({experimentalForceLongPolling:true,merge:true})}catch(e2){}}
+if(!oldBrowser){try{db.enablePersistence({synchronizeTabs:true}).catch(function(){})}catch(e){}}
+var auth=firebase.auth();
+var FV=firebase.firestore.FieldValue,CR=firebase.firestore.CollectionReference;
+function rest(a,from){return Array.prototype.slice.call(a,from)}
+function collection(base){var p=rest(arguments,1).join('/');return base===db?db.collection(p):base.collection(p)}
+function doc(base){
+var s=rest(arguments,1);
+if(base===db)return db.doc(s.join('/'));
+if(base instanceof CR)return s.length?base.doc(s.join('/')):base.doc();
+var last=s.pop();return base.collection(s.join('/')).doc(last)
+}
+function query(q){for(var i=1;i<arguments.length;i++)q=arguments[i](q);return q}
+function orderBy(f,d){return function(q){return d?q.orderBy(f,d):q.orderBy(f)}}
+function limit(n){return function(q){return q.limit(n)}}
+function startAfter(s){return function(q){return q.startAfter(s)}}
+window.__fs={
+db:db,auth:auth,
+collection:collection,doc:doc,query:query,orderBy:orderBy,limit:limit,startAfter:startAfter,
+setDoc:function(r,d,o){return o?r.set(d,o):r.set(d)},
+addDoc:function(c,d){return c.add(d)},
+deleteDoc:function(r){return r['delete']()},
+updateDoc:function(r,d){return r.update(d)},
+getDocs:function(q){return q.get()},
+onSnapshot:function(r,a,b){return r.onSnapshot(a,b)},
+serverTimestamp:function(){return FV.serverTimestamp()},
+arrayUnion:function(){return FV.arrayUnion.apply(FV,arguments)},
+arrayRemove:function(){return FV.arrayRemove.apply(FV,arguments)},
+createUserWithEmailAndPassword:function(a,e,p){return a.createUserWithEmailAndPassword(e,p)},
+signInWithEmailAndPassword:function(a,e,p){return a.signInWithEmailAndPassword(e,p)},
+onAuthStateChanged:function(a,cb){return a.onAuthStateChanged(cb)},
+signOut:function(a){return a.signOut()}
+};
+})();
+  
