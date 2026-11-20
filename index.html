@@ -828,4 +828,324 @@ onAuthStateChanged:function(a,cb){return a.onAuthStateChanged(cb)},
 signOut:function(a){return a.signOut()}
 };
 })();
-  
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+return new (P || (P = Promise))(function (resolve, reject) {
+function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+step((generator = generator.apply(thisArg, _arguments || [])).next());
+});
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+function verb(n) { return function (v) { return step([n, v]); }; }
+function step(op) {
+if (f) throw new TypeError("Generator is already executing.");
+while (g && (g = 0, op[0] && (_ = 0)), _) try {
+if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+if (y = 0, t) op = [op[0] & 2, t.value];
+switch (op[0]) {
+case 0: case 1: t = op; break;
+case 4: _.label++; return { value: op[1], done: false };
+case 5: _.label++; y = op[1]; op = [0]; continue;
+case 7: op = _.ops.pop(); _.trys.pop(); continue;
+default:
+if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+if (t[2]) _.ops.pop();
+_.trys.pop(); continue;
+}
+op = body.call(thisArg, _);
+} catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+}
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+if (ar || !(i in from)) {
+if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+ar[i] = from[i];
+}
+}
+return to.concat(ar || Array.prototype.slice.call(from));
+};
+(function () {
+"use strict";
+var _this = this;
+var FS = window.__fs;
+var collection = FS.collection, doc = FS.doc, setDoc = FS.setDoc, addDoc = FS.addDoc, deleteDoc = FS.deleteDoc, updateDoc = FS.updateDoc, onSnapshot = FS.onSnapshot, query = FS.query, orderBy = FS.orderBy, limit = FS.limit, startAfter = FS.startAfter, serverTimestamp = FS.serverTimestamp, arrayUnion = FS.arrayUnion, arrayRemove = FS.arrayRemove, getDocs = FS.getDocs, createUserWithEmailAndPassword = FS.createUserWithEmailAndPassword, signInWithEmailAndPassword = FS.signInWithEmailAndPassword, onAuthStateChanged = FS.onAuthStateChanged, signOut = FS.signOut;
+var db = FS.db, auth = FS.auth;
+var $ = function (id) { return document.getElementById(id); };
+var ONLINE_WINDOW = 300000, HEARTBEAT_MS = 20000, TYPING_REFRESH_MS = 2000, TYPING_STOP_MS = 1500, TYPING_SHOW_MS = 5000, FRESH_MS = 60000, INBOX_WATCH_LIMIT = 36;
+var KEEP_MSGS = 40, KEEP_PRIV = 35, TWO_DAYS = 2 * 24 * 60 * 60 * 1000, CHUNK_SIZE = 980000;
+var currentUser = null, demoUsers = [], allUsers = [], remoteContacts = [], blockMap = readJSON('nexa_blockMap', {}), removedMap = readJSON('nexa_removed', {}), removedAtMap = readJSON('nexa_removed_at', {}), contactsMap = readJSON('nexa_contacts', {});
+var selected = null, selectedInbox = null, selectedMsgIndex = null, mentionIndex = 0, replyTo = null, focusIndex = 0;
+var globalUnsub = null, privateUnsub = null, usersUnsub = null, globalTypingUnsub = null, privateTypingUnsub = null;
+var globalTypingTimer = null, privateTypingTimer = null, globalTypingHide = null, privateTypingHide = null, globalLastTypingWrite = 0, privateLastTypingWrite = 0, privateTypingChatId = null, mentionOpen = false, lastMentionQuery = '', messageCache = [], busy = false, authReady = false, authStateVersion = 0, usersErrorShown = false, lastOnlineSig = '', permErrorShown = false, serverSkew = 0, lastOwnSeen = 0;
+var inboxListeners = new Map(), notifiedMsgs = new Set(), chunkCache = new Map();
+var unreadMap = {}, lastMsgMap = {}, inboxRefreshTimer = null, audioCtx = null, masterBus = null;
+window.__nexaReady = true;
+setTimeout(function () { authReady = true; }, 6000);
+var myLoc = 'private';
+function spamBlocked(to) { if (!currentUser)
+return false; var t = allUsers.find(function (x) { return x.id === String(to).toLowerCase(); }); if (!t || !t.spam)
+return false; if ((t.contacts || []).indexOf(currentUser.toLowerCase()) >= 0)
+return false; alert('This user has Spam Protection ON. You cannot message them because you are not in their chat list.'); return true; }
+window.__nx = { dn: function (i) { return dn(i); }, spamBlocked: spamBlocked, db: db, me: function () { return currentUser; }, users: function () { return allUsers; }, contacts: function () { return getContacts(); }, chatId: getChatId, sel: function () { return selected; }, blocked: function (id) { return isBlockedByMe(id) || isBlockedByOther(id); }, addContact: addContact, cleanup: cleanupPrivateChat, chunkWrite: chunkWrite, chunkLoad: chunkLoad, prime: chunkPrime, delWithChunks: deleteWithChunks };
+function readJSON(key, fallback) { try {
+var v = JSON.parse(localStorage.getItem(key) || 'null');
+return v && typeof v === 'object' ? v : fallback;
+}
+catch (e) {
+return fallback;
+} }
+function cleanUsername(v) { return String(v || '').replace(/^\s+|\s+$/g, '').replace(/\s+/g, '_').toLowerCase(); }
+function cpLen(t) { return String(t).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '_').length; }
+var pendingName = null, pendingDisp = null;
+function nxHex(t) { var b = unescape(encodeURIComponent(t)), h = '', i, c; for (i = 0; i < b.length; i++) { c = b.charCodeAt(i).toString(16); h += c.length < 2 ? '0' + c : c; } return h; }
+function nxUnhex(h) { try { var b = '', i; for (i = 0; i + 1 < h.length; i += 2) b += String.fromCharCode(parseInt(h.substr(i, 2), 16)); return decodeURIComponent(escape(b)); } catch (e) { return ''; } }
+function nxHash(t) { var seeds = [2166136261, 16777619, 5381, 52711], out = '', k, i, h, c; for (k = 0; k < 4; k++) { h = seeds[k] >>> 0; for (i = 0; i < t.length; i++) { c = t.charCodeAt(i); h = k % 2 ? (((h << 5) + h) ^ c) >>> 0 : ((h ^ c) * 16777619) >>> 0; } h = h.toString(16); while (h.length < 8) h = '0' + h; out += h; } return out; }
+function isValidUsername(id) { return typeof id === 'string' && id.length > 0 && cpLen(id) <= 25 && !/[\/\u0000-\u001F\u007F\s]/.test(id) && id !== '.' && id !== '..' && !/^__.*__$/.test(id); }
+var frozenAt = (typeof navigator !== 'undefined' && navigator.onLine === false) ? Date.now() : 0;
+function nowMs() { return (frozenAt || Date.now()) - serverSkew; }
+function isOnline(u) { return !!u && u.online === true && u.lastSeenMs > 0 && (nowMs() - u.lastSeenMs) < ONLINE_WINDOW; }
+function inGlobal(u) { return !!u && u.loc === 'global' && isOnline(u); }
+function setLoc(l) { if (myLoc === l)
+return; myLoc = l; if (!currentUser)
+return; setDoc(doc(db, 'users', currentUser), { loc: l, lastSeen: serverTimestamp() }, { merge: true }).catch(function (e) { return console.warn(e); }); refreshOnline(); updateCounts(); }
+function refreshOnline() { demoUsers = allUsers.filter(isOnline); }
+function updateCounts() { var g = demoUsers.filter(function (u) { return u.loc === 'global'; }).length, p = demoUsers.length - g, me = currentUser ? 1 : 0; $('globalOnlineCount').textContent = '● Online: ' + (g + (myLoc === 'global' ? me : 0)); $('onlineCount').textContent = '● Online: ' + (p + (myLoc === 'global' ? 0 : me)); }
+function lastSeenText(u) {
+var ms = u && u.lastSeenMs;
+if (!ms)
+return 'Offline';
+var d = new Date(ms), n = new Date(), y = new Date(n.getFullYear(), n.getMonth(), n.getDate() - 1), t = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+if (d.toDateString() === n.toDateString())
+return 'Last seen today, ' + t;
+if (d.toDateString() === y.toDateString())
+return 'Last seen yesterday, ' + t;
+return 'Last seen ' + d.toLocaleDateString([], { day: '2-digit', month: 'short' }) + ', ' + t;
+}
+function updateChatStatus() { if (!selected || !$('chatApp').classList.contains('show'))
+return; var u = allUsers.find(function (x) { return x.id.toLowerCase() === selected.toLowerCase(); }); $('chatStatus').textContent = isBlockedByMe(selected) ? currentUser + ' has blocked u' : isBlockedByOther(selected) ? 'Blocked You' : isOnline(u) ? 'Online' : lastSeenText(u); }
+function setBusy(v) { busy = v; $('loginBtn').disabled = v; $('signupBtn').disabled = v; }
+function clearTimer(t) { if (t)
+clearTimeout(t); }
+function usernameEmail(u) { u = cleanUsername(u); if (/^[a-z0-9_]{2,25}$/.test(u)) return u + '@nexachat.invalid'; var h = nxHex(u); return (h.length <= 60 ? 'x-' + h : 'h-' + nxHash(u)) + '@nexachat.invalid'; }
+function usernameFromUser(user) { var email = String(user && user.email || '').toLowerCase(), suf = '@nexachat.invalid'; if (email.slice(-suf.length) !== suf) return null; var local = email.slice(0, -suf.length), n; if (/^[a-z0-9_]{2,25}$/.test(local)) return local; if (local.indexOf('x-') === 0) { n = cleanUsername(nxUnhex(local.slice(2))); if (n && usernameEmail(n) === email) return n; } if (pendingName && usernameEmail(pendingName) === email) return cleanUsername(pendingName); var map = readJSON('nexa_unames', {}); if (map[email] && usernameEmail(map[email]) === email) return map[email]; if (user.displayName && usernameEmail(user.displayName) === email) return cleanUsername(user.displayName); return null; }
+function rememberName(name) { try { var map = readJSON('nexa_unames', {}); map[usernameEmail(name)] = name; localStorage.setItem('nexa_unames', JSON.stringify(map)); } catch (e) { } }
+function dataUrlToBlob(u) {
+var i = u.indexOf(','), meta = u.slice(5, i), t = meta.split(';')[0], type = /^video\//.test(t) ? t : 'video/mp4', bin = atob(u.slice(i + 1)), len = bin.length, arr = new Uint8Array(len);
+for (var k = 0; k < len; k++)
+arr[k] = bin.charCodeAt(k);
+return new Blob([arr], { type: type });
+}
+function chunkWrite(parentRef, dataUrl) {
+return __awaiter(this, void 0, void 0, function () {
+var n, jobs, i, e_1, i;
+return __generator(this, function (_a) {
+switch (_a.label) {
+case 0:
+n = Math.ceil(dataUrl.length / CHUNK_SIZE), jobs = [];
+try { if (window.nxUp) window.nxUp.start(n); } catch (e) { }
+for (i = 0; i < n; i++)
+jobs.push(setDoc(doc(parentRef, 'chunks', 'c' + i), { i: i, d: dataUrl.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE) }).then(function () { try { if (window.nxUp) window.nxUp.step(); } catch (e) { } }));
+_a.label = 1;
+case 1:
+_a.trys.push([1, 3, , 4]);
+return [4 /*yield*/, Promise.all(jobs)];
+case 2:
+_a.sent();
+return [3 /*break*/, 4];
+case 3:
+e_1 = _a.sent();
+try { if (window.nxUp) window.nxUp.end(); } catch (e) { }
+for (i = 0; i < n; i++)
+deleteDoc(doc(parentRef, 'chunks', 'c' + i)).catch(function () { });
+throw e_1;
+case 4: try { if (window.nxUp) window.nxUp.end(); } catch (e) { }
+return [2 /*return*/, n];
+}
+});
+});
+}
+function nxBlobUrl(u) { try { return window.nxObjUrl(dataUrlToBlob(u)) || u; } catch (e) { return u; } }
+function chunkPrime(p, u) { chunkCache.set(p.join('/'), Promise.resolve(nxBlobUrl(u))); }
+function chunkLoad(pathArr, n) {
+var _this = this;
+var key = pathArr.join('/');
+if (chunkCache.has(key))
+return chunkCache.get(key);
+var p = (function () { return __awaiter(_this, void 0, void 0, function () {
+var snap, a, s;
+return __generator(this, function (_a) {
+switch (_a.label) {
+case 0:
+snap = null;
+a = 0;
+_a.label = 1;
+case 1:
+if (!(a < 6)) return [3 /*break*/, 5];
+return [4 /*yield*/, (function(){var qq=query(collection.apply(void 0, __spreadArray(__spreadArray([db], pathArr, false), ['chunks'], false)), orderBy('i', 'asc'));return getDocs(qq).then(function(r){return (r.size>=n||r.metadata.fromCache)?r:r;},function(){return qq.get({source:'cache'});}).then(function(r){if(r.size>=n)return r;return qq.get({source:'cache'}).then(function(c){return c.size>r.size?c:r;},function(){return r;});});})()];
+case 2:
+snap = _a.sent();
+if (snap.size >= n)
+return [3 /*break*/, 5];
+return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 1500); })];
+case 3:
+_a.sent();
+_a.label = 4;
+case 4:
+a++;
+return [3 /*break*/, 1];
+case 5:
+if (!snap || snap.size < n)
+throw new Error('Video chunks missing');
+s = '';
+snap.forEach(function (d) { s += String(d.data().d || ''); });
+return [2 /*return*/, nxBlobUrl(s)];
+}
+});
+}); })();
+chunkCache.set(key, p);
+p.catch(function () { return chunkCache.delete(key); });
+return p;
+}
+function deleteWithChunks(ref, n) {
+return __awaiter(this, void 0, void 0, function () {
+return __generator(this, function (_a) {
+switch (_a.label) {
+case 0:
+n = parseInt(n, 10) || 0;
+if (!(n > 0)) return [3 /*break*/, 2];
+return [4 /*yield*/, Promise.all(Array.from({ length: n }, function (_, i) { return deleteDoc(doc(ref, 'chunks', 'c' + i)).catch(function () { }); }))];
+case 1:
+_a.sent();
+_a.label = 2;
+case 2: return [4 /*yield*/, deleteDoc(ref)];
+case 3:
+_a.sent();
+return [2 /*return*/];
+}
+});
+});
+}
+var themes = [
+{ name: 'White Theme', bg: '#f0f2f5', panel: '#ffffff', top: '#ffffff', text: '#111b21', muted: '#667781', accent: '#00a884', me: '#d9fdd3', other: '#ffffff', input: '#f0f2f5', chat: '#efeae2', head: '#f0f2f5', privme: '#d9fdd3', privother: '#ffffff', privinput: '#f0f2f5', soft: '#e9edef' },
+{ name: 'Golden Luxury', bg: '#1d1708', panel: '#35290e', top: '#493816', text: '#fff8e1', muted: '#e7d6a5', accent: '#fbbf24', border: '#5c4a1e', me: '#854d0e', other: '#40331a', input: '#251d0b', chat: '#1d1708', head: '#493816', privme: '#854d0e', privother: '#40331a', privinput: '#59451d', soft: '#090702' },
+{ name: 'Midnight Neon', bg: '#020611', panel: '#0f1733', top: '#101a3a', text: '#ffffff', muted: '#a5b4d4', accent: '#22d3ee', me: '#0e7490', other: '#1a2040', input: '#070e28', chat: '#0b141a', head: '#202c33', privme: '#005c4b', privother: '#202c33', privinput: '#2a3942', soft: '#000' },
+{ name: 'Ocean Blue', bg: '#061a2d', panel: '#0b2944', top: '#103858', text: '#ffffff', muted: '#b9d9f2', accent: '#38bdf8', me: '#075985', other: '#123955', input: '#071e32', chat: '#071e32', head: '#103858', privme: '#075e54', privother: '#173c52', privinput: '#23485e', soft: '#020c16' },
+{ name: 'Purple Dream', bg: '#160b2b', panel: '#281545', top: '#36205a', text: '#ffffff', muted: '#decaf8', accent: '#c084fc', me: '#7e22ce', other: '#35204b', input: '#1c1032', chat: '#160b2b', head: '#36205a', privme: '#6b21a8', privother: '#35204b', privinput: '#42245d', soft: '#08040e' },
+{ name: 'Emerald Pro', bg: '#071b13', panel: '#103426', top: '#164832', text: '#ffffff', muted: '#b6e6c9', accent: '#34d399', me: '#047857', other: '#194633', input: '#09251a', chat: '#071b13', head: '#164832', privme: '#047857', privother: '#194633', privinput: '#24533e', soft: '#020b07' },
+{ name: 'Cyberpunk Red', bg: '#210909', panel: '#3b1111', top: '#511717', text: '#ffffff', muted: '#f5caca', accent: '#f87171', me: '#991b1b', other: '#4b2020', input: '#2b0b0b', chat: '#210909', head: '#511717', privme: '#991b1b', privother: '#4b2020', privinput: '#602a2a', soft: '#0b0202' },
+{ name: 'Carbon Dark', bg: '#101010', panel: '#202020', top: '#303030', text: '#ffffff', muted: '#c0c0c0', accent: '#e5e7eb', me: '#404040', other: '#252525', input: '#151515', chat: '#101010', head: '#303030', privme: '#374151', privother: '#252525', privinput: '#404040', soft: '#000000' }
+];
+function savedTheme() { try { var p = localStorage.getItem('nexa_theme_pick'); return p === null || p === '' ? 1 : parseInt(p, 10); } catch (e) { return 1; } }
+function applyTheme(index, byUser) {
+index = parseInt(index, 10);
+if (isNaN(index) || index < 0 || index >= themes.length)
+index = 1;
+var t = themes[index], root = document.documentElement;
+var vars = { border: t.border || '#1e2a50', bg: t.bg, panel: t.panel, top: t.top, text: t.text, muted: t.muted, accent: t.accent, msgme: t.me, msgother: t.other, input: t.input, chatbg: t.chat, chathead: t.head, privme: t.privme, privother: t.privother, privinput: t.privinput, soft: t.soft };
+Object.keys(vars).forEach(function (k) { try { root.style.setProperty('--' + k, vars[k]); } catch (e) { } if (window.__nxVars) window.__nxVars.set(k, vars[k]); });
+try {
+localStorage.setItem('nexa_theme', String(index));
+if (byUser) localStorage.setItem('nexa_theme_pick', String(index));
+}
+catch (e) { }
+renderThemeChoices();
+}
+function renderThemeChoices() {
+var grid = $('themeGrid');
+if (!grid)
+return;
+grid.replaceChildren();
+var chosen = savedTheme();
+themes.forEach(function (t, i) {
+var b = document.createElement('button');
+b.type = 'button';
+b.className = 'theme-choice' + (i === chosen ? ' selected' : '');
+b.textContent = (i + 1) + '. ' + t.name;
+b.style.background = t.panel;
+b.style.color = t.text;
+b.style.borderColor = i === chosen ? '#fde047' : t.accent;
+b.addEventListener('click', function () { return applyTheme(i, true); });
+grid.appendChild(b);
+});
+}
+var inboxSoundEnabled = true;
+try {
+inboxSoundEnabled = localStorage.getItem('nexa_inbox_sound') !== 'off';
+}
+catch (e) { }
+function updateSoundToggle() { var b = $('soundToggle'); if (!b)
+return; b.textContent = inboxSoundEnabled ? 'ON' : 'OFF'; b.className = 'setting-toggle' + (inboxSoundEnabled ? ' on' : ''); }
+window.toggleInboxSound = function () { inboxSoundEnabled = !inboxSoundEnabled; try {
+localStorage.setItem('nexa_inbox_sound', inboxSoundEnabled ? 'on' : 'off');
+}
+catch (e) { } updateSoundToggle(); };
+var spamProtectionEnabled = false;
+try {
+spamProtectionEnabled = localStorage.getItem('nexa_spam_prot') === 'on';
+}
+catch (e) { }
+function updateSpamToggle() { var b = $('spamToggle'); if (!b)
+return; b.textContent = spamProtectionEnabled ? 'ON' : 'OFF'; b.className = 'setting-toggle' + (spamProtectionEnabled ? ' on' : ''); }
+window.toggleSpamProtection = function () {
+if (!spamProtectionEnabled) {
+if (!confirm('Spam Protection ON: only users in your chat list can message you. New users will not be able to message you, but you can still message everyone. Continue?'))
+return;
+}
+spamProtectionEnabled = !spamProtectionEnabled;
+try {
+localStorage.setItem('nexa_spam_prot', spamProtectionEnabled ? 'on' : 'off');
+}
+catch (e) { }
+updateSpamToggle();
+if (currentUser)
+setDoc(doc(db, 'users', currentUser), { spam: spamProtectionEnabled }, { merge: true }).catch(function (e) { return console.warn(e); });
+};
+window.showSettings = function () {
+$('inboxOptions').style.display = 'none';
+$('settingsView').style.display = 'flex';
+renderThemeChoices();
+updateSoundToggle();
+updateSpamToggle();
+$('themeGrid').style.display = 'none';
+setTimeout(updateFocus, 50);
+};
+window.closeSettings = function () { $('settingsView').style.display = 'none'; updateFocus(); };
+applyTheme(savedTheme());
+updateSoundToggle();
+updateSpamToggle();
+document.addEventListener('click', function (e) {
+if (e.target && e.target.id === 'themeSectionTitle') {
+var tg = $('themeGrid');
+tg.style.display = tg.style.display === 'none' ? (window.__gridDisp || 'grid') : 'none';
+}
+});
+function unlockAudio() { try {
+if (!audioCtx) {
+var AC = window.AudioContext || window.webkitAudioContext;
+if (!AC)
+return;
+audioCtx = new AC();
+}
+if (audioCtx.state === 'suspended')
+audioCtx.resume();
+}
+catch (e) { } }
+['click', 'touchstart', 'keydown'].forEach(function (ev) { return document.addEventListener(ev, unlockAudio, { passive: true }); });
+function getBus() { if (!audioCtx)
+return null; if (!masterBus) {
+var g = audioCtx.createGain();
+g.gain.value = 1.5;
+g.connect(audioCtx.destination);
+masterBus = g;
+} return masterBus; }
+function beep(freq, when, dur, vol) { var bus = get
