@@ -442,3 +442,303 @@ window.showPass=function(){var p=document.getElementById('password');p.type=p.ty
 #nxImg video{max-height:100%}
 #chatMediaMenu{width:104px;padding:4px;bottom:46px;left:6px;right:auto;border-radius:9px}
 .chat-menu-btn{padding:5px 7px;font-size:11px;border-radius:6px}
+.nogap #chatMediaMenu>*+*{margin-top:4px}
+#chatMediaMenu{gap:4px}
+@media (max-width:360px),(max-height:340px){
+body{font-size:12px}
+.top-g{height:34px;padding:0 6px;gap:6px}.top-g h2{font-size:14px}
+.online-badge{font-size:9px;padding:2px 5px}
+.top-i{height:36px;justify-content:flex-start;padding-left:8px}.top-i h1{font-size:14px}
+#stBtn{font-size:10px;padding:3px 8px;right:4px}
+.search-box{height:34px;padding:4px 6px}.search-box input{font-size:11px;padding:0 8px;border-radius:8px}
+.list{padding:5px;gap:4px}
+.row{min-height:40px;padding:4px 6px;gap:6px;border-radius:9px}
+.avatar{width:30px;height:30px;font-size:13px}
+.status.online,.status.offline{font-size:8px;padding:1px 4px}
+.unread-badge,.home-badge{min-width:18px;height:18px;font-size:10px;padding:0 5px;border-radius:9px}
+.chat-top{height:38px;padding:0 6px;gap:6px}
+.chat-msgs{padding:6px 5px;gap:5px}
+.c-msg{font-size:12px;padding:4px 7px;max-width:86%}
+.c-meta{font-size:8px;margin-top:2px}
+.reply-preview{font-size:9px}
+.msg{font-size:12px;padding:5px 7px}
+.chat-area{padding:6px;gap:6px}
+.inputbar{height:38px;padding:0 5px;gap:5px}
+.inputbar input{height:26px;font-size:12px;padding:0 10px}
+.send,.nx-ib{width:28px;height:28px;font-size:15px}
+.soft{height:24px;font-size:10px;padding:0 6px}
+#inboxOptions,#chatOptions{width:168px;bottom:28px;padding:4px;left:4px}
+.opt-btn{padding:6px 8px;font-size:11px;margin-bottom:4px}
+#mentionPopup{bottom:70px;width:150px}
+.neon-top{padding:7px 10px}.neon-top h1{font-size:16px!important}
+.neon-card{margin-top:8px;padding:8px 10px;border-radius:12px}
+.neon-icon{width:32px;height:32px;font-size:16px}
+.neon-card h3{font-size:12px}.neon-card p{font-size:10px}
+#homeApp{padding:8px}
+.settings-content{padding:6px}.settings-card{padding:8px;margin-bottom:8px}
+.settings-title{font-size:12px;margin-bottom:6px}
+.setting-row{font-size:11px;padding:6px 0}
+.setting-toggle{width:44px;height:22px;font-size:11px}
+.theme-choice{min-height:36px;padding:4px;font-size:10px}
+.nx-big{padding:9px;font-size:12px}.nx-body{padding:8px;gap:7px}
+.nx-sec{padding:6px}.nx-back{font-size:24px}
+#svHead{padding:4px 6px}
+.nx-r{width:38px;height:38px;font-size:20px}
+#svReact{padding:6px}
+.g14{gap:6px!important}
+.g14>button{width:62px!important;padding:6px 2px!important;font-size:10px!important}
+#txtArea{font-size:16px!important;padding:12px 8px!important}
+.hacker-card{padding:8px 10px 6px}
+#nxImg .soft{height:24px}
+}
+</style>
+
+<script>
+/* nxDiag: shows the first errors on screen so a phone without console can report them */
+var nxErrN=0;
+window.onerror=function(msg,url,line){if(!url||/kaiads|^Script error/i.test(String(msg||'')+' '+String(url||'')))return false;if(nxErrN++<3){try{alert('Error: '+msg+'\n'+String(url||'').split('/').pop()+' line '+line)}catch(e){}}return false};
+</script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script>
+/* backup CDNs: if Google's Firebase link is blocked on this phone/network, load from another host */
+function nxFbOk(){return typeof firebase!=='undefined'&&firebase.firestore&&firebase.auth}
+if(!nxFbOk()){document.write('<script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-app.js"><\/script><script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-auth.js"><\/script><script src="https://cdn.jsdelivr.net/npm/firebase@8.10.1/firebase-firestore.js"><\/script>')}
+</script>
+<script>
+if(!nxFbOk()){document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.js"><\/script><script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-auth.js"><\/script><script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-firestore.js"><\/script>')}
+</script>
+<script>
+try{if(window.__nxVars)window.__nxVars.init()}catch(e){}
+/* ===== NexaChat KaiOS key fix: old phone browsers give no/old e.key, so map keyCode ===== */
+(function(){
+try{
+var KP=window.KeyboardEvent&&KeyboardEvent.prototype;
+var d=KP&&Object.getOwnPropertyDescriptor(KP,'key');
+if(d&&d.get){
+var alias={Up:'ArrowUp',Down:'ArrowDown',Left:'ArrowLeft',Right:'ArrowRight',Esc:'Escape',Menu:'ContextMenu'};
+var codes={13:'Enter',8:'Backspace',27:'Escape',37:'ArrowLeft',38:'ArrowUp',39:'ArrowRight',40:'ArrowDown',112:'SoftLeft',113:'SoftRight'};
+Object.defineProperty(KP,'key',{configurable:true,enumerable:true,get:function(){
+var k=d.get.call(this);
+if(alias[k])return alias[k];
+if(!k||k==='Unidentified'){var c=this.keyCode||this.which;if(codes[c])return codes[c]}
+return k}});
+}
+}catch(e){}
+})();
+
+/* ===== NexaChat compatibility layer (plain ES5, works in old KaiOS / Jio / Jazz browsers) ===== */
+(function(){
+/* ---- DOM polyfills for old browsers ---- */
+function toNode(n){return (typeof n==='string')?document.createTextNode(n):n}
+function mkFrag(list){var f=document.createDocumentFragment();for(var i=0;i<list.length;i++)f.appendChild(toNode(list[i]));return f}
+var protos=[window.Element&&Element.prototype,window.Document&&Document.prototype,window.DocumentFragment&&DocumentFragment.prototype];
+protos.forEach(function(p){
+if(!p)return;
+if(!p.append)p.append=function(){this.appendChild(mkFrag(arguments))};
+if(!p.prepend)p.prepend=function(){this.insertBefore(mkFrag(arguments),this.firstChild)};
+if(!p.replaceChildren)p.replaceChildren=function(){while(this.firstChild)this.removeChild(this.firstChild);if(arguments.length)this.appendChild(mkFrag(arguments))};
+});
+if(window.Element&&Element.prototype){
+var EP=Element.prototype;
+if(!EP.after)EP.after=function(){var p=this.parentNode;if(p)p.insertBefore(mkFrag(arguments),this.nextSibling)};
+if(!EP.before)EP.before=function(){var p=this.parentNode;if(p)p.insertBefore(mkFrag(arguments),this)};
+if(!EP.replaceWith)EP.replaceWith=function(){var p=this.parentNode;if(p)p.replaceChild(mkFrag(arguments),this)};
+if(!EP.remove)EP.remove=function(){if(this.parentNode)this.parentNode.removeChild(this)};
+if(!EP.matches)EP.matches=EP.msMatchesSelector||EP.webkitMatchesSelector||EP.mozMatchesSelector;
+if(!EP.closest)EP.closest=function(s){var e=this;while(e&&e.nodeType===1){if(e.matches(s))return e;e=e.parentNode}return null};
+}
+if(window.NodeList&&!NodeList.prototype.forEach)NodeList.prototype.forEach=Array.prototype.forEach;
+if(window.HTMLCollection&&!HTMLCollection.prototype.forEach)HTMLCollection.prototype.forEach=Array.prototype.forEach;
+if(!Object.values)Object.values=function(o){return Object.keys(o).map(function(k){return o[k]})};
+if(!Object.entries)Object.entries=function(o){return Object.keys(o).map(function(k){return [k,o[k]]})};
+if(!String.prototype.padStart)String.prototype.padStart=function(n,s){var t=String(this);s=s===undefined?' ':String(s);while(t.length<n)t=s+t;return t};
+if(!Array.prototype.includes)Array.prototype.includes=function(x){return this.indexOf(x)!==-1};
+if(!String.prototype.includes)String.prototype.includes=function(x){return this.indexOf(x)!==-1};
+if(!String.prototype.endsWith)String.prototype.endsWith=function(x){var s=String(this);return s.slice(s.length-x.length)===x};
+if(typeof Promise!=='undefined'&&!Promise.prototype['finally'])Promise.prototype['finally']=function(f){return this.then(function(v){return Promise.resolve(f()).then(function(){return v})},function(e){return Promise.resolve(f()).then(function(){throw e})})};
+/* ---- flex-gap detection (old browsers ignore "gap") ---- */
+try{
+var t=document.createElement('div');
+t.style.cssText='display:flex;flex-direction:column;gap:1px;position:absolute;visibility:hidden;top:0;left:0';
+var a=document.createElement('div'),b=document.createElement('div');
+a.style.height='1px';b.style.height='1px';t.appendChild(a);t.appendChild(b);document.body.appendChild(t);
+var ok=t.offsetHeight===3;document.body.removeChild(t);
+if(!ok)document.documentElement.className+=' nogap';
+var gridOk=!!(window.CSS&&CSS.supports&&CSS.supports('display','grid'));
+window.__gridDisp=gridOk?'grid':'flex';
+if(!gridOk)document.documentElement.className+=' nogrid';
+}catch(e){window.__gridDisp='grid'}
+/* ---- WhatsApp-style video box: thumbnail + play button, loading and retry ---- */
+window.nxMakeVideo=function(o){
+var box=document.createElement('div');
+box.style.cssText='position:relative;background:#000;border-radius:8px;overflow:hidden;width:100%;min-height:110px';
+var vd=document.createElement('video');
+vd.controls=true;vd.setAttribute('playsinline','');vd.setAttribute('webkit-playsinline','');
+vd.preload=o.thumb?'metadata':'auto';
+vd.style.cssText='display:block;width:100%;background:#000;'+(o.full?'max-height:calc(100vh - 150px);max-height:calc(var(--app-h,100vh) - 150px);object-fit:contain;':'max-height:'+(o.maxH||'240px')+';');
+if(o.thumb)vd.poster=o.thumb;
+var ov=document.createElement('div');
+ov.style.cssText='position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.25);cursor:pointer';
+var badge=document.createElement('div');
+badge.style.cssText='width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid #fff;color:#fff;font-size:24px;line-height:48px;text-align:center';
+var lbl=document.createElement('div');
+lbl.style.cssText='color:#fff;font-size:11px;margin-top:6px;text-shadow:0 0 4px #000';
+ov.appendChild(badge);ov.appendChild(lbl);box.appendChild(vd);box.appendChild(ov);
+var ready=false,loading=false;
+function show(v){ov.style.display=v?'flex':'none'}
+function state(ic,tx){badge.textContent=ic;lbl.textContent=tx||''}
+function play(){try{var r=vd.play();if(r&&r['catch'])r['catch'](function(){})}catch(e){}}
+function load(playAfter){
+if(loading)return;loading=true;state('','Loading...');show(true);
+var p;
+try{p=o.getUrl?o.getUrl():Promise.resolve(o.src)}catch(e){p=Promise.reject(e)}
+p.then(function(u){
+if(!u)throw new Error('No video source');
+ready=true;loading=false;vd.src=o.thumb?u:u+'#t=0.1';
+try{vd.load()}catch(e){}
+state('▶','');show(true);
+if(playAfter||o.autoplay)play()
+})['catch'](function(err){loading=false;ready=false;console.warn('Video load failed:',err);state('','Tap to retry');show(true)})
+}
+ov.addEventListener('click',function(e){e.stopPropagation();if(ready)play();else load(true)});
+box.addEventListener('click',function(e){e.stopPropagation()});
+vd.addEventListener('playing',function(){show(false)});
+vd.addEventListener('play',function(){show(false)});
+vd.addEventListener('ended',function(){state('▶','');show(true);if(o.onEnded)o.onEnded()});
+vd.addEventListener('error',function(){if(!vd.getAttribute('src'))return;ready=false;state('','Cannot play - tap to retry');show(true)});
+if(o.lazy)state('▶','');else load(false);
+if(o.lazy&&o.autoLoad)load(false);
+box.vd=vd;
+box.activate=function(){if(!ready){load(true);return}if(vd.paused)play();else{try{vd.pause()}catch(e){}}};
+return box
+};
+/* chat bubble video: thumbnail with a play badge (opens full screen viewer on tap/Enter) */
+window.nxVideoThumb=function(o){
+var box=document.createElement('div');
+box.className='nx-vthumb';
+box.style.cssText='position:relative;background-color:#10182f;background-position:center;background-repeat:no-repeat;background-size:cover;border-radius:8px;overflow:hidden;width:100%;height:84px';
+if(o&&o.thumb)box.style.backgroundImage='url("'+o.thumb+'")';
+var b=document.createElement('div');
+b.style.cssText='position:absolute;left:50%;top:50%;margin:-18px 0 0 -18px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid #fff;color:#fff;font-size:16px;line-height:32px;text-align:center';
+b.textContent='\u25B6';
+var t=document.createElement('div');
+t.style.cssText='position:absolute;left:5px;bottom:3px;color:#fff;font-size:10px;text-shadow:0 0 3px #000';
+t.textContent='Video';
+box.appendChild(b);box.appendChild(t);
+return box
+};
+/* ---- Firebase (compat SDK) wrapped with the same function names the app uses ---- */
+if(typeof firebase==='undefined'){
+window.__fsFail=true;
+setTimeout(function(){alert('Could not load Firebase. Check your internet connection and reload the page.')},500);
+return;
+}
+var db;try{firebase.initializeApp({apiKey:"AIzaSyDwDjLlhRxNNfIFN1B9j4PUTqT0fq34y50",authDomain:"nexachat-28ecc.firebaseapp.com",projectId:"nexachat-28ecc",storageBucket:"nexachat-28ecc.firebasestorage.app",messagingSenderId:"367209102337",appId:"1:367209102337:web:6f3a0e63b554f6dd145400",measurementId:"G-JLQW9XPDL6"});
+db=firebase.firestore();}catch(err){window.__fsFail=true;setTimeout(function(){alert("Firebase start nahi hua: "+(err&&err.message||err))},300);return}
+var oldBrowser=(typeof ReadableStream==='undefined'||typeof Symbol==='undefined'||/KaiOS|JioPhone|Jazz|UCBrowser|Opera Mini|Opera Mobi|Android [2-4]\.|Gecko\/(2|3|4|5|6)\d\b/i.test(navigator.userAgent||''));
+try{db.settings({experimentalForceLongPolling:true,merge:true})}catch(e){}
+if(!oldBrowser){try{db.enablePersistence({synchronizeTabs:true}).catch(function(){})}catch(e){}}
+var auth=firebase.auth();
+var FV=firebase.firestore.FieldValue,CR=firebase.firestore.CollectionReference;
+function rest(a,from){return Array.prototype.slice.call(a,from)}
+function collection(base){var p=rest(arguments,1).join('/');return base===db?db.collection(p):base.collection(p)}
+function doc(base){
+var s=rest(arguments,1);
+if(base===db)return db.doc(s.join('/'));
+if(base instanceof CR)return s.length?base.doc(s.join('/')):base.doc();
+var last=s.pop();return base.collection(s.join('/')).doc(last)
+}
+function query(q){for(var i=1;i<arguments.length;i++)q=arguments[i](q);return q}
+function orderBy(f,d){return function(q){return d?q.orderBy(f,d):q.orderBy(f)}}
+function limit(n){return function(q){return q.limit(n)}}
+function startAfter(s){return function(q){return q.startAfter(s)}}
+window.__fs={
+db:db,auth:auth,
+collection:collection,doc:doc,query:query,orderBy:orderBy,limit:limit,startAfter:startAfter,
+setDoc:function(r,d,o){return o?r.set(d,o):r.set(d)},
+addDoc:function(c,d){return c.add(d)},
+deleteDoc:function(r){return r['delete']()},
+updateDoc:function(r,d){return r.update(d)},
+getDocs:function(q){return q.get()},
+onSnapshot:function(r,a,b){return r.onSnapshot(a,b)},
+serverTimestamp:function(){return FV.serverTimestamp()},
+arrayUnion:function(){return FV.arrayUnion.apply(FV,arguments)},
+arrayRemove:function(){return FV.arrayRemove.apply(FV,arguments)},
+createUserWithEmailAndPassword:function(a,e,p){return a.createUserWithEmailAndPassword(e,p)},
+signInWithEmailAndPassword:function(a,e,p){return a.signInWithEmailAndPassword(e,p)},
+onAuthStateChanged:function(a,cb){return a.onAuthStateChanged(cb)},
+signOut:function(a){return a.signOut()}
+};
+})();
+</script>
+<script>
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+return new (P || (P = Promise))(function (resolve, reject) {
+function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+step((generator = generator.apply(thisArg, _arguments || [])).next());
+});
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+function verb(n) { return function (v) { return step([n, v]); }; }
+function step(op) {
+if (f) throw new TypeError("Generator is already executing.");
+while (g && (g = 0, op[0] && (_ = 0)), _) try {
+if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+if (y = 0, t) op = [op[0] & 2, t.value];
+switch (op[0]) {
+case 0: case 1: t = op; break;
+case 4: _.label++; return { value: op[1], done: false };
+case 5: _.label++; y = op[1]; op = [0]; continue;
+case 7: op = _.ops.pop(); _.trys.pop(); continue;
+default:
+if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+if (t[2]) _.ops.pop();
+_.trys.pop(); continue;
+}
+op = body.call(thisArg, _);
+} catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+}
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+if (ar || !(i in from)) {
+if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+ar[i] = from[i];
+}
+}
+return to.concat(ar || Array.prototype.slice.call(from));
+};
+(function () {
+var _this = this;
+var FS = window.__fs;
+var collection = FS.collection, doc = FS.doc, setDoc = FS.setDoc, addDoc = FS.addDoc, deleteDoc = FS.deleteDoc, updateDoc = FS.updateDoc, onSnapshot = FS.onSnapshot, query = FS.query, orderBy = FS.orderBy, limit = FS.limit, startAfter = FS.startAfter, serverTimestamp = FS.serverTimestamp, arrayUnion = FS.arrayUnion, arrayRemove = FS.arrayRemove, getDocs = FS.getDocs, createUserWithEmailAndPassword = FS.createUserWithEmailAndPassword, signInWithEmailAndPassword = FS.signInWithEmailAndPassword, onAuthStateChanged = FS.onAuthStateChanged, signOut = FS.signOut;
+var db = FS.db, auth = FS.auth;
+var $ = function (id) { return document.getElementById(id); };
+var ONLINE_WINDOW = 100000, HEARTBEAT_MS = 25000, TYPING_REFRESH_MS = 2000, TYPING_STOP_MS = 1500, TYPING_SHOW_MS = 5000, FRESH_MS = 60000, INBOX_WATCH_LIMIT = 36;
+var KEEP_MSGS = 40, KEEP_PRIV = 35, TWO_DAYS = 2 * 24 * 60 * 60 * 1000, CHUNK_SIZE = 980000;
+var currentUser = null, demoUsers = [], allUsers = [], remoteContacts = [], blockMap = readJSON('nexa_blockMap', {}), removedMap = readJSON('nexa_removed', {}), removedAtMap = readJSON('nexa_removed_at', {}), contactsMap = readJSON('nexa_contacts', {});
+var selected = null, selectedInbox = null, selectedMsgIndex = null, mentionIndex = 0, replyTo = null, focusIndex = 0;
+var globalUnsub = null, privateUnsub = null, usersUnsub = null, globalTypingUnsub = null, privateTypingUnsub = null;
+var globalTypingTimer = null, privateTypingTimer = null, globalTypingHide = null, privateTypingHide = null, globalLastTypingWrite = 0, privateLastTypingWrite = 0, privateTypingChatId = null, mentionOpen = false, lastMentionQuery = '', messageCache = [], busy = false, authReady = false, authStateVersion = 0, usersErrorShown = false, lastOnlineSig = '', permErrorShown = false, serverSkew = 0, lastOwnSeen = 0;
+var inboxListeners = new Map(), notifiedMsgs = new Set(), chunkCache = new Map();
+var unreadMap = {}, lastMsgMap = {}, inboxRefreshTimer = null, audioCtx = null, masterBus = null;
+window.__nexaReady = true;
+setTimeout(function () { authReady = true; }, 6000);
+var myLoc = 'private';
+function spamBlocked(to) { if (!currentUser)
+return false; var t = allUsers.find(function (x) { return x.id === String(to).toLowerCase(); }); if (!t || !t.spam)
+return false; if ((t.contacts || []).indexOf(currentUser.toLowerCase()) >= 0)
+return false; alert('This user has Spam Protection ON. You cannot message them because you are not in their chat list.'); return true; }
+window.__nx = { dn: function (i) { return dn(i); }, spamBlocked: spamBlocked, db: db, me: function () { return currentUser; }, users: function () { return allUsers; }, contacts: funct
